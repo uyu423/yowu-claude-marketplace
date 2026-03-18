@@ -1,0 +1,11 @@
+{
+    "name": "yowu-claude-marketplace",
+    "owner": {
+        "name": "yowu"
+    },
+    "metadata": {
+        "description": "yowu의 개인 Claude Code 플러그인 마켓플레이스",
+        "version": "0.1.0"
+    },
+    "plugins": []
+}
