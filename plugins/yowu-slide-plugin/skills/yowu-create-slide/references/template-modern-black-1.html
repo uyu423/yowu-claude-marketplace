@@ -1,0 +1,991 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Essential AI Skills: Practical Training Deck</title>
+
+  <!-- Reveal.js core -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Chart.js for data visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* NanumSquareNeo Web Font */
+    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-aLt.woff2); font-weight: 300; font-display: swap; }
+    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-bRg.woff2); font-weight: 400; font-display: swap; }
+    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-cBd.woff2); font-weight: 700; font-display: swap; }
+    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-dEb.woff2); font-weight: 800; font-display: swap; }
+    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-eHv.woff2); font-weight: 900; font-display: swap; }
+
+    :root {
+      --bg: #EDEDEF;
+      --bg-alt: #F0F0F2;
+      --text: #222222;
+      --muted: #888;
+      --accent: #2A2A2A;
+      --white: #ffffff;
+      --card-bg: #ffffff;
+      --heading-font: 'NanumSquareNeo', 'Source Sans Pro', Helvetica, sans-serif;
+      --body-font: 'NanumSquareNeo', 'Source Sans Pro', Helvetica, sans-serif;
+    }
+
+    /* BASE */
+    .reveal {
+      font-family: var(--body-font);
+      font-size: 32px;
+      background-color: var(--bg);
+    }
+    .reveal-viewport { background-color: var(--bg); }
+    .reveal strong, .reveal b { font-weight: 700; }
+    .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+      font-family: var(--heading-font);
+      text-transform: none;
+      color: var(--text);
+      font-weight: 900;
+      line-height: 1.2;
+      margin: 0;
+    }
+    .reveal p, .reveal li, .reveal td, .reveal th {
+      font-size: 11pt;
+      color: var(--text);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* SLIDE LAYOUT */
+    .reveal .slides section {
+      height: 100%;
+      display: flex !important;
+      flex-direction: column !important;
+      padding: 44px 60px 36px 60px !important;
+      box-sizing: border-box;
+      text-align: left;
+      overflow: hidden;
+      background-color: var(--bg);
+    }
+    .reveal .slides section.stack { padding: 0 !important; }
+
+    /* Disable default reveal controls */
+    .reveal .controls { display: none !important; }
+    .reveal .progress { height: 2px; color: var(--accent); }
+
+    /* =============================================
+       BLACK PILL BADGE
+       ============================================= */
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 100px;
+      padding: 6px 18px;
+      font-size: 10pt;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .pill-sm {
+      padding: 4px 14px;
+      font-size: 9pt;
+    }
+    .pill-lg {
+      padding: 8px 24px;
+      font-size: 12pt;
+    }
+
+    /* =============================================
+       WHITE ROUNDED CARD
+       ============================================= */
+    .card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 20px 22px;
+      box-sizing: border-box;
+    }
+
+    /* =============================================
+       SLIDE TITLE (top-left large bold)
+       ============================================= */
+    .slide-title {
+      font-size: 30pt;
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1.15;
+      margin-bottom: 18px;
+    }
+
+    /* =============================================
+       DECORATIVE HATCHED ARC (SVG, absolute)
+       ============================================= */
+    .deco-arc {
+      position: absolute;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Ensure content is above deco */
+    .z1 { position: relative; z-index: 1; }
+
+    /* =============================================
+       PLACEHOLDER IMAGE BOX
+       ============================================= */
+    .placeholder-img {
+      background: #C8C8C8;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #888;
+      font-size: 10pt;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* =============================================
+       PROFILE PHOTO FRAME
+       ============================================= */
+    .profile-photo {
+      background: #B0B8C8;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* =============================================
+       CHECK CIRCLE ITEM
+       ============================================= */
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .check-circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .check-circle i {
+      color: white;
+      font-size: 11pt;
+    }
+    .check-item p {
+      font-size: 12pt;
+      line-height: 1.5;
+    }
+
+    /* =============================================
+       NUMBERED PILL ITEM (agenda style)
+       ============================================= */
+    .agenda-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+    .agenda-item p {
+      font-size: 11pt;
+      color: #444;
+    }
+
+    /* =============================================
+       KEYWORD ROW (slide 8, 15)
+       ============================================= */
+    .kw-row {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 14px;
+    }
+    .kw-row-desc {
+      font-size: 10pt;
+      color: #555;
+      line-height: 1.55;
+      flex: 1;
+    }
+
+    /* =============================================
+       KEYWORD BLOCK (slide 8 - large black rectangles)
+       ============================================= */
+    .kw-block {
+      display: flex;
+      align-items: center;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 20px;
+      padding: 16px 22px;
+      min-width: 200px;
+      flex-shrink: 0;
+      gap: 12px;
+    }
+    .kw-block .kw-num {
+      font-size: 11pt;
+      font-weight: 700;
+      opacity: 0.7;
+    }
+    .kw-block .kw-label {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* =============================================
+       STAIRCASE STEP CARD (slide 16)
+       ============================================= */
+    .step-card {
+      border-radius: 14px;
+      padding: 18px 16px;
+      box-sizing: border-box;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .step-card.light {
+      background: var(--white);
+      color: var(--text);
+      border: 1.5px solid #D0D0D2;
+    }
+    .step-card.dark {
+      background: var(--accent);
+      color: var(--white);
+    }
+    .step-card p { margin: 0; }
+
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ============================================
+           SLIDE 1: Title
+           ============================================ -->
+      <section id="slide-01">
+
+        <!-- Decorative large hatched semicircle - bottom-right arc -->
+        <svg class="deco-arc" viewBox="0 0 600 600" style="right: -80px; bottom: -180px; width: 520px; height: 520px; opacity: 0.85;">
+          <defs>
+            <pattern id="hatch1" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="7" stroke="#222" stroke-width="2.2"/>
+            </pattern>
+          </defs>
+          <circle cx="300" cy="300" r="240" fill="none" stroke="url(#hatch1)" stroke-width="65"/>
+        </svg>
+
+        <!-- Date top-right -->
+        <p class="z1" style="position: absolute; top: 44px; right: 60px; font-size: 9pt; color: #888; font-weight: 400;">20XX.XX.XX</p>
+
+        <!-- Main content -->
+        <div class="z1" style="flex: 1; display: flex; flex-direction: column; justify-content: center; padding-top: 20px;">
+          <h1 style="font-size: 44pt; font-weight: 900; color: var(--text); line-height: 1.1; margin-bottom: 20px; max-width: 620px;">Essential AI Skills:<br>Practical Training Deck</h1>
+          <p style="font-size: 14pt; color: #555; font-weight: 400; margin-bottom: 0;">Practical AI Training for Professionals</p>
+        </div>
+
+        <!-- Bottom-left instructor pill -->
+        <div class="z1" style="margin-top: auto;">
+          <span class="pill">Instructor Name</span>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 2: Instructor Profile
+           ============================================ -->
+      <section id="slide-02" style="padding: 0 !important;">
+        <div style="display: grid; grid-template-columns: 320px 1fr; height: 100%; gap: 0;">
+
+          <!-- Left: profile photo placeholder -->
+          <div class="profile-photo" style="border-radius: 0; margin: 0; background: #B4BCC8;">
+            <!-- Network pattern overlay -->
+            <svg viewBox="0 0 320 720" style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0.25;">
+              <defs>
+                <pattern id="net" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <circle cx="20" cy="20" r="2" fill="#4A6CF7" opacity="0.6"/>
+                  <line x1="20" y1="20" x2="40" y2="0" stroke="#4A6CF7" stroke-width="0.5" opacity="0.4"/>
+                  <line x1="20" y1="20" x2="40" y2="40" stroke="#4A6CF7" stroke-width="0.5" opacity="0.4"/>
+                  <line x1="20" y1="20" x2="0" y2="0" stroke="#4A6CF7" stroke-width="0.5" opacity="0.4"/>
+                  <line x1="20" y1="20" x2="0" y2="40" stroke="#4A6CF7" stroke-width="0.5" opacity="0.4"/>
+                </pattern>
+              </defs>
+              <rect width="320" height="720" fill="url(#net)"/>
+            </svg>
+            <i class="fa-solid fa-user" style="font-size: 80pt; color: rgba(255,255,255,0.5); position: relative; z-index: 1;"></i>
+          </div>
+
+          <!-- Right: content -->
+          <div style="padding: 52px 60px; display: flex; flex-direction: column; justify-content: center;">
+            <h2 style="font-size: 42pt; font-weight: 900; color: var(--text); margin-bottom: 18px; line-height: 1.1;">Cameron Blake</h2>
+            <p style="font-size: 11pt; color: #555; line-height: 1.7; margin-bottom: 28px;">This slide introduces the instructor. Add a brief instructor introduction here. Add the instructor's image to the left image frame. Add a brief description here.</p>
+
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <span class="pill pill-sm" style="align-self: flex-start;">Field of Study</span>
+                <p style="font-size: 10pt; color: #666; padding-left: 4px;">Please enter a brief description.</p>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <span class="pill pill-sm" style="align-self: flex-start;">Focus Area</span>
+                <p style="font-size: 10pt; color: #666; padding-left: 4px;">Please enter a brief description.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 3: Agenda
+           ============================================ -->
+      <section id="slide-03">
+
+        <!-- Decorative hatched radial sunburst pattern bottom-left -->
+        <svg class="deco-arc" viewBox="0 0 400 400" style="left: -100px; bottom: -100px; width: 360px; height: 360px; opacity: 0.85;">
+          <defs>
+            <pattern id="hatch3" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="7" stroke="#222" stroke-width="2.2"/>
+            </pattern>
+          </defs>
+          <circle cx="200" cy="200" r="180" fill="none" stroke="url(#hatch3)" stroke-width="110"/>
+        </svg>
+
+        <h2 class="z1 slide-title">Agenda</h2>
+
+        <div class="z1" style="display: flex; flex-direction: column; gap: 14px; margin-top: 16px; margin-left: auto; width: 65%;">
+          <div class="agenda-item">
+            <span class="pill pill-sm" style="min-width: 48px; justify-content: center;">01</span>
+            <p>Understanding Generative AI and key concepts</p>
+          </div>
+          <div class="agenda-item">
+            <span class="pill pill-sm" style="min-width: 48px; justify-content: center;">02</span>
+            <p>Real-world applications across different roles</p>
+          </div>
+          <div class="agenda-item">
+            <span class="pill pill-sm" style="min-width: 48px; justify-content: center;">03</span>
+            <p>Principles of effective prompt writing</p>
+          </div>
+          <div class="agenda-item">
+            <span class="pill pill-sm" style="min-width: 48px; justify-content: center;">04</span>
+            <p>Comparing prompt results</p>
+          </div>
+          <div class="agenda-item">
+            <span class="pill pill-sm" style="min-width: 48px; justify-content: center;">05</span>
+            <p>Guidelines for responsible AI use</p>
+          </div>
+          <div class="agenda-item">
+            <span class="pill pill-sm" style="min-width: 48px; justify-content: center;">06</span>
+            <p>Add a brief overview of today's learning objectives.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 4: Agenda (duplicate)
+           ============================================ -->
+      <section id="slide-04">
+
+        <!-- Decorative hatched radial sunburst pattern bottom-left -->
+        <svg class="deco-arc" viewBox="0 0 400 400" style="left: -100px; bottom: -100px; width: 360px; height: 360px; opacity: 0.85;">
+          <defs>
+            <pattern id="hatch4" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="7" stroke="#222" stroke-width="2.2"/>
+            </pattern>
+          </defs>
+          <circle cx="200" cy="200" r="180" fill="none" stroke="url(#hatch4)" stroke-width="110"/>
+        </svg>
+
+        <h2 class="z1 slide-title">Agenda</h2>
+
+        <div class="z1" style="display: flex; flex-direction: column; gap: 14px; margin-top: 16px; margin-left: auto; width: 65%;">
+          <div class="agenda-item">
+            <span class="pill pill-sm" style="min-width: 48px; justify-content: center;">01</span>
+            <p>Understanding Generative AI and key concepts</p>
+          </div>
+          <div class="agenda-item">
+            <span class="pill pill-sm" style="min-width: 48px; justify-content: center;">02</span>
+            <p>Real-world applications across different roles</p>
+          </div>
+          <div class="agenda-item">
+            <span class="pill pill-sm" style="min-width: 48px; justify-content: center;">03</span>
+            <p>Principles of effective prompt writing</p>
+          </div>
+          <div class="agenda-item">
+            <span class="pill pill-sm" style="min-width: 48px; justify-content: center;">04</span>
+            <p>Comparing prompt results</p>
+          </div>
+          <div class="agenda-item">
+            <span class="pill pill-sm" style="min-width: 48px; justify-content: center;">05</span>
+            <p>Guidelines for responsible AI use</p>
+          </div>
+          <div class="agenda-item">
+            <span class="pill pill-sm" style="min-width: 48px; justify-content: center;">06</span>
+            <p>Add a brief overview of today's learning objectives.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 5: Learning Objectives
+           ============================================ -->
+      <section id="slide-05">
+
+        <!-- Decorative hatched arc top-right swooping -->
+        <svg class="deco-arc" viewBox="0 0 500 500" style="right: -60px; top: -60px; width: 440px; height: 440px; opacity: 0.75;">
+          <defs>
+            <pattern id="hatch5" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="6" stroke="#222" stroke-width="1.8"/>
+            </pattern>
+          </defs>
+          <path d="M250,20 A230,230 0 0,1 480,250" fill="none" stroke="url(#hatch5)" stroke-width="75"/>
+        </svg>
+
+        <h2 class="z1 slide-title" style="max-width: 320px;">Learning<br>Objectives</h2>
+
+        <div class="z1" style="margin-top: auto; margin-bottom: 20px; display: flex; flex-direction: column; gap: 0;">
+          <div class="check-item">
+            <div class="check-circle"><i class="fa-solid fa-check"></i></div>
+            <p>Understand how Generative AI can reduce hours.</p>
+          </div>
+          <div class="check-item">
+            <div class="check-circle"><i class="fa-solid fa-check"></i></div>
+            <p>Identify practical ways to apply AI in your role.</p>
+          </div>
+          <div class="check-item">
+            <div class="check-circle"><i class="fa-solid fa-check"></i></div>
+            <p>Learn the core principles of effective prompts.</p>
+          </div>
+          <div class="check-item">
+            <div class="check-circle"><i class="fa-solid fa-check"></i></div>
+            <p>Please add the course learning objectives here.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 6: Warm-up Questions
+           ============================================ -->
+      <section id="slide-06" style="justify-content: center !important; align-items: center !important; text-align: center;">
+        <p class="z1" style="font-size: 12pt; color: #555; margin-bottom: 14px; font-weight: 700;">Warm-up Questions</p>
+        <h2 class="z1" style="font-size: 40pt; font-weight: 900; color: var(--text); margin-bottom: 30px; line-height: 1.15;">Have you used AI before?</h2>
+        <div class="z1">
+          <i class="fa-solid fa-microchip" style="font-size: 72pt; color: #AAAAAA;"></i>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 7: Why AI Now?
+           ============================================ -->
+      <section id="slide-07" style="justify-content: center !important; align-items: center !important; text-align: center;">
+
+        <div class="z1" style="display: flex; align-items: center; justify-content: center; gap: 24px; margin-bottom: 40px;">
+          <i class="fa-solid fa-laptop" style="font-size: 56pt; color: #AAAAAA;"></i>
+          <h2 style="font-size: 42pt; font-weight: 900; color: var(--text); line-height: 1.1;">Why AI Now?</h2>
+        </div>
+
+        <div class="z1" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 76%; margin: 0 auto;">
+          <div style="display: flex; align-items: flex-start; gap: 14px;">
+            <span class="pill" style="flex-shrink: 0;">Efficiency</span>
+            <p style="font-size: 10pt; color: #555; text-align: left; line-height: 1.6;">Add a short sentence related to the keyword to introduce the main idea.</p>
+          </div>
+          <div style="display: flex; align-items: flex-start; gap: 14px;">
+            <span class="pill" style="flex-shrink: 0;">Productivity</span>
+            <p style="font-size: 10pt; color: #555; text-align: left; line-height: 1.6;">Use a short sentence to spark curiosity and engage the learner.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 8: What is Generative AI?
+           ============================================ -->
+      <section id="slide-08">
+        <h2 class="z1 slide-title">What is<br>Generative AI?</h2>
+
+        <div class="z1" style="display: flex; flex-direction: column; gap: 14px; flex: 1; justify-content: center;">
+          <!-- Row 1 -->
+          <div class="card" style="display: flex; align-items: center; gap: 24px; padding: 0; background: transparent;">
+            <div class="kw-block">
+              <span class="kw-num">01</span>
+              <span class="kw-label">Core definition</span>
+            </div>
+            <p style="font-size: 10pt; color: #555; line-height: 1.6; flex: 1;">Add a description of the keyword here. Use a short sentence to engage the audience. Clearly present keywords and descriptions to sustain audience interest.</p>
+          </div>
+          <!-- Row 2 -->
+          <div class="card" style="display: flex; align-items: center; gap: 24px; padding: 0; background: transparent;">
+            <div class="kw-block">
+              <span class="kw-num">02</span>
+              <span class="kw-label">Difference from<br>traditional AI</span>
+            </div>
+            <p style="font-size: 10pt; color: #555; line-height: 1.6; flex: 1;">Add a description of the keyword here. Use a short sentence to engage the audience. Clearly present keywords and descriptions to sustain audience interest.</p>
+          </div>
+          <!-- Row 3 -->
+          <div class="card" style="display: flex; align-items: center; gap: 24px; padding: 0; background: transparent;">
+            <div class="kw-block">
+              <span class="kw-num">03</span>
+              <span class="kw-label">Output types</span>
+            </div>
+            <p style="font-size: 10pt; color: #555; line-height: 1.6; flex: 1;">Add a description of the keyword here. Use a short sentence to engage the audience. Clearly present keywords and descriptions to sustain audience interest.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 9: Generative AI Output Types
+           ============================================ -->
+      <section id="slide-09">
+        <h2 class="z1 slide-title">Generative AI<br>Output Types</h2>
+
+        <div class="z1" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; flex: 1;">
+          <!-- Card 1 -->
+          <div class="card" style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="background: var(--accent); color: #fff; border-radius: 100px; padding: 8px 20px; font-size: 10pt; font-weight: 700; display: flex; gap: 12px;">
+              <span>01</span><span>Text generation</span>
+            </div>
+            <p style="font-size: 10pt; color: #555; line-height: 1.6;">Use this page to add descriptions for four items. Feel free to add a brief description of the keyword.</p>
+          </div>
+          <!-- Card 2 -->
+          <div class="card" style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="background: var(--accent); color: #fff; border-radius: 100px; padding: 8px 20px; font-size: 10pt; font-weight: 700; display: flex; gap: 12px;">
+              <span>02</span><span>Image generation</span>
+            </div>
+            <p style="font-size: 10pt; color: #555; line-height: 1.6;">Use this page to add descriptions for four items. Feel free to add a brief description of the keyword.</p>
+          </div>
+          <!-- Card 3 -->
+          <div class="card" style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="background: var(--accent); color: #fff; border-radius: 100px; padding: 8px 20px; font-size: 10pt; font-weight: 700; display: flex; gap: 12px;">
+              <span>03</span><span>Information structuring</span>
+            </div>
+            <p style="font-size: 10pt; color: #555; line-height: 1.6;">Use this page to add descriptions for four items. Feel free to add a brief description of the keyword.</p>
+          </div>
+          <!-- Card 4 -->
+          <div class="card" style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="background: var(--accent); color: #fff; border-radius: 100px; padding: 8px 20px; font-size: 10pt; font-weight: 700; display: flex; gap: 12px;">
+              <span>04</span><span>Idea generation</span>
+            </div>
+            <p style="font-size: 10pt; color: #555; line-height: 1.6;">Use this page to add descriptions for four items. Feel free to add a brief description of the keyword.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 10: AI Use Cases - Image
+           ============================================ -->
+      <section id="slide-10" style="justify-content: flex-start !important; align-items: center !important; text-align: center;">
+        <h2 class="z1" style="font-size: 28pt; font-weight: 900; margin-bottom: 20px; text-align: center; width: 100%;">AI Use Cases - Image</h2>
+
+        <div class="z1" style="display: flex; align-items: flex-start; gap: 20px; width: 100%; flex: 1;">
+          <!-- Before -->
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 12px; align-items: center;">
+            <p style="font-size: 12pt; font-weight: 700; color: var(--text);">Before</p>
+            <div class="placeholder-img" style="width: 100%; height: 260px; background: #D0D0D2; flex-direction: column; gap: 10px;">
+              <!-- Sketch style SVG placeholder -->
+              <svg viewBox="0 0 180 120" style="width: 120px; opacity: 0.5;">
+                <rect x="10" y="10" width="160" height="100" fill="none" stroke="#888" stroke-width="2" stroke-dasharray="6,4"/>
+                <line x1="10" y1="10" x2="170" y2="110" stroke="#888" stroke-width="1.5" opacity="0.5"/>
+                <line x1="170" y1="10" x2="10" y2="110" stroke="#888" stroke-width="1.5" opacity="0.5"/>
+                <circle cx="90" cy="55" r="22" fill="none" stroke="#888" stroke-width="2" opacity="0.6"/>
+              </svg>
+              <p style="font-size: 9pt; color: #888; margin: 0;">Sketch / Draft</p>
+            </div>
+            <p style="font-size: 10pt; color: #666; text-align: center; line-height: 1.5;">Please add an image related to the topic in the image frame. Use a short sentence to engage the audience.</p>
+          </div>
+
+          <!-- Arrow -->
+          <div style="font-size: 24pt; color: var(--accent); flex-shrink: 0; align-self: center;">&#9654;</div>
+
+          <!-- After -->
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 12px; align-items: center;">
+            <p style="font-size: 12pt; font-weight: 700; color: var(--text);">After</p>
+            <div class="placeholder-img" style="width: 100%; height: 260px; background: #B8B8BC; flex-direction: column; gap: 10px;">
+              <!-- Photo style SVG placeholder -->
+              <svg viewBox="0 0 180 120" style="width: 120px; opacity: 0.6;">
+                <rect x="0" y="0" width="180" height="120" fill="#A0A0A8" rx="4"/>
+                <rect x="0" y="70" width="180" height="50" fill="#8888A0" rx="0"/>
+                <circle cx="90" cy="45" r="28" fill="#C0C0CC"/>
+                <circle cx="60" cy="100" r="16" fill="#9898B0" opacity="0.6"/>
+                <circle cx="130" cy="95" r="20" fill="#A0A0B4" opacity="0.6"/>
+              </svg>
+              <p style="font-size: 9pt; color: #ccc; margin: 0;">Rendered / Photo</p>
+            </div>
+            <p style="font-size: 10pt; color: #666; text-align: center; line-height: 1.5;">Please add an image related to the topic in the image frame. Use a short sentence to engage the audience.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 11: Text-based AI Applications
+           ============================================ -->
+      <section id="slide-11" style="justify-content: center !important; align-items: center !important; text-align: center;">
+        <h2 class="z1" style="font-size: 28pt; font-weight: 900; margin-bottom: 28px; text-align: center;">Text-based AI Applications</h2>
+
+        <div class="z1" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; width: 100%;">
+          <!-- Card 1 -->
+          <div style="display: flex; flex-direction: column; align-items: center;">
+            <div style="background: var(--accent); color: #fff; border-radius: 100px; padding: 6px 24px; font-size: 10pt; font-weight: 700; margin-bottom: -14px; z-index: 2;">01</div>
+            <div class="card" style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 28px 18px 20px 18px; width: 100%; box-sizing: border-box;">
+              <p style="font-size: 14pt; font-weight: 900; color: var(--text); margin-top: 4px;">Drafting documents</p>
+              <i class="fa-solid fa-desktop" style="font-size: 32pt; color: #AAAAAA;"></i>
+              <p style="font-size: 10pt; color: #666; line-height: 1.6;">Please add a description of the keyword here. Please add a topic-related image to the frame.</p>
+            </div>
+          </div>
+          <!-- Card 2 -->
+          <div style="display: flex; flex-direction: column; align-items: center;">
+            <div style="background: var(--accent); color: #fff; border-radius: 100px; padding: 6px 24px; font-size: 10pt; font-weight: 700; margin-bottom: -14px; z-index: 2;">02</div>
+            <div class="card" style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 28px 18px 20px 18px; width: 100%; box-sizing: border-box;">
+              <p style="font-size: 14pt; font-weight: 900; color: var(--text); margin-top: 4px;">Summaries</p>
+              <i class="fa-solid fa-database" style="font-size: 32pt; color: #AAAAAA;"></i>
+              <p style="font-size: 10pt; color: #666; line-height: 1.6;">Please add a description of the keyword here. Please add a topic-related image to the frame.</p>
+            </div>
+          </div>
+          <!-- Card 3 -->
+          <div style="display: flex; flex-direction: column; align-items: center;">
+            <div style="background: var(--accent); color: #fff; border-radius: 100px; padding: 6px 24px; font-size: 10pt; font-weight: 700; margin-bottom: -14px; z-index: 2;">03</div>
+            <div class="card" style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 28px 18px 20px 18px; width: 100%; box-sizing: border-box;">
+              <p style="font-size: 14pt; font-weight: 900; color: var(--text); margin-top: 4px;">Idea development</p>
+              <i class="fa-solid fa-laptop" style="font-size: 32pt; color: #AAAAAA;"></i>
+              <p style="font-size: 10pt; color: #666; line-height: 1.6;">Please add a description of the keyword here. Please add a topic-related image to the frame.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 12: Design-based AI Applications
+           ============================================ -->
+      <section id="slide-12">
+        <h2 class="z1 slide-title">Design-based AI Applications</h2>
+
+        <div class="z1" style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px; flex: 1;">
+          <!-- Left: illustration area (no background container) -->
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 28px;">
+            <div style="display: flex; gap: 20px; align-items: flex-end;">
+              <i class="fa-solid fa-desktop" style="font-size: 42pt; color: #888;"></i>
+              <i class="fa-solid fa-robot" style="font-size: 36pt; color: #666;"></i>
+              <i class="fa-solid fa-mobile" style="font-size: 30pt; color: #999;"></i>
+            </div>
+            <p style="font-size: 9pt; color: #888; text-align: center;">AI Design Tools</p>
+          </div>
+
+          <!-- Right: content -->
+          <div style="display: flex; flex-direction: column; justify-content: center; gap: 20px;">
+            <div class="kw-row" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+              <span class="pill pill-sm">Generating thumbnails or posters</span>
+              <p class="kw-row-desc" style="font-size: 10pt; color: #555;">Please add a description of the keyword here. Feel free to add a brief description of the keyword.</p>
+            </div>
+            <div class="kw-row" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+              <span class="pill pill-sm">Creating design drafts</span>
+              <p class="kw-row-desc" style="font-size: 10pt; color: #555;">Please add a description of the keyword here. Feel free to add a brief description of the keyword.</p>
+            </div>
+
+            <!-- Example prompt card -->
+            <div class="card" style="background: var(--white); border-radius: 12px; padding: 16px 20px; margin-top: 4px;">
+              <p style="font-size: 9pt; color: #888; font-weight: 700; margin-bottom: 6px;">Example prompt</p>
+              <p style="font-size: 10pt; color: #444; line-height: 1.6; font-style: italic;">"Add [details] about your design project. [details] about your design project. --here"</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 13: How Work Changes with AI
+           ============================================ -->
+      <section id="slide-13" style="justify-content: flex-start !important; align-items: center !important; text-align: center;">
+        <h2 class="z1" style="font-size: 28pt; font-weight: 900; margin-bottom: 16px; text-align: center;">How Work Changes with AI</h2>
+
+
+        <div class="z1" style="display: flex; align-items: flex-start; gap: 16px; width: 100%; margin-bottom: 16px;">
+          <!-- Before column -->
+          <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+            <span class="pill">Before using AI</span>
+            <div class="card" style="width: 100%; text-align: left;">
+              <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
+                <li style="font-size: 10pt; color: #666; padding-left: 16px; position: relative;">
+                  <span style="position:absolute; left:0; top: 0.5em; width:6px; height:6px; background:#CCC; border-radius:50%; display:block;"></span>
+                  Use this page to add befor/after comparisons.
+                </li>
+                <li style="font-size: 10pt; color: #666; padding-left: 16px; position: relative;">
+                  <span style="position:absolute; left:0; top: 0.5em; width:6px; height:6px; background:#CCC; border-radius:50%; display:block;"></span>
+                  Feel free to add a description of the keyword.
+                </li>
+                <li style="font-size: 10pt; color: #666; padding-left: 16px; position: relative;">
+                  <span style="position:absolute; left:0; top: 0.5em; width:6px; height:6px; background:#CCC; border-radius:50%; display:block;"></span>
+                  Please add a description of the keyword here.
+                </li>
+                <li style="font-size: 10pt; color: #666; padding-left: 16px; position: relative;">
+                  <span style="position:absolute; left:0; top: 0.5em; width:6px; height:6px; background:#CCC; border-radius:50%; display:block;"></span>
+                  Use a short sentence to engage the audience.
+                </li>
+                <li style="font-size: 10pt; color: #666; padding-left: 16px; position: relative;">
+                  <span style="position:absolute; left:0; top: 0.5em; width:6px; height:6px; background:#CCC; border-radius:50%; display:block;"></span>
+                  Please add a description of the keyword here.
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Arrow -->
+          <div style="font-size: 24pt; color: var(--accent); align-self: center; flex-shrink: 0;">&#9654;</div>
+
+          <!-- After column -->
+          <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+            <span class="pill">After using AI</span>
+            <div class="card" style="width: 100%; text-align: left;">
+              <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
+                <li style="font-size: 10pt; color: #444; padding-left: 16px; position: relative;">
+                  <span style="position:absolute; left:0; top: 0.5em; width:6px; height:6px; background:#444; border-radius:50%; display:block;"></span>
+                  Use this page to add befor/after comparisons.
+                </li>
+                <li style="font-size: 10pt; color: #444; padding-left: 16px; position: relative;">
+                  <span style="position:absolute; left:0; top: 0.5em; width:6px; height:6px; background:#444; border-radius:50%; display:block;"></span>
+                  Feel free to add a description of the keyword.
+                </li>
+                <li style="font-size: 10pt; color: #444; padding-left: 16px; position: relative;">
+                  <span style="position:absolute; left:0; top: 0.5em; width:6px; height:6px; background:#444; border-radius:50%; display:block;"></span>
+                  Please add a description of the keyword here.
+                </li>
+                <li style="font-size: 10pt; color: #444; padding-left: 16px; position: relative;">
+                  <span style="position:absolute; left:0; top: 0.5em; width:6px; height:6px; background:#444; border-radius:50%; display:block;"></span>
+                  Use a short sentence to engage the audience.
+                </li>
+                <li style="font-size: 10pt; color: #444; padding-left: 16px; position: relative;">
+                  <span style="position:absolute; left:0; top: 0.5em; width:6px; height:6px; background:#444; border-radius:50%; display:block;"></span>
+                  Please add a description of the keyword here.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom dark banner -->
+        <div class="z1" style="background: var(--accent); color: white; border-radius: 100px; padding: 14px 36px; text-align: center; width: fit-content; margin: 0 auto;">
+          <p style="font-size: 11pt; color: white; font-weight: 700; font-style: italic;">AI increases both work speed and quality at the same time</p>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 14: Major Benefits - Doughnut Chart
+           ============================================ -->
+      <section id="slide-14">
+
+        <!-- Decorative hatched arc bottom-left -->
+        <svg class="deco-arc" viewBox="0 0 400 400" style="left: -60px; bottom: -60px; width: 300px; height: 300px; opacity: 0.75;">
+          <defs>
+            <pattern id="hatch14" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="6" stroke="#222" stroke-width="1.8"/>
+            </pattern>
+          </defs>
+          <path d="M200,20 A180,180 0 0,0 20,200" fill="none" stroke="url(#hatch14)" stroke-width="65"/>
+        </svg>
+
+        <h2 class="z1 slide-title" style="font-size: 26pt;">Major Benefits of Using Generative AI</h2>
+
+        <div class="z1" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; flex: 1; align-items: center;">
+          <!-- Chart area -->
+          <div style="position: relative; display: flex; align-items: center; justify-content: center; height: 340px;">
+            <canvas id="benefitsChart" style="max-width: 300px; max-height: 300px;"></canvas>
+          </div>
+
+          <!-- Legend / Labels -->
+          <div style="display: flex; flex-direction: column; gap: 24px; justify-content: center;">
+            <div>
+              <p style="font-size: 24pt; font-weight: 900; color: var(--text); line-height: 1; margin-bottom: 6px;">25%</p>
+              <span class="pill pill-sm" style="margin-bottom: 4px;">Automation of repetitive tasks</span>
+              <p style="font-size: 9pt; color: #555; margin-top: 6px; line-height: 1.5;">Use this page to present numerical data through graphs.</p>
+            </div>
+            <div>
+              <p style="font-size: 24pt; font-weight: 900; color: var(--text); line-height: 1; margin-bottom: 6px;">45%</p>
+              <span class="pill pill-sm" style="margin-bottom: 4px;">Consistency in documents</span>
+              <p style="font-size: 9pt; color: #555; margin-top: 6px; line-height: 1.5;">Use this page to present numerical data through graphs.</p>
+            </div>
+            <div>
+              <p style="font-size: 24pt; font-weight: 900; color: var(--text); line-height: 1; margin-bottom: 6px;">30%</p>
+              <span class="pill pill-sm" style="margin-bottom: 4px;">Expanded ideation</span>
+              <p style="font-size: 9pt; color: #555; margin-top: 6px; line-height: 1.5;">Edit the chart to highlight key metrics and provide clarity.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 15: Role-based AI Applications
+           ============================================ -->
+      <section id="slide-15">
+
+        <!-- Decorative hatched arc top-right -->
+        <svg class="deco-arc" viewBox="0 0 320 320" style="right: -30px; top: -30px; width: 260px; height: 260px; opacity: 0.75;">
+          <defs>
+            <pattern id="hatch15" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="6" stroke="#222" stroke-width="1.8"/>
+            </pattern>
+          </defs>
+          <path d="M160,10 A150,150 0 0,1 310,160" fill="none" stroke="url(#hatch15)" stroke-width="65"/>
+        </svg>
+
+        <h2 class="z1 slide-title">Role-based AI Applications</h2>
+
+        <div class="z1" style="display: flex; flex-direction: column; gap: 14px; flex: 1; justify-content: center;">
+          <div class="kw-row">
+            <span class="pill" style="min-width: 200px; justify-content: center;">Marketing</span>
+            <p class="kw-row-desc">Add a description of the keyword here. Use a short sentence to engage the audience. Add a description of the keyword here.</p>
+          </div>
+          <div class="kw-row">
+            <span class="pill" style="min-width: 200px; justify-content: center;">Sales</span>
+            <p class="kw-row-desc">Add a description of the keyword here. Use a short sentence to engage the audience. Add a description of the keyword here.</p>
+          </div>
+          <div class="kw-row">
+            <span class="pill" style="min-width: 200px; justify-content: center;">Operations/HR</span>
+            <p class="kw-row-desc">Add a description of the keyword here. Use a short sentence to engage the audience. Add a description of the keyword here.</p>
+          </div>
+          <div class="kw-row">
+            <span class="pill" style="min-width: 200px; justify-content: center;">Project management</span>
+            <p class="kw-row-desc">Add a description of the keyword here. Use a short sentence to engage the audience. Add a description of the keyword here.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 16: Role-based AI Workflow
+           ============================================ -->
+      <section id="slide-16" style="justify-content: center !important; align-items: center !important; text-align: center;">
+
+        <!-- Decorative hatched arc top-left -->
+        <svg class="deco-arc" viewBox="0 0 280 280" style="left: -20px; top: -20px; width: 200px; height: 200px; opacity: 0.75;">
+          <defs>
+            <pattern id="hatch16" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="6" stroke="#222" stroke-width="1.8"/>
+            </pattern>
+          </defs>
+          <path d="M140,10 A130,130 0 0,0 10,140" fill="none" stroke="url(#hatch16)" stroke-width="65"/>
+        </svg>
+
+        <h2 class="z1" style="font-size: 28pt; font-weight: 900; margin-bottom: 14px; text-align: center;">Role-based AI Workflow</h2>
+
+        <!-- Subtitle banner -->
+        <div class="z1" style="margin-bottom: 24px;">
+          <span class="pill pill-lg" style="font-size: 11pt;">Steps for integrating AI into real work</span>
+        </div>
+
+        <!-- Staircase step cards -->
+        <div class="z1" style="display: flex; align-items: flex-end; gap: 10px; width: 100%; height: 280px;">
+
+          <!-- Step 01 - shortest, light with border -->
+          <div class="step-card light" style="height: 52%;">
+            <div style="margin-top: auto;">
+              <p style="font-size: 10pt; font-weight: 700; color: #888; margin-bottom: 6px;">01</p>
+              <p style="font-size: 15pt; font-weight: 900; color: var(--text); margin-bottom: 6px;"><span class="pill pill-sm" style="font-size: 10pt;">Input</span></p>
+              <p style="font-size: 9pt; color: #666; line-height: 1.5; text-align: left;">This page organizes topic-related items into a process or timeline.</p>
+            </div>
+          </div>
+
+          <!-- Step 02 - dark -->
+          <div class="step-card dark" style="height: 66%;">
+            <div style="margin-top: auto;">
+              <p style="font-size: 10pt; font-weight: 700; color: rgba(255,255,255,0.6); margin-bottom: 6px;">02</p>
+              <p style="font-size: 15pt; font-weight: 900; color: white; margin-bottom: 6px;"><span class="pill pill-sm" style="background: rgba(255,255,255,0.2); font-size: 10pt;">Generate</span></p>
+              <p style="font-size: 9pt; color: rgba(255,255,255,0.75); line-height: 1.5; text-align: left;">Place each step in sequence to explain the process flow.</p>
+            </div>
+          </div>
+
+          <!-- Step 03 - dark -->
+          <div class="step-card dark" style="height: 80%;">
+            <div style="margin-top: auto;">
+              <p style="font-size: 10pt; font-weight: 700; color: rgba(255,255,255,0.6); margin-bottom: 6px;">03</p>
+              <p style="font-size: 15pt; font-weight: 900; color: white; margin-bottom: 6px;"><span class="pill pill-sm" style="background: rgba(255,255,255,0.2); font-size: 10pt;">Edit</span></p>
+              <p style="font-size: 9pt; color: rgba(255,255,255,0.75); line-height: 1.5; text-align: left;">This page organizes topic-related items into a process or timeline.</p>
+            </div>
+          </div>
+
+          <!-- Step 04 - dark, tallest -->
+          <div class="step-card dark" style="height: 100%;">
+            <div style="margin-top: auto;">
+              <p style="font-size: 10pt; font-weight: 700; color: rgba(255,255,255,0.6); margin-bottom: 6px;">04</p>
+              <p style="font-size: 15pt; font-weight: 900; color: white; margin-bottom: 6px;"><span class="pill pill-sm" style="background: rgba(255,255,255,0.2); font-size: 10pt;">Apply</span></p>
+              <p style="font-size: 9pt; color: rgba(255,255,255,0.75); line-height: 1.5; text-align: left;">Place each step in sequence to explain the process flow.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+  <script>
+    Reveal.initialize({
+      width: 1280,
+      height: 720,
+      margin: 0,
+      controls: false,
+      progress: true,
+      slideNumber: false,
+      hash: true,
+      transition: 'fade',
+      transitionSpeed: 'default',
+      center: false,
+      plugins: []
+    });
+
+    // Render doughnut chart on slide 14
+    Reveal.on('slidechanged', function(event) {
+      if (event.currentSlide.id === 'slide-14') {
+        renderBenefitsChart();
+      }
+    });
+
+    // Also try on ready in case slide-14 is shown first
+    Reveal.on('ready', function(event) {
+      if (event.currentSlide && event.currentSlide.id === 'slide-14') {
+        renderBenefitsChart();
+      }
+    });
+
+    var benefitsChartRendered = false;
+    function renderBenefitsChart() {
+      if (benefitsChartRendered) return;
+      benefitsChartRendered = true;
+      var ctx = document.getElementById('benefitsChart');
+      if (!ctx) return;
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Consistency in documents', 'Automation of repetitive tasks', 'Expanded ideation'],
+          datasets: [{
+            data: [45, 25, 30],
+            backgroundColor: ['#444444', '#888888', '#C8C8C8'],
+            borderColor: ['#EDEDEF', '#EDEDEF', '#EDEDEF'],
+            borderWidth: 3,
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          cutout: '62%',
+          responsive: true,
+          maintainAspectRatio: true,
+          animation: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(ctx) {
+                  return ' ' + ctx.label + ': ' + ctx.parsed + '%';
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

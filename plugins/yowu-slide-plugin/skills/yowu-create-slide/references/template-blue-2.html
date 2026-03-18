@@ -1,0 +1,1198 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HR 서비스 소개서 - Blue Template</title>
+
+  <!-- Reveal.js core -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Chart.js for data visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* NanumSquareNeo Web Font */
+    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-aLt.woff2); font-weight: 300; font-display: swap; }
+    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-bRg.woff2); font-weight: 400; font-display: swap; }
+    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-cBd.woff2); font-weight: 700; font-display: swap; }
+    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-dEb.woff2); font-weight: 800; font-display: swap; }
+    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-eHv.woff2); font-weight: 900; font-display: swap; }
+
+    :root {
+      --background-color: #ffffff;
+      --heading-font: "NanumSquareNeo", "Source Sans Pro", Helvetica, sans-serif;
+      --body-font: "NanumSquareNeo", "Source Sans Pro", Helvetica, sans-serif;
+      --base-font-size: 32px;
+      --text-size: 13pt;
+      --h1-size: 44pt;
+      --h2-size: 28pt;
+      --h3-size: 18pt;
+      --footnote-size: 9pt;
+      --primary-color: #4A6CF7;
+      --primary-dark: #3454d4;
+      --primary-light: rgba(74, 108, 247, 0.12);
+      --text-color: #222;
+      --muted-color: #888;
+      --line-color: #ddd;
+      --slide-padding: 60px;
+      --slide-padding-top: 36px;
+      --content-gap: 16px;
+      --box-radius: 4px;
+    }
+
+    /* BASE */
+    .reveal {
+      font-family: var(--body-font);
+      font-size: var(--base-font-size);
+    }
+    .reveal strong, .reveal b { font-weight: 700; }
+    .reveal-viewport { background-color: #f0f2f8; }
+    .reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
+      font-family: var(--heading-font);
+      text-transform: none;
+      color: var(--text-color);
+      font-weight: 700;
+      line-height: 1.2;
+      margin: 0;
+    }
+    .reveal h1 { font-size: var(--h1-size); }
+    .reveal h2 { font-size: var(--h2-size); }
+    .reveal h3 { font-size: var(--h3-size); }
+    .reveal p, .reveal li, .reveal td, .reveal th {
+      font-size: var(--text-size);
+      color: var(--text-color);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* LISTS */
+    .reveal ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 6px 0;
+    }
+    .reveal ul li {
+      position: relative;
+      padding-left: 18px;
+      margin-bottom: 4px;
+    }
+    .reveal ul li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.6em;
+      width: 6px;
+      height: 6px;
+      background: var(--muted-color);
+      border-radius: 50%;
+    }
+
+    /* SLIDE LAYOUT */
+    .reveal .slides section {
+      height: 100%;
+      display: flex !important;
+      flex-direction: column !important;
+      padding: var(--slide-padding-top) var(--slide-padding) var(--slide-padding) var(--slide-padding) !important;
+      box-sizing: border-box;
+      text-align: left;
+      background: white;
+    }
+    .reveal .slides section.stack { padding: 0 !important; }
+    .reveal .slides section.fullbleed { padding: 0 !important; }
+
+    /* CONTROLS */
+    .reveal .controls { display: none !important; }
+    .reveal .progress { height: 3px; color: var(--primary-color); }
+
+    /* =============================================
+       SHARED COMPONENTS
+       ============================================= */
+
+    /* Brand logo top-right */
+    .brand-logo {
+      position: absolute;
+      top: 16px;
+      right: 22px;
+      font-size: 8.5pt;
+      font-weight: 400;
+      color: #999;
+      letter-spacing: 0.06em;
+      z-index: 20;
+      white-space: nowrap;
+    }
+    .brand-logo span { font-weight: 800; color: #222; }
+    .brand-logo.white { color: rgba(255,255,255,0.7); }
+    .brand-logo.white span { color: white; }
+    .brand-logo.blue { color: var(--primary-color); }
+    .brand-logo.blue span { color: var(--primary-dark); }
+
+    /* Left blue accent bar */
+    .left-accent {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 7px;
+      background: var(--primary-color);
+      z-index: 10;
+    }
+
+    /* Section chapter label (top-left gray) */
+    .chapter-label {
+      font-size: 9pt;
+      font-weight: 400;
+      color: #aaa;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+
+    /* Blue checkmark list */
+    .check-list {
+      list-style: none !important;
+      padding-left: 0 !important;
+      margin: 6px 0 !important;
+    }
+    .check-list li {
+      position: relative;
+      padding-left: 20px !important;
+      margin-bottom: 5px !important;
+      font-size: 10pt !important;
+      color: #555;
+    }
+    .check-list li::before {
+      content: '\f058' !important;
+      font-family: 'Font Awesome 6 Free' !important;
+      font-weight: 900 !important;
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--primary-color) !important;
+      font-size: 9.5pt !important;
+      background: none !important;
+      width: auto !important;
+      height: auto !important;
+      border-radius: 0 !important;
+    }
+    .check-list.white li { color: rgba(255,255,255,0.85); }
+    .check-list.white li::before { color: rgba(255,255,255,0.7) !important; }
+
+    /* Placeholder image */
+    .placeholder-img {
+      background: linear-gradient(135deg, #c8ccd8, #b0b4c0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.6);
+      font-size: 10pt;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* Footer bar */
+    .slide-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--primary-color);
+      color: white;
+      padding: 14px 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 9pt;
+      z-index: 10;
+    }
+
+    /* =============================================
+       SLIDE 1: TITLE/COVER
+       ============================================= */
+    .slide-cover {
+      background: linear-gradient(160deg, rgba(10,20,60,0.82) 0%, rgba(30,50,120,0.75) 100%), linear-gradient(135deg, #1a2a5e 0%, #2d4494 50%, #1e3a8a 100%);
+      overflow: hidden;
+    }
+    .slide-cover::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 80px,
+        rgba(255,255,255,0.012) 80px, rgba(255,255,255,0.012) 81px
+      ),
+      repeating-linear-gradient(
+        90deg, transparent, transparent 80px,
+        rgba(255,255,255,0.012) 80px, rgba(255,255,255,0.012) 81px
+      );
+    }
+
+    /* =============================================
+       SLIDE 2: TOC
+       ============================================= */
+    .toc-num {
+      font-size: 22pt;
+      font-weight: 900;
+      color: var(--primary-color);
+      line-height: 1;
+      margin-right: 16px;
+      flex-shrink: 0;
+      width: 44px;
+    }
+    .toc-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+      gap: 16px;
+    }
+    .toc-item:last-child { border-bottom: none; }
+    .toc-title {
+      font-size: 13pt;
+      font-weight: 700;
+      color: #222;
+      line-height: 1.3;
+      min-width: 140px;
+      flex-shrink: 0;
+    }
+    .toc-desc {
+      font-size: 9.5pt;
+      color: #888;
+      margin-top: 0;
+      line-height: 1.4;
+    }
+
+    /* =============================================
+       SLIDE 4: STAT CARDS
+       ============================================= */
+    .stat-card {
+      background: white;
+      border: 1px solid #e8eaf0;
+      border-radius: 10px;
+      padding: 26px 24px 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    .stat-card.blue-card {
+      background: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    .stat-num {
+      font-size: 52pt;
+      font-weight: 900;
+      color: var(--primary-color);
+      line-height: 1;
+      letter-spacing: -0.03em;
+      margin: 12px 0 8px;
+    }
+    .stat-num.white { color: white; }
+    .stat-card-title {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    .stat-card-title.white { color: white; }
+
+    /* =============================================
+       SLIDE 5: FEATURE ROWS
+       ============================================= */
+    .feature-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 14px 16px;
+      border: 1px solid #eee;
+      border-radius: 4px;
+    }
+    .feature-row.highlighted {
+      background: var(--primary-color);
+      border-color: var(--primary-color);
+      border-radius: 4px;
+    }
+    .feature-num-box {
+      width: 34px;
+      height: 34px;
+      background: var(--primary-color);
+      color: white;
+      font-size: 10pt;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 3px;
+      flex-shrink: 0;
+      margin-right: 12px;
+    }
+    .feature-num-box.white-box {
+      background: white;
+      color: var(--primary-color);
+    }
+    .feature-icon {
+      width: 34px;
+      text-align: center;
+      font-size: 16pt;
+      color: var(--primary-color);
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
+    .feature-icon.white { color: rgba(255,255,255,0.8); }
+    .feature-title {
+      font-size: 11.5pt;
+      font-weight: 700;
+      color: #222;
+      line-height: 1.3;
+    }
+    .feature-title.white { color: white; }
+    .feature-desc {
+      font-size: 9.5pt;
+      color: #666;
+      line-height: 1.5;
+      margin-top: 2px;
+    }
+    .feature-desc.white { color: rgba(255,255,255,0.82); }
+
+    /* =============================================
+       SLIDE 6: FEE CHART
+       ============================================= */
+    .bar-container {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .bar-label {
+      font-size: 10pt;
+      color: #555;
+      width: 80px;
+      flex-shrink: 0;
+      text-align: right;
+    }
+    .bar-track {
+      flex: 1;
+      height: 32px;
+      background: #eee;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      padding-left: 10px;
+      font-size: 10pt;
+      font-weight: 700;
+      color: white;
+      border-radius: 3px;
+    }
+    .bar-fill.gray { background: #aaa; }
+    .bar-fill.blue { background: var(--primary-color); }
+
+    /* Circle badges */
+    .circle-badge {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 11pt;
+      font-weight: 700;
+    }
+    .circle-badge.blue {
+      background: var(--primary-color);
+      color: white;
+    }
+    .circle-badge.outline {
+      border: 3px solid var(--primary-color);
+      color: var(--primary-color);
+      background: white;
+    }
+    .dot-connector {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--primary-color);
+      font-size: 8pt;
+    }
+
+    /* =============================================
+       SLIDE 7: 5 COLUMNS
+       ============================================= */
+    .field-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 8px;
+      text-align: center;
+      border-right: 1px solid #eee;
+    }
+    .field-col:last-child { border-right: none; }
+    .field-col.first { border-left: 4px solid var(--primary-color); background: rgba(74,108,247,0.03); }
+    .field-col-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary-color);
+      font-size: 20pt;
+      margin-bottom: 8px;
+      flex-shrink: 0;
+    }
+
+    /* =============================================
+       SLIDE 8: PROCESS STEPS
+       ============================================= */
+    .process-box {
+      flex: 1;
+      background: #f0f2fa;
+      border: 1px solid #d8dcee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10pt;
+      font-weight: 700;
+      color: #333;
+      padding: 10px 6px;
+      text-align: center;
+      position: relative;
+    }
+    .process-box.blue-box {
+      background: var(--primary-color);
+      border-color: var(--primary-dark);
+      color: white;
+    }
+    .process-arrow {
+      font-size: 12pt;
+      color: var(--primary-color);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+    }
+    .step-desc {
+      font-size: 8.5pt;
+      color: #666;
+      line-height: 1.5;
+      text-align: center;
+    }
+    .step-num {
+      font-size: 9pt;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 4px;
+      text-align: center;
+    }
+
+    /* =============================================
+       SLIDE 9: CASE STUDIES
+       ============================================= */
+    .case-row {
+      display: flex;
+      gap: 14px;
+      align-items: stretch;
+    }
+    .case-left {
+      flex: 0 0 280px;
+      border-left: 4px solid var(--primary-color);
+      padding-left: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .case-badge {
+      display: inline-block;
+      background: var(--primary-color);
+      color: white;
+      font-size: 8.5pt;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 2px;
+      margin-bottom: 6px;
+    }
+    .case-boxes {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .case-box {
+      flex: 1;
+      border: 1px solid #e0e4f0;
+      padding: 12px 18px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+    .case-box.blue {
+      background: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    .case-box-label {
+      font-size: 9pt;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 0;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .case-box-label.white { color: rgba(255,255,255,0.85); }
+    .case-box-sep {
+      width: 1px;
+      height: 16px;
+      background: #ccc;
+      margin: 0 14px;
+      flex-shrink: 0;
+    }
+    .case-box-sep.white { background: rgba(255,255,255,0.4); }
+    .case-box-text {
+      font-size: 9pt;
+      color: #555;
+      line-height: 1.5;
+    }
+    .case-box-text.white { color: rgba(255,255,255,0.8); }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ============================================
+           SLIDE 1: Title / Cover
+           ============================================ -->
+      <section id="slide-01" class="fullbleed slide-cover" style="padding: 0 !important; justify-content: flex-start !important; background: linear-gradient(160deg, rgba(8,18,55,0.88) 0%, rgba(25,45,110,0.80) 100%), linear-gradient(135deg, #0d1b4b 0%, #1e3480 50%, #152d78 100%) !important;">
+        <!-- Brand logo top-right -->
+        <div class="brand-logo white" style="top: 22px; right: 28px;">
+          <i class="fa-solid fa-diamond" style="font-size: 6.5pt; margin-right: 4px; color: var(--primary-color);"></i>
+          <span>YOWU</span> .DEV
+        </div>
+
+        <!-- Main content area -->
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 60px 80px 120px;">
+          <p style="font-size: 10pt; color: rgba(255,255,255,0.6); letter-spacing: 0.06em; margin-bottom: 20px; font-weight: 400;">채용 관리가 어려울 땐?</p>
+
+          <h1 style="font-size: 56pt; font-weight: 900; color: white; line-height: 1.15; letter-spacing: -0.02em;">
+            HR 서비스<br>소개서
+          </h1>
+        </div>
+
+        <!-- Bottom footer bar -->
+        <div class="slide-footer">
+          <p style="font-size: 9pt; color: rgba(255,255,255,0.9); margin: 0;">이곳에 주제에 알맞은 내용을 입력해 주세요.</p>
+          <p style="font-size: 9pt; color: rgba(255,255,255,0.7); margin: 0; font-weight: 400; letter-spacing: 0.06em;">MARKETING TEAM | yowu</p>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 2: Contents / TOC
+           ============================================ -->
+      <section id="slide-02" style="padding: 0 !important;">
+        <!-- Left blue accent bar -->
+        <div class="left-accent"></div>
+
+        <div style="display: grid; grid-template-columns: 3fr 7fr; height: 100%;">
+          <!-- Left panel -->
+          <div style="padding: 48px 40px 48px 60px; display: flex; flex-direction: column; justify-content: flex-end; background: white; padding-bottom: 100px;">
+            <p style="font-size: 32pt; font-weight: 900; color: #1a1a2e; letter-spacing: 0.14em; text-decoration: underline; text-underline-offset: 8px; text-decoration-thickness: 3px; text-decoration-color: var(--primary-color); margin-bottom: 12px;">CONTENTS</p>
+            <p style="font-size: 10pt; color: #999; font-weight: 400;">목차를 순서대로 입력해 주세요.</p>
+          </div>
+
+          <!-- Right panel: gray photo placeholder + TOC list -->
+          <div style="display: flex; flex-direction: column; overflow: hidden;">
+            <!-- Top photo area (grayscale placeholder) -->
+            <div style="height: 40%; background: linear-gradient(180deg, #8a8e98 0%, #6e727c 100%); display: flex; align-items: center; justify-content: center; filter: grayscale(100%);">
+              <i class="fa-solid fa-handshake" style="font-size: 52pt; color: rgba(255,255,255,0.25);"></i>
+            </div>
+            <!-- Bottom: TOC items repeated for right panel -->
+            <div style="flex: 1; background: white; padding: 24px 36px; display: flex; flex-direction: column; justify-content: center;">
+              <div class="toc-item">
+                <span class="toc-num">01</span>
+                <p class="toc-title">HR 소개</p>
+                <p class="toc-desc">주제에 알맞은 내용을 입력해 주세요.</p>
+              </div>
+              <div class="toc-item">
+                <span class="toc-num">02</span>
+                <p class="toc-title">서비스 주요 특징</p>
+                <p class="toc-desc">주제에 알맞은 내용을 입력해 주세요.</p>
+              </div>
+              <div class="toc-item">
+                <span class="toc-num">03</span>
+                <p class="toc-title">분야별 소개</p>
+                <p class="toc-desc">주제에 알맞은 내용을 입력해 주세요.</p>
+              </div>
+              <div class="toc-item">
+                <span class="toc-num">04</span>
+                <p class="toc-title">인재 채용 프로세스</p>
+                <p class="toc-desc">주제에 알맞은 내용을 입력해 주세요.</p>
+              </div>
+              <div class="toc-item">
+                <span class="toc-num">05</span>
+                <p class="toc-title">채용 성공 사례</p>
+                <p class="toc-desc">주제에 알맞은 내용을 입력해 주세요.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 3: Chapter 1 - HR 소개
+           ============================================ -->
+      <section id="slide-03" style="padding-left: 68px !important; padding-right: 0 !important; padding-bottom: 0 !important;">
+        <div class="left-accent"></div>
+        <div class="brand-logo">
+          <i class="fa-solid fa-diamond" style="font-size: 6.5pt; color: var(--primary-color); margin-right: 4px;"></i>
+          <span>YOWU</span> .DEV
+        </div>
+
+        <p class="chapter-label">Chapter 1. HR 소개</p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px; flex: 1; margin-top: 4px;">
+          <!-- Left: Content -->
+          <div style="display: flex; flex-direction: column; padding-right: 10px;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+              <div style="width: 46px; height: 46px; background: var(--primary-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i class="fa-solid fa-building" style="font-size: 20pt; color: var(--primary-color);"></i>
+              </div>
+              <div>
+                <h2 style="font-size: 26pt; font-weight: 900; color: var(--primary-color); line-height: 1.1;">HR 소개</h2>
+                <p style="font-size: 11pt; color: #555; font-weight: 400;">좋은 구직자 여기서 모이다.</p>
+              </div>
+            </div>
+
+            <p style="font-size: 11.5pt; font-weight: 700; color: #222; margin-bottom: 8px;">오랜 경험이 곧 경쟁력!</p>
+            <p style="font-size: 9.5pt; color: #555; line-height: 1.7; margin-bottom: 14px;">
+              이곳에 주제에 알맞은 내용을 입력해 주세요. 20년 이상의 헤드헌팅 경력을 바탕으로 검증된 인재 매칭 시스템을 제공합니다. 풍부한 네트워크와 데이터 기반의 정밀한 인재 분석으로 귀사에 꼭 맞는 최적의 인재를 연결해 드립니다. 기업의 성장 파트너로서 채용의 모든 과정을 함께합니다.
+            </p>
+
+            <ul class="check-list" style="margin-top: auto;">
+              <li style="font-size: 9.5pt !important;">전국 15개 지사 네트워크 운영</li>
+              <li style="font-size: 9.5pt !important;">업종별 전문 헤드헌터 팀 구성</li>
+              <li style="font-size: 9.5pt !important;">이곳에 주제에 알맞은 내용을 입력해 주세요.</li>
+            </ul>
+          </div>
+
+          <!-- Right: Placeholder tall image -->
+          <div class="placeholder-img" style="height: 100%; background: linear-gradient(160deg, #9aa4b8, #7a8296);">
+            <i class="fa-solid fa-city" style="font-size: 56pt; color: rgba(255,255,255,0.2);"></i>
+          </div>
+        </div>
+
+        <!-- Bottom blue stats bar -->
+        <div style="background: var(--primary-color); color: white; padding: 14px 20px; display: flex; justify-content: space-around; align-items: center; margin-top: 0; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-circle-check" style="font-size: 16pt; color: rgba(255,255,255,0.7);"></i>
+            <span style="font-size: 10.5pt; font-weight: 700; color: white;">20년 이상의 경력</span>
+          </div>
+          <div style="width: 1px; height: 30px; background: rgba(255,255,255,0.3);"></div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-circle-check" style="font-size: 16pt; color: rgba(255,255,255,0.7);"></i>
+            <span style="font-size: 10.5pt; font-weight: 700; color: white;">전국 15개 지사</span>
+          </div>
+          <div style="width: 1px; height: 30px; background: rgba(255,255,255,0.3);"></div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-circle-check" style="font-size: 16pt; color: rgba(255,255,255,0.7);"></i>
+            <span style="font-size: 10.5pt; font-weight: 700; color: white;">고객 만족 1위</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 4: Stats - 채용 실적
+           ============================================ -->
+      <section id="slide-04" style="background: linear-gradient(160deg, #f5f6fb 0%, #eef0f8 100%) !important; padding-bottom: 48px !important;">
+        <div class="brand-logo blue">
+          <i class="fa-solid fa-diamond" style="font-size: 6.5pt; margin-right: 4px;"></i>
+          <span>YOWU</span> .DEV
+        </div>
+
+        <h2 style="font-size: 24pt; font-weight: 900; color: #1a1a2e; line-height: 1.35; margin-bottom: 6px;">
+          우수한 채용 실적과<br>높은 만족도를 경험하세요!
+        </h2>
+        <p style="font-size: 9.5pt; color: #aaa; margin-bottom: 22px;">이곳에 주제에 알맞은 설명을 입력해 주세요.</p>
+
+        <div style="flex: 1; display: flex; gap: 16px; align-items: stretch;">
+          <!-- Card 1 -->
+          <div class="stat-card" style="text-align: center;">
+            <div style="display: flex; align-items: center; gap: 8px; justify-content: center; margin-bottom: 4px;">
+              <i class="fa-solid fa-circle-check" style="font-size: 12pt; color: var(--primary-color);"></i>
+              <p class="stat-card-title">전체 채용 만족도</p>
+            </div>
+            <p class="stat-num" style="text-align: center;">96%</p>
+            <p style="font-size: 9pt; color: #888; line-height: 1.5; margin-bottom: 10px;">이곳에 주제에 알맞은 내용을<br>입력해 주세요.</p>
+            <div style="border-top: 1px solid #eee; padding-top: 10px; text-align: left;">
+              <ul class="check-list" style="margin-top: 0;">
+                <li>이곳에 해당 항목의 세부 내용을 입력해 주세요.</li>
+                <li>이곳에 해당 항목의 세부 내용을 입력해 주세요.</li>
+                <li>이곳에 해당 항목의 세부 내용을 입력해 주세요.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="stat-card" style="text-align: center;">
+            <div style="display: flex; align-items: center; gap: 8px; justify-content: center; margin-bottom: 4px;">
+              <i class="fa-solid fa-circle-check" style="font-size: 12pt; color: var(--primary-color);"></i>
+              <p class="stat-card-title">3년간 고객 재계약률</p>
+            </div>
+            <p class="stat-num" style="text-align: center;">95%</p>
+            <p style="font-size: 9pt; color: #888; line-height: 1.5; margin-bottom: 10px;">이곳에 주제에 알맞은 내용을<br>입력해 주세요.</p>
+            <div style="border-top: 1px solid #eee; padding-top: 10px; text-align: left;">
+              <ul class="check-list" style="margin-top: 0;">
+                <li>이곳에 해당 항목의 세부 내용을 입력해 주세요.</li>
+                <li>이곳에 해당 항목의 세부 내용을 입력해 주세요.</li>
+                <li>이곳에 해당 항목의 세부 내용을 입력해 주세요.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Card 3 (Blue) -->
+          <div class="stat-card blue-card" style="text-align: center;">
+            <div style="display: flex; align-items: center; gap: 8px; justify-content: center; margin-bottom: 4px;">
+              <i class="fa-solid fa-circle-check" style="font-size: 12pt; color: rgba(255,255,255,0.75);"></i>
+              <p class="stat-card-title white">고객사 평가 점수</p>
+            </div>
+            <p class="stat-num white" style="text-align: center;">98점</p>
+            <p style="font-size: 9pt; color: rgba(255,255,255,0.7); line-height: 1.5; margin-bottom: 10px;">이곳에 주제에 알맞은 내용을<br>입력해 주세요.</p>
+            <div style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 10px; text-align: left;">
+              <ul class="check-list white" style="margin-top: 0;">
+                <li>이곳에 해당 항목의 세부 내용을 입력해 주세요.</li>
+                <li>이곳에 해당 항목의 세부 내용을 입력해 주세요.</li>
+                <li>이곳에 해당 항목의 세부 내용을 입력해 주세요.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 5: Chapter 2 - 서비스 주요 특징
+           ============================================ -->
+      <section id="slide-05" style="padding-left: 68px !important;">
+        <div class="left-accent"></div>
+        <div class="brand-logo">
+          <i class="fa-solid fa-diamond" style="font-size: 6.5pt; color: var(--primary-color); margin-right: 4px;"></i>
+          <span>YOWU</span> .DEV
+        </div>
+
+        <p class="chapter-label">Chapter 2. 서비스 주요 특징</p>
+
+        <div style="display: grid; grid-template-columns: 2fr 3fr; gap: 30px; flex: 1; margin-top: 8px;">
+          <!-- Left -->
+          <div style="display: flex; flex-direction: column; justify-content: center; padding-right: 10px;">
+            <h2 style="font-size: 22pt; font-weight: 900; color: #1a1a2e; line-height: 1.25; margin-bottom: 14px;">서비스<br>주요 특징</h2>
+            <p style="font-size: 11pt; font-weight: 700; color: var(--primary-color); margin-bottom: 6px;">키워드를 입력해 주세요.</p>
+            <p style="font-size: 9.5pt; color: #666; line-height: 1.7;">서비스에 대한 특징을 설명하는 내용을 요약하여 입력해 주세요. 이곳에 서비스의 핵심 가치와 경쟁력을 간략하게 소개해 보세요.</p>
+          </div>
+
+          <!-- Right: Feature rows -->
+          <div style="display: flex; flex-direction: column; justify-content: center; gap: 4px;">
+            <!-- Row 01 highlighted -->
+            <div class="feature-row highlighted">
+              <div class="feature-num-box white-box">01</div>
+              <div style="font-size: 14pt; color: rgba(255,255,255,0.6); margin-right: 12px; width: 28px; text-align: center; flex-shrink: 0;">
+                <i class="fa-solid fa-users"></i>
+              </div>
+              <div>
+                <p class="feature-title white">방대하고 우수한 인재풀 확보</p>
+                <p class="feature-desc white">이곳에 해당 특징에 관한 상세 내용을 입력해 주세요.</p>
+              </div>
+            </div>
+            <!-- Row 02 -->
+            <div class="feature-row">
+              <div class="feature-num-box">02</div>
+              <div style="font-size: 14pt; color: var(--primary-color); margin-right: 12px; width: 28px; text-align: center; flex-shrink: 0;">
+                <i class="fa-solid fa-chart-line"></i>
+              </div>
+              <div>
+                <p class="feature-title">데이터 기반 인재 매칭</p>
+                <p class="feature-desc">이곳에 서비스의 장점이나 특징을 작성해 주세요.</p>
+              </div>
+            </div>
+            <!-- Row 03 -->
+            <div class="feature-row">
+              <div class="feature-num-box">03</div>
+              <div style="font-size: 14pt; color: var(--primary-color); margin-right: 12px; width: 28px; text-align: center; flex-shrink: 0;">
+                <i class="fa-solid fa-puzzle-piece"></i>
+              </div>
+              <div>
+                <p class="feature-title">고객 맞춤형 솔루션 제공</p>
+                <p class="feature-desc">이곳에 우리 서비스가 자랑할 만한 특징을 입력해 주세요.</p>
+              </div>
+            </div>
+            <!-- Row 04 -->
+            <div class="feature-row" style="border-bottom: none;">
+              <div class="feature-num-box">04</div>
+              <div style="font-size: 14pt; color: var(--primary-color); margin-right: 12px; width: 28px; text-align: center; flex-shrink: 0;">
+                <i class="fa-solid fa-user-check"></i>
+              </div>
+              <div>
+                <p class="feature-title">엄격한 후보 검증 프로세스</p>
+                <p class="feature-desc">이곳에 해당 특징에 관한 상세 내용을 입력해 주세요.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 6: Chapter 3 - 합리적인 수수료 책정
+           ============================================ -->
+      <section id="slide-06" style="padding-left: 68px !important;">
+        <div class="left-accent"></div>
+        <div class="brand-logo">
+          <i class="fa-solid fa-diamond" style="font-size: 6.5pt; color: var(--primary-color); margin-right: 4px;"></i>
+          <span>YOWU</span> .DEV
+        </div>
+
+        <p class="chapter-label">Chapter 3. 합리적인 수수료 책정</p>
+
+        <!-- Center title -->
+        <div style="text-align: center; margin-bottom: 14px;">
+          <i class="fa-solid fa-coins" style="font-size: 22pt; color: var(--primary-color); margin-bottom: 6px; display: block;"></i>
+          <h2 style="font-size: 22pt; font-weight: 900; color: #1a1a2e; margin-bottom: 8px;">합리적인 <span style="color: var(--primary-color);">수수료</span> 책정</h2>
+          <p style="font-size: 9pt; color: #666; line-height: 1.6;">
+            수수료는 채용 확정 및 입사 전까지 발생하지 않으며
+            <strong>입사 후 2주 내 포지션 별 정산</strong>이 진행됩니다.
+          </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px; flex: 1;">
+          <!-- Left: Vertical Bar chart -->
+          <div style="display: flex; flex-direction: column; justify-content: center; padding-right: 14px; border-right: 1px solid #eee;">
+            <div style="display: flex; align-items: flex-end; justify-content: center; gap: 32px; height: 200px; margin-bottom: 14px;">
+              <!-- Bar 1: Competitor -->
+              <div style="display: flex; flex-direction: column; align-items: center; height: 100%;">
+                <p style="font-size: 9pt; font-weight: 700; color: #888; margin-bottom: 6px;">20</p>
+                <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-end; width: 80px;">
+                  <div style="height: 80%; background: #aab0be; border-radius: 3px 3px 0 0; display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 8px;">
+                    <p style="font-size: 9pt; font-weight: 700; color: white; line-height: 1.3;">연봉의<br>20%</p>
+                  </div>
+                </div>
+                <p style="font-size: 9pt; color: #666; margin-top: 8px; font-weight: 400;">타사 수수료</p>
+              </div>
+              <!-- Bar 2: Our company -->
+              <div style="display: flex; flex-direction: column; align-items: center; height: 100%;">
+                <p style="font-size: 9pt; font-weight: 700; color: #888; margin-bottom: 6px;">15</p>
+                <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-end; width: 80px;">
+                  <div style="height: 60%; background: var(--primary-color); border-radius: 3px 3px 0 0; display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 8px;">
+                    <p style="font-size: 9pt; font-weight: 700; color: white; line-height: 1.3;">연봉의<br>15%</p>
+                  </div>
+                </div>
+                <p style="font-size: 9pt; color: var(--primary-color); margin-top: 8px; font-weight: 700;">자사 수수료</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Circles + bullet points -->
+          <div style="display: flex; flex-direction: column; justify-content: center;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 18px;">
+              <div class="circle-badge outline">성과<br>&amp;실적</div>
+              <div class="dot-connector">
+                <span style="width: 5px; height: 5px; background: #bbb; border-radius: 50%; display: inline-block;"></span>
+                <span style="width: 5px; height: 5px; background: #bbb; border-radius: 50%; display: inline-block;"></span>
+                <span style="width: 5px; height: 5px; background: #bbb; border-radius: 50%; display: inline-block;"></span>
+              </div>
+              <div class="circle-badge blue">투명한<br>수수료</div>
+            </div>
+
+            <p style="font-size: 11pt; font-weight: 700; color: #1a1a2e; margin-bottom: 10px; text-align: center;">성과에 기반한 투명한 수수료 책정</p>
+            <ul class="check-list" style="text-align: left;">
+              <li>실제 채용이 이루어진 건에 한해 수수료 부과</li>
+              <li>채용 직급 및 연봉 수준에 따라 자동화된 수수료 적용</li>
+              <li>1년 이상 장기 계약 체결 시 우대 수수료 적용</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 7: Chapter 4 - 헤드헌팅 전문 분야 소개
+           ============================================ -->
+      <section id="slide-07" style="padding-left: 68px !important; padding-bottom: 0 !important;">
+        <div class="left-accent"></div>
+        <div class="brand-logo">
+          <i class="fa-solid fa-diamond" style="font-size: 6.5pt; color: var(--primary-color); margin-right: 4px;"></i>
+          <span>YOWU</span> .DEV
+        </div>
+
+        <p class="chapter-label">Chapter 4. 헤드헌팅 전문 분야 소개</p>
+
+        <!-- Center title -->
+        <div style="text-align: center; margin-bottom: 14px;">
+          <i class="fa-solid fa-pen-ruler" style="font-size: 22pt; color: var(--primary-color); margin-bottom: 8px; display: block;"></i>
+          <h2 style="font-size: 22pt; font-weight: 900; color: #1a1a2e; margin-bottom: 6px;">헤드헌팅 전문 <strong style="color: #1a1a2e;">분야 소개</strong></h2>
+          <p style="font-size: 9.5pt; color: #888;">이곳에 주제에 알맞은 내용을 입력해 주세요.</p>
+        </div>
+
+        <!-- 5 columns -->
+        <div style="flex: 1; display: flex; align-items: stretch; gap: 0; border: 1px solid #e8eaf0; border-radius: 4px; overflow: hidden;">
+          <!-- Col 1 -->
+          <div class="field-col first" style="padding: 16px 10px;">
+            <div class="field-col-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <p style="font-size: 10pt; font-weight: 700; color: #222; margin-bottom: 6px; text-align: center;">IT/기술 분야</p>
+            <p style="font-size: 8.5pt; color: #777; line-height: 1.5; text-align: center;">이곳에 해당 분야의 세부 직무를 입력해 주세요.</p>
+            <div class="placeholder-img" style="width: 100%; flex: 1; min-height: 100px; margin-top: auto; border-radius: 0;"></div>
+          </div>
+          <!-- Col 2 -->
+          <div class="field-col" style="padding: 16px 10px;">
+            <div class="field-col-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <p style="font-size: 10pt; font-weight: 700; color: #222; margin-bottom: 6px; text-align: center;">제조 / R&amp;D 분야</p>
+            <p style="font-size: 8.5pt; color: #777; line-height: 1.5; text-align: center;">이곳에 해당 분야의 세부 직무를 입력해 주세요.</p>
+            <div class="placeholder-img" style="width: 100%; flex: 1; min-height: 100px; margin-top: auto; border-radius: 0;"></div>
+          </div>
+          <!-- Col 3 -->
+          <div class="field-col" style="padding: 16px 10px;">
+            <div class="field-col-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <p style="font-size: 10pt; font-weight: 700; color: #222; margin-bottom: 6px; text-align: center;">금융 / 법률 분야</p>
+            <p style="font-size: 8.5pt; color: #777; line-height: 1.5; text-align: center;">이곳에 해당 분야의 세부 직무를 입력해 주세요.</p>
+            <div class="placeholder-img" style="width: 100%; flex: 1; min-height: 100px; margin-top: auto; border-radius: 0;"></div>
+          </div>
+          <!-- Col 4 -->
+          <div class="field-col" style="padding: 16px 10px;">
+            <div class="field-col-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <p style="font-size: 10pt; font-weight: 700; color: #222; margin-bottom: 6px; text-align: center;">경영 / 리더십 분야</p>
+            <p style="font-size: 8.5pt; color: #777; line-height: 1.5; text-align: center;">이곳에 해당 분야의 세부 직무를 입력해 주세요.</p>
+            <div class="placeholder-img" style="width: 100%; flex: 1; min-height: 100px; margin-top: auto; border-radius: 0;"></div>
+          </div>
+          <!-- Col 5 -->
+          <div class="field-col" style="border-right: none; padding: 16px 10px;">
+            <div class="field-col-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <p style="font-size: 10pt; font-weight: 700; color: #222; margin-bottom: 6px; text-align: center;">유통 분야</p>
+            <p style="font-size: 8.5pt; color: #777; line-height: 1.5; text-align: center;">이곳에 해당 분야의 세부 직무를 입력해 주세요.</p>
+            <div class="placeholder-img" style="width: 100%; flex: 1; min-height: 100px; margin-top: auto; border-radius: 0;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 8: Chapter 5 - 인재 채용 프로세스
+           ============================================ -->
+      <section id="slide-08" style="padding-left: 68px !important; padding-bottom: 0 !important; overflow: hidden;">
+        <div class="left-accent"></div>
+        <div class="brand-logo">
+          <i class="fa-solid fa-diamond" style="font-size: 6.5pt; color: var(--primary-color); margin-right: 4px;"></i>
+          <span>YOWU</span> .DEV
+        </div>
+
+        <!-- Subtle blueprint background at bottom -->
+        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 200px; background: linear-gradient(180deg, transparent, rgba(74,108,247,0.04)); z-index: 0; pointer-events: none;"></div>
+
+        <p class="chapter-label" style="position: relative; z-index: 1;">Chapter 5. 인재 채용 과정</p>
+
+        <!-- Center title -->
+        <div style="text-align: center; margin-bottom: 10px; position: relative; z-index: 1;">
+          <i class="fa-solid fa-people-group" style="font-size: 18pt; color: var(--primary-color); margin-bottom: 4px; display: block;"></i>
+          <h2 style="font-size: 20pt; font-weight: 900; color: #1a1a2e; margin-bottom: 4px;">인재 <strong style="color: var(--primary-color);">채용</strong> 프로세스</h2>
+          <p style="font-size: 9pt; color: #888;">성공으로 이끄는 체계적인 인재 채용 과정</p>
+        </div>
+
+        <!-- Process flow area -->
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 1; gap: 6px;">
+          <!-- Top row: STEP 01, 03, 05 descriptions -->
+          <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px;">
+            <!-- STEP 01 above col1 -->
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <p class="step-num">STEP 01</p>
+              <p class="step-desc">이곳에 해당 단계 상세 내용을 적어주세요.</p>
+              <div style="width: 1px; height: 14px; background: var(--primary-color); opacity: 0.4;"></div>
+            </div>
+            <!-- STEP 02 placeholder -->
+            <div></div>
+            <!-- STEP 03 above col3 -->
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <p class="step-num">STEP 03</p>
+              <p class="step-desc">이곳에 해당 단계 상세 내용을 적어주세요.</p>
+              <div style="width: 1px; height: 14px; background: var(--primary-color); opacity: 0.4;"></div>
+            </div>
+            <!-- STEP 04 placeholder -->
+            <div></div>
+            <!-- STEP 05 above col5 -->
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <p class="step-num">STEP 05</p>
+              <p class="step-desc">이곳에 해당 단계 상세 내용을 적어주세요.</p>
+              <div style="width: 1px; height: 14px; background: var(--primary-color); opacity: 0.4;"></div>
+            </div>
+            <!-- STEP 06 placeholder -->
+            <div></div>
+          </div>
+
+          <!-- Middle row: Process boxes -->
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <div class="process-box" style="flex: 1; min-height: 52px;">채용 의뢰</div>
+            <div class="process-arrow"><i class="fa-solid fa-chevron-right" style="font-size: 10pt;"></i></div>
+            <div class="process-box" style="flex: 1; min-height: 52px;">헤드헌터 배정</div>
+            <div class="process-arrow"><i class="fa-solid fa-chevron-right" style="font-size: 10pt;"></i></div>
+            <div class="process-box" style="flex: 1; min-height: 52px;">구직자 리서치</div>
+            <div class="process-arrow"><i class="fa-solid fa-chevron-right" style="font-size: 10pt;"></i></div>
+            <div class="process-box" style="flex: 1; min-height: 52px;">심사 및 검증</div>
+            <div class="process-arrow"><i class="fa-solid fa-chevron-right" style="font-size: 10pt;"></i></div>
+            <div class="process-box" style="flex: 1; min-height: 52px;">면접</div>
+            <div class="process-arrow"><i class="fa-solid fa-chevron-right" style="font-size: 10pt;"></i></div>
+            <div class="process-box blue-box" style="flex: 1; min-height: 52px;">합격 및<br>사후관리</div>
+          </div>
+
+          <!-- Bottom row: STEP 02, 04, 06 descriptions -->
+          <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px;">
+            <!-- STEP 01 placeholder -->
+            <div></div>
+            <!-- STEP 02 below col2 -->
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <div style="width: 1px; height: 14px; background: var(--primary-color); opacity: 0.4;"></div>
+              <p class="step-num">STEP 02</p>
+              <p class="step-desc">이곳에 해당 단계 상세 내용을 적어주세요.</p>
+            </div>
+            <!-- STEP 03 placeholder -->
+            <div></div>
+            <!-- STEP 04 below col4 -->
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <div style="width: 1px; height: 14px; background: var(--primary-color); opacity: 0.4;"></div>
+              <p class="step-num">STEP 04</p>
+              <p class="step-desc">이곳에 해당 단계 상세 내용을 적어주세요.</p>
+            </div>
+            <!-- STEP 05 placeholder -->
+            <div></div>
+            <!-- STEP 06 below col6 -->
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <div style="width: 1px; height: 14px; background: var(--primary-color); opacity: 0.4;"></div>
+              <p class="step-num">STEP 06</p>
+              <p class="step-desc">이곳에 해당 단계 상세 내용을 적어주세요.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 9: Chapter 6 - 채용 성공 사례
+           ============================================ -->
+      <section id="slide-09" style="padding-left: 68px !important;">
+        <div class="left-accent"></div>
+        <div class="brand-logo">
+          <i class="fa-solid fa-diamond" style="font-size: 6.5pt; color: var(--primary-color); margin-right: 4px;"></i>
+          <span>YOWU</span> .DEV
+        </div>
+
+        <p class="chapter-label">Chapter 6. 채용 성공 사례</p>
+
+        <!-- Center title -->
+        <div style="text-align: center; margin-bottom: 16px;">
+          <i class="fa-solid fa-thumbs-up" style="font-size: 18pt; color: var(--primary-color); margin-bottom: 4px; display: block;"></i>
+          <h2 style="font-size: 20pt; font-weight: 900; color: #1a1a2e; margin-bottom: 4px;">채용 성공 사례</h2>
+          <p style="font-size: 9.5pt; color: #888;">이곳에 주제에 알맞은 내용을 입력해 주세요.</p>
+        </div>
+
+        <!-- Case studies -->
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 14px;">
+          <!-- Case 01 -->
+          <div style="flex: 1; background: #f8f9fc; border-radius: 6px; padding: 18px 22px;">
+            <div class="case-row" style="height: 100%;">
+              <div class="case-left">
+                <p class="case-badge">성공사례 01</p>
+                <p style="font-size: 12pt; font-weight: 700; color: #1a1a2e; margin-bottom: 6px;">사업부 PM 채용</p>
+                <p style="font-size: 9pt; color: #777; line-height: 1.6; font-style: italic;">"이곳에 고객사의 채용 성공 경험이나 후기를 입력해 주세요."</p>
+              </div>
+              <div class="case-boxes">
+                <div class="case-box">
+                  <p class="case-box-label">도입 전</p>
+                  <div class="case-box-sep"></div>
+                  <p class="case-box-text">자사 서비스 활용 전 채용 상황을 입력해 주세요.</p>
+                </div>
+                <div class="case-box blue">
+                  <p class="case-box-label white">도입 후</p>
+                  <div class="case-box-sep white"></div>
+                  <p class="case-box-text white">자사 서비스 활용 후 채용 상황을 입력해 주세요.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Case 02 -->
+          <div style="flex: 1; background: #f8f9fc; border-radius: 6px; padding: 18px 22px;">
+            <div class="case-row" style="height: 100%;">
+              <div class="case-left">
+                <p class="case-badge">성공사례 02</p>
+                <p style="font-size: 12pt; font-weight: 700; color: #1a1a2e; margin-bottom: 6px;">신사업 컨설팅 전문가 채용</p>
+                <p style="font-size: 9pt; color: #777; line-height: 1.6; font-style: italic;">"이곳에 고객사의 채용 성공 경험이나 후기를 입력해 주세요."</p>
+              </div>
+              <div class="case-boxes">
+                <div class="case-box">
+                  <p class="case-box-label">도입 전</p>
+                  <div class="case-box-sep"></div>
+                  <p class="case-box-text">자사 서비스 활용 전 채용 상황을 입력해 주세요.</p>
+                </div>
+                <div class="case-box blue">
+                  <p class="case-box-label white">도입 후</p>
+                  <div class="case-box-sep white"></div>
+                  <p class="case-box-text white">자사 서비스 활용 후 채용 상황을 입력해 주세요.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 10: Thank You / Last Page
+           ============================================ -->
+      <section id="slide-10" class="fullbleed" style="padding: 0 !important; background: linear-gradient(160deg, rgba(8,18,55,0.90) 0%, rgba(22,40,110,0.85) 100%), linear-gradient(135deg, #0a1540 0%, #1a2e7a 50%, #101e60 100%) !important; justify-content: flex-start !important;">
+        <!-- Brand logo top-right -->
+        <div class="brand-logo white" style="top: 22px; right: 28px;">
+          <i class="fa-solid fa-diamond" style="font-size: 6.5pt; margin-right: 4px; color: #7B93FA;"></i>
+          <span>YOWU</span> .DEV
+        </div>
+
+        <!-- Top-left thank you text -->
+        <div style="padding: 48px 80px 0; position: relative; z-index: 1;">
+          <p style="font-size: 11pt; color: rgba(255,255,255,0.55); font-weight: 300; letter-spacing: 0.04em;">끝까지 읽어주셔서 감사합니다.</p>
+        </div>
+
+        <!-- Center main text -->
+        <div style="flex: 1; display: flex; align-items: center; padding: 0 80px; position: relative; z-index: 1;">
+          <h1 style="font-size: 44pt; font-weight: 900; color: white; line-height: 1.35; letter-spacing: -0.01em;">
+            귀사의 성공적인<br>채용을 응원합니다.
+          </h1>
+        </div>
+
+        <!-- Bottom footer bar -->
+        <div class="slide-footer" style="background: var(--primary-color); padding: 16px 60px;">
+          <p style="font-size: 9pt; color: rgba(255,255,255,0.9); margin: 0;">주소 &nbsp;|&nbsp; 이곳에 주소를 입력해 주세요</p>
+          <p style="font-size: 9pt; color: rgba(255,255,255,0.9); margin: 0;">이메일 &nbsp;|&nbsp; contact@yowu.dev</p>
+          <p style="font-size: 9pt; color: rgba(255,255,255,0.9); margin: 0;">담당자 &nbsp;|&nbsp; yowu (012.345.6789)</p>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+  <script>
+    Reveal.initialize({
+      width: 1280,
+      height: 720,
+      margin: 0,
+      controls: false,
+      progress: true,
+      slideNumber: false,
+      hash: true,
+      transition: 'fade',
+      transitionSpeed: 'default',
+      center: false,
+      plugins: []
+    });
+  </script>
+</body>
+</html>

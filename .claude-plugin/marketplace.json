@@ -15,6 +15,14 @@
             "version": "1.0.0",
             "keywords": ["wikijs", "knowledge-management", "mcp"],
             "category": "productivity"
+        },
+        {
+            "name": "yowu-slide-plugin",
+            "source": "./plugins/yowu-slide-plugin",
+            "description": "reveal.js 템플릿 기반 발표 슬라이드 생성 플러그인. 5개 고품질 레이아웃 템플릿 내장.",
+            "version": "1.0.0",
+            "keywords": ["reveal.js", "slide", "presentation", "template"],
+            "category": "productivity"
         }
     ]
 }

@@ -1,0 +1,913 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report Layouts - 보고서 작성 시 자주 쓰이는 레이아웃 모음</title>
+
+  <!-- Reveal.js core -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Chart.js for data visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* NanumSquareNeo Web Font */
+    @font-face {
+      font-family: 'NanumSquareNeo';
+      src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-aLt.woff2);
+      font-weight: 300;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'NanumSquareNeo';
+      src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-bRg.woff2);
+      font-weight: 400;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'NanumSquareNeo';
+      src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-cBd.woff2);
+      font-weight: 700;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'NanumSquareNeo';
+      src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-dEb.woff2);
+      font-weight: 800;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'NanumSquareNeo';
+      src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-eHv.woff2);
+      font-weight: 900;
+      font-display: swap;
+    }
+
+    :root {
+      --background-color: #ffffff;
+      --section-divider-bg: #ffffff;
+      --heading-font: "NanumSquareNeo", "Source Sans Pro", Helvetica, sans-serif;
+      --body-font: "NanumSquareNeo", "Source Sans Pro", Helvetica, sans-serif;
+      --base-font-size: 32px;
+      --text-size: 13pt;
+      --h1-size: 48pt;
+      --h2-size: 30pt;
+      --h3-size: 20pt;
+      --footnote-size: 9pt;
+      --primary-color: #4A6CF7;
+      --primary-light: #7B93FA;
+      --primary-lighter: rgba(74, 108, 247, 0.15);
+      --secondary-color: #ff9800;
+      --text-color: #222;
+      --muted-color: #888;
+      --line-color: #ddd;
+      --slide-padding: 60px;
+      --slide-padding-top: 40px;
+      --content-gap: 20px;
+      --box-radius: 4px;
+    }
+
+    /* BASE */
+    .reveal {
+      font-family: var(--body-font);
+      font-size: var(--base-font-size);
+    }
+    .reveal strong, .reveal b { font-weight: 700; }
+    .reveal-viewport { background-color: var(--background-color); }
+    .reveal-viewport.is-section-divider .slide-background.present {
+      background-color: var(--section-divider-bg) !important;
+    }
+    .reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
+      font-family: var(--heading-font);
+      text-transform: none;
+      color: var(--text-color);
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .reveal h1 { font-size: var(--h1-size); }
+    .reveal h2 { font-size: var(--h2-size); margin-bottom: 0; }
+    .reveal h3 { font-size: var(--h3-size); }
+    .reveal p, .reveal li, .reveal td, .reveal th, .reveal blockquote {
+      font-size: var(--text-size);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+
+    /* LISTS */
+    .reveal ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 8px 0;
+    }
+    .reveal ul li {
+      position: relative;
+      padding-left: 22px;
+      margin-bottom: 6px;
+    }
+    .reveal ul li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.6em;
+      width: 7px;
+      height: 7px;
+      background: var(--text-color);
+      border-radius: 50%;
+    }
+
+    /* SLIDE LAYOUT */
+    .reveal .slides section {
+      height: 100%;
+      display: flex !important;
+      flex-direction: column !important;
+      padding: var(--slide-padding-top) var(--slide-padding) var(--slide-padding) var(--slide-padding) !important;
+      box-sizing: border-box;
+      text-align: left;
+    }
+    .reveal .slides section.stack { padding: 0 !important; }
+    .reveal .slides section > .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      padding-top: var(--content-gap);
+      text-align: left;
+    }
+    .reveal .slides section > .footnote {
+      position: absolute;
+      bottom: 15px;
+      left: var(--slide-padding);
+      right: var(--slide-padding);
+      font-size: var(--footnote-size);
+      color: var(--muted-color);
+    }
+
+    /* SECTION DIVIDERS */
+    .reveal .slides section.section-divider {
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      align-items: center !important;
+      text-align: center;
+    }
+
+    /* TEXT UTILITIES */
+    .text-lg { font-size: 15pt !important; }
+    .text-xl { font-size: 18pt !important; }
+    .text-2xl { font-size: 22pt !important; }
+    .text-3xl { font-size: 26pt !important; }
+    .text-4xl { font-size: 30pt !important; }
+    .text-muted { color: var(--muted-color) !important; }
+    .text-center { text-align: center !important; }
+    .text-uppercase { text-transform: uppercase; letter-spacing: 0.15em; }
+
+    /* =============================================
+       TEMPLATE-SPECIFIC STYLES
+       ============================================= */
+
+    /* Brand logo */
+    .brand-logo {
+      position: absolute;
+      top: 18px;
+      right: 24px;
+      font-size: 9pt;
+      font-weight: 400;
+      color: #888;
+      letter-spacing: 0.05em;
+      z-index: 10;
+    }
+    .brand-logo span {
+      font-weight: 700;
+      color: #222;
+    }
+    .brand-logo-left {
+      right: auto;
+      left: 20px;
+    }
+
+    /* Left blue accent bar */
+    .left-accent {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 8px;
+      background: var(--primary-color);
+      z-index: 10;
+    }
+
+    /* Vertical rotated text */
+    .vertical-text {
+      position: absolute;
+      left: 40px;
+      top: 50%;
+      transform: translateX(-50%) translateY(-50%) rotate(-90deg);
+      font-size: 7pt;
+      letter-spacing: 0.25em;
+      color: #bbb;
+      white-space: nowrap;
+      font-weight: 400;
+      z-index: 10;
+    }
+    .vertical-text-right {
+      left: auto;
+      right: 14px;
+      transform: translateX(0) translateY(-50%) rotate(90deg);
+    }
+
+    /* Section title style for content slides */
+    .section-label {
+      font-size: 13pt;
+      font-weight: 700;
+      color: var(--primary-color);
+      letter-spacing: 0.15em;
+      margin-bottom: 4px;
+    }
+
+    /* Subtitle with mixed bold */
+    .slide-subtitle {
+      font-size: 22pt;
+      color: var(--text-color);
+      font-weight: 400;
+      margin: 0;
+    }
+    .slide-subtitle strong { font-weight: 700; }
+
+    /* Blue header bar */
+    .blue-header-bar {
+      background: var(--primary-color);
+      color: white;
+      padding: 8px 20px;
+      font-size: 12pt;
+      font-weight: 500;
+      border-radius: 0;
+      margin: 12px 0 10px 0;
+      display: inline-block;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Blue outline header bar */
+    .blue-outline-bar {
+      border: 2px solid var(--primary-color);
+      color: var(--primary-color);
+      padding: 8px 20px;
+      font-size: 13pt;
+      font-weight: 600;
+      text-align: center;
+      margin: 10px 0;
+      box-sizing: border-box;
+    }
+
+    /* Numbered item */
+    .numbered-item {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 12px;
+      align-items: flex-start;
+    }
+    .numbered-item .num {
+      font-size: 16pt;
+      font-weight: 700;
+      color: var(--primary-color);
+      flex-shrink: 0;
+      line-height: 1.4;
+    }
+    .numbered-item .desc {
+      font-size: 11pt;
+      line-height: 1.6;
+      color: #444;
+    }
+    .numbered-item .desc strong { color: #222; }
+
+    /* Placeholder image boxes */
+    .placeholder-img {
+      background: #c8c8c8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-size: 10pt;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    /* Blue checkmark list */
+    .check-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 8px 0;
+    }
+    .check-list li {
+      position: relative;
+      padding-left: 22px;
+      margin-bottom: 5px;
+      font-size: 10pt;
+      color: #555;
+    }
+    .check-list li::before {
+      content: '\f058';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--primary-color);
+      font-size: 10pt;
+    }
+
+    /* Keyword card (Contents 03, 06) */
+    .keyword-card {
+      border: 1px solid #ddd;
+      border-top: 3px solid var(--primary-color);
+      padding: 0;
+      box-sizing: border-box;
+    }
+    .keyword-card-header {
+      background: var(--primary-color);
+      color: white;
+      padding: 8px 16px;
+      font-size: 13pt;
+      font-weight: 600;
+      text-align: center;
+    }
+    .keyword-card-body { padding: 14px 16px; }
+
+    /* Keyword row (Contents 04) */
+    .keyword-row {
+      display: flex;
+      align-items: stretch;
+      border-bottom: 1px solid #eee;
+    }
+    .keyword-row:last-child { border-bottom: none; }
+    .keyword-label {
+      width: 120px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      font-size: 14pt;
+      font-weight: 700;
+      color: var(--primary-color);
+      border-left: 4px solid var(--primary-color);
+      padding: 12px 16px;
+      background: #f8f9ff;
+    }
+    .keyword-label-blue {
+      background: var(--primary-color);
+      color: white;
+      border-left: 4px solid #3454d4;
+    }
+    .keyword-desc {
+      flex: 1;
+      padding: 12px 20px;
+      font-size: 11pt;
+      line-height: 1.6;
+      color: #444;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Cause-effect cards */
+    .cause-card {
+      background: var(--primary-color);
+      color: white;
+      border-radius: 20px;
+      padding: 24px 20px;
+      text-align: center;
+      flex: 1;
+    }
+    .effect-card {
+      background: #f8f9ff;
+      color: var(--text-color);
+      border: 2px solid var(--primary-color);
+      border-radius: 20px;
+      padding: 24px 20px;
+      text-align: center;
+      flex: 1;
+    }
+    .arrow-connector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      color: var(--primary-color);
+      font-size: 20pt;
+      padding: 0 10px;
+    }
+
+    /* Four-column card */
+    .four-col-card {
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    .four-col-header {
+      padding: 10px 8px;
+      font-size: 11pt;
+      font-weight: 600;
+    }
+    .four-col-header-blue {
+      background: var(--primary-color);
+      color: white;
+    }
+    .four-col-header-white {
+      background: white;
+      color: var(--primary-color);
+      border-bottom: 2px solid var(--primary-color);
+    }
+    .four-col-body {
+      padding: 12px 10px;
+      font-size: 10pt;
+      color: #444;
+      text-align: left;
+    }
+
+    /* Title slide specific */
+    .title-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--primary-color);
+      color: white;
+      padding: 18px 60px;
+      font-size: 9pt;
+      display: flex;
+      gap: 30px;
+      letter-spacing: 0.03em;
+    }
+    .title-footer strong {
+      font-weight: 700;
+      margin-right: 6px;
+    }
+
+    /* TOC card on blue background */
+    .toc-card {
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.25);
+      padding: 20px 16px;
+      text-align: center;
+      color: white;
+      border-radius: 2px;
+    }
+    .toc-card-label {
+      font-size: 8pt;
+      letter-spacing: 0.12em;
+      margin-bottom: 8px;
+      opacity: 0.8;
+    }
+    .toc-card-title {
+      font-size: 16pt;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+    .toc-card-desc {
+      font-size: 8pt;
+      opacity: 0.7;
+      line-height: 1.5;
+    }
+
+    /* Disable default reveal controls for clean look */
+    .reveal .controls { display: none !important; }
+    .reveal .progress { height: 3px; color: var(--primary-color); }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ============================================
+           SLIDE 1: Title Page
+           ============================================ -->
+      <section id="title-page" style="justify-content: center !important; align-items: center !important; text-align: center; padding-bottom: 80px !important;">
+        <div class="brand-logo"><i class="fa-solid fa-diamond" style="font-size: 7pt; color: var(--primary-color); margin-right: 4px;"></i> <span>YOWU</span> .DEV</div>
+
+        <p style="font-size: 11pt; color: #bbb; letter-spacing: 0.3em; font-weight: 300; margin-bottom: 10px;">COMMONLY USED</p>
+        <h1 style="font-size: 52pt; font-weight: 900; color: #1a1a2e; letter-spacing: 0.35em; line-height: 1.2; margin: 0;">REPORT<br>LAYOUTS</h1>
+        <p style="font-size: 18pt; color: #444; margin-top: 16px; font-weight: 400;">보고서 작성 시 <strong style="color: var(--primary-color); font-weight: 700;">자주 쓰이는 레이아웃</strong> 모음</p>
+        <p style="font-size: 10pt; color: var(--primary-color); margin-top: 20px; font-weight: 400;">직장인을 위한 콘텐츠 연구소</p>
+
+        <div class="title-footer">
+          <p style="font-size: 9pt; color: white; margin: 0;"><strong>DESIGNER</strong> : yowu</p>
+          <p style="font-size: 9pt; color: white; margin: 0;"><strong>MAIL</strong> : contact@yowu.dev</p>
+          <p style="font-size: 9pt; color: white; margin: 0;"><strong>PHONE</strong> : 010-16XX-0X06</p>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 2: Table of Contents
+           ============================================ -->
+      <section id="toc" data-background-color="#4A6CF7" style="justify-content: center !important; align-items: center !important; text-align: center;">
+        <div class="brand-logo" style="color: rgba(255,255,255,0.5);"><i class="fa-solid fa-diamond" style="font-size: 7pt; margin-right: 4px;"></i> <span style="color: white;">YOWU</span> .DEV</div>
+
+        <h2 style="color: white; font-size: 28pt; letter-spacing: 0.18em; font-weight: 700;">TABLE OF CONTENTS</h2>
+        <p style="color: white; font-size: 16pt; margin-top: 4px; font-weight: 400;"><strong style="color: white;">목차</strong>로 쓰기 좋은 페이지</p>
+        <p style="color: rgba(255,255,255,0.5); font-size: 14pt; margin: 6px 0 20px 0;">/</p>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; width: 90%; max-width: 900px;">
+          <div class="toc-card">
+            <p class="toc-card-label" style="color: white;">CONTENTS 01</p>
+            <p class="toc-card-title" style="color: white;">왼쪽엔 <strong>요소</strong>,<br>오른쪽엔 <strong>줄글</strong></p>
+            <p class="toc-card-desc" style="color: rgba(255,255,255,0.7);">해당 페이지를에 대한 사이트에서 도구가 들어가는 문장입니다.</p>
+          </div>
+          <div class="toc-card">
+            <p class="toc-card-label" style="color: white;">CONTENTS 02</p>
+            <p class="toc-card-title" style="color: white;"><strong>2개</strong>의 단으로<br><strong>내용정리</strong></p>
+            <p class="toc-card-desc" style="color: rgba(255,255,255,0.7);">해당 페이지를에 대한 사이트에서 도구가 들어가는 문장입니다.</p>
+          </div>
+          <div class="toc-card">
+            <p class="toc-card-label" style="color: white;">CONTENTS 03</p>
+            <p class="toc-card-title" style="color: white;">상단엔 <strong>줄글</strong>,<br>하단엔 <strong>그래프</strong></p>
+            <p class="toc-card-desc" style="color: rgba(255,255,255,0.7);">해당 페이지를에 대한 사이트에서 도구가 들어가는 문장입니다.</p>
+          </div>
+          <div class="toc-card">
+            <p class="toc-card-label" style="color: white;">CONTENTS 04</p>
+            <p class="toc-card-title" style="color: white;"><strong>3개</strong>의 키워드와<br>그에 따른 <strong>설명</strong></p>
+            <p class="toc-card-desc" style="color: rgba(255,255,255,0.7);">해당 페이지를에 대한 사이트에서 도구가 들어가는 문장입니다.</p>
+          </div>
+          <div class="toc-card">
+            <p class="toc-card-label" style="color: white;">CONTENTS 05</p>
+            <p class="toc-card-title" style="color: white;"><strong>화살표</strong>와<br><strong>인과관계</strong></p>
+            <p class="toc-card-desc" style="color: rgba(255,255,255,0.7);">해당 페이지를에 대한 사이트에서 도구가 들어가는 문장입니다.</p>
+          </div>
+          <div class="toc-card">
+            <p class="toc-card-label" style="color: white;">CONTENTS 06</p>
+            <p class="toc-card-title" style="color: white;"><strong>4단</strong>으로 구분해<br>깔끔히 <strong>정리</strong></p>
+            <p class="toc-card-desc" style="color: rgba(255,255,255,0.7);">해당 페이지를에 대한 사이트에서 도구가 들어가는 문장입니다.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 3: Contents 01 - Left elements, Right text
+           ============================================ -->
+      <section id="contents-01" style="padding-left: 80px !important;">
+        <div class="left-accent"></div>
+        <div class="vertical-text">COMMONLY USED REPORT LAYOUTS</div>
+        <div class="brand-logo"><i class="fa-solid fa-diamond" style="font-size: 7pt; color: var(--primary-color); margin-right: 4px;"></i> <span>YOWU</span> .DEV</div>
+
+        <p class="section-label" style="text-align: center;">CONTENTS 01</p>
+        <p class="slide-subtitle" style="text-align: center;"><strong>좌측 요소</strong>, <strong>우측 설명</strong> 넣는 페이지</p>
+        <p style="color: #ccc; text-align: center; font-size: 14pt; margin: 4px 0 0 0;">/</p>
+
+        <div class="content" style="padding-top: 14px;">
+          <div style="display: grid; grid-template-columns: 2fr 3fr; gap: 24px; flex: 1;">
+            <!-- Left: Placeholder images -->
+            <div style="display: grid; grid-template-rows: 1fr 1fr; gap: 10px;">
+              <div class="placeholder-img" style="background: #8899bb;">
+                <p style="color: rgba(255,255,255,0.7); font-size: 9pt; margin: 0;"><i class="fa-solid fa-image" style="margin-right: 4px;"></i> 이미지 영역</p>
+              </div>
+              <div class="placeholder-img" style="background: #7788aa;">
+                <p style="color: rgba(255,255,255,0.7); font-size: 9pt; margin: 0;"><i class="fa-solid fa-image" style="margin-right: 4px;"></i> 이미지 영역</p>
+              </div>
+            </div>
+            <!-- Right: Text content -->
+            <div>
+              <div class="blue-outline-bar" style="margin-top: 0;">소제목이 들어갈 위치</div>
+
+              <div class="numbered-item">
+                <p class="num">01</p>
+                <p class="desc">요소에 관한 문장을 입력해 주세요. 해당 페이지는 요소와 함께, <strong>업무 배경</strong>이나 개요를 설명하기 좋습니다. 서브텍스트를 입력해주세요. 요소에 관한 간단한 설명이 들어가는 영역입니다.</p>
+              </div>
+
+              <div class="numbered-item">
+                <p class="num">02</p>
+                <p class="desc">요소에 관한 문장을 입력해 주세요. 해당 페이지는 요소와 함께, 업무 배경이나 개요를 설명하기 좋습니다. 서브텍스트를 입력해주세요. <strong>요소에 관한 간단한 설명</strong>이 들어가는 영역입니다.</p>
+              </div>
+
+              <div class="numbered-item">
+                <p class="num">03</p>
+                <p class="desc">요소에 관한 문장을 입력해 주세요. 해당 페이지는 요소와 함께, 업무 배경이나 개요를 설명하기 좋습니다. <strong>서브텍스트</strong>를 입력해주세요. 요소에 관한 간단한 설명이 들어가는 영역입니다.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 4: Contents 02 - Top text, Bottom graph
+           ============================================ -->
+      <section id="contents-02" style="display: flex; flex-direction: column; height: 100%; padding-left: 80px !important;">
+        <div class="left-accent"></div>
+        <div class="vertical-text">COMMONLY USED REPORT LAYOUTS</div>
+        <div class="brand-logo"><i class="fa-solid fa-diamond" style="font-size: 7pt; color: var(--primary-color); margin-right: 4px;"></i> <span>YOWU</span> .DEV</div>
+
+        <div style="text-align: center;">
+          <p class="section-label" style="text-align: center;">CONTENTS 02</p>
+          <p class="slide-subtitle" style="text-align: center;">상단 <strong>문장</strong>, 하단 <strong>그래프</strong> 넣는 페이지</p>
+        </div>
+
+        <div class="blue-outline-bar" style="margin-top: 10px;">소제목이 들어갈 위치</div>
+
+        <p style="font-size: 10pt; color: #555; text-align: center; line-height: 1.7; margin: 6px 0 8px 0;">
+          상단에는 아래의 <strong>그래프</strong>나 <strong>수치와 관련된 내용</strong>을 입력해 주세요. 프레젠테이션 <strong>주제와 관련된 동향</strong>이나 트렌드 등을 설명하는 용도로<br>
+          사용해도 좋습니다. 상단에는 아래의 그래프나 수치와 관련된 내용을 입력해 주세요. 주제와 관련된 <strong>동향이나, 전망, 트렌드 등을 설명</strong>하는<br>
+          용도로 사용해도 좋습니다. 상단에는 아래의 <strong>그래프</strong>나 <strong>수치</strong>와 관련된 내용을 입력해 주세요.
+        </p>
+
+        <div style="flex: 1; position: relative; min-height: 0;">
+          <canvas data-chart="line">
+          <!--
+          {
+            "data": {
+              "labels": ["항목 01", "항목 02", "항목 03", "항목 04", "항목 05", "항목 06", "항목 07", "항목 08", "항목 09", "항목 10"],
+              "datasets": [{
+                "label": "데이터",
+                "data": [3, 8, 19, 26, 32, 65, 49, 30, 80, 99],
+                "borderColor": "#4A6CF7",
+                "backgroundColor": "rgba(74, 108, 247, 0.08)",
+                "pointBackgroundColor": "#4A6CF7",
+                "pointBorderColor": "#4A6CF7",
+                "pointRadius": 5,
+                "pointHoverRadius": 7,
+                "fill": true,
+                "tension": 0.1,
+                "borderWidth": 2
+              }]
+            },
+            "options": {
+              "maintainAspectRatio": false,
+              "plugins": {
+                "legend": { "display": false }
+              },
+              "scales": {
+                "y": {
+                  "beginAtZero": true,
+                  "max": 100,
+                  "grid": { "color": "rgba(0,0,0,0.06)" },
+                  "ticks": { "color": "#999", "font": { "size": 10 } }
+                },
+                "x": {
+                  "grid": { "display": false },
+                  "ticks": { "color": "#999", "font": { "size": 10 } }
+                }
+              }
+            }
+          }
+          -->
+          </canvas>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 5: Contents 03 - Two columns
+           ============================================ -->
+      <section id="contents-03" style="padding-left: 80px !important;">
+        <div class="left-accent"></div>
+        <div class="vertical-text">COMMONLY USED REPORT LAYOUTS</div>
+        <div class="brand-logo"><i class="fa-solid fa-diamond" style="font-size: 7pt; color: var(--primary-color); margin-right: 4px;"></i> <span>YOWU</span> .DEV</div>
+
+        <p class="section-label" style="text-align: center;">CONTENTS 03</p>
+        <p class="slide-subtitle" style="text-align: center;"><strong>2단</strong>으로 <strong>내용 나누는</strong> 페이지</p>
+        <p style="font-size: 9pt; color: #999; margin-top: 2px; text-align: center;">제목 아래에는, 해당 페이지를 간략하게 요약하는 문장을 입력해 보세요.</p>
+        <p style="color: #ccc; text-align: center; font-size: 14pt; margin: 2px 0 0 0;">/</p>
+
+        <div class="content" style="padding-top: 10px;">
+          <div class="blue-outline-bar" style="margin-top: 0;">소제목이 들어갈 위치</div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; flex: 1; margin-top: 8px;">
+            <!-- Column 1 -->
+            <div class="keyword-card">
+              <div class="keyword-card-header">주요 키워드 1</div>
+              <div class="keyword-card-body">
+                <p style="font-size: 12pt; font-weight: 600; margin-bottom: 10px;"><strong>주요 키워드 1</strong>을 설명하는 문장을 입력해 주세요.</p>
+                <ul class="check-list">
+                  <li>키워드에 관한 세부 사항을 입력하는 영역입니다.</li>
+                  <li>단추형 항목을 활용해도 좋습니다.</li>
+                  <li>주요키워드에대한 세부설명을 입력해주세요.</li>
+                </ul>
+              </div>
+            </div>
+            <!-- Column 2 -->
+            <div class="keyword-card">
+              <div class="keyword-card-header">주요 키워드 2</div>
+              <div class="keyword-card-body">
+                <p style="font-size: 12pt; font-weight: 600; margin-bottom: 10px;"><strong>주요 키워드 2</strong>를 설명하는 문장을 입력해 주세요.</p>
+                <ul class="check-list">
+                  <li>키워드에 관한 세부 사항을 입력하는 영역입니다.</li>
+                  <li>단추형 항목을 활용해도 좋습니다.</li>
+                  <li>주요키워드에대한 세부설명을 입력해주세요.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 6: Contents 04 - Three keywords
+           ============================================ -->
+      <section id="contents-04" style="padding-right: 80px !important;">
+        <div class="brand-logo brand-logo-left"><i class="fa-solid fa-diamond" style="font-size: 7pt; color: var(--primary-color); margin-right: 4px;"></i> <span>YOWU</span> .DEV</div>
+        <div class="vertical-text vertical-text-right">COMMONLY USED REPORT LAYOUTS</div>
+
+        <div style="text-align: center;">
+          <p class="section-label" style="text-align: center;">CONTENTS 04</p>
+          <p class="slide-subtitle" style="text-align: center;">3가지 <strong>키워드</strong>를 <strong>설명</strong>하는 페이지</p>
+        </div>
+
+        <div class="content" style="padding-top: 10px;">
+          <p style="font-size: 14pt; color: var(--primary-color); font-weight: 600; text-align: center; margin-bottom: 2px;">소제목이 들어갈 위치</p>
+          <p style="font-size: 9pt; color: #999; text-align: center; margin-bottom: 6px;">아래 키워드들을 간단하게 요약하는 한 문장을 입력해보세요.</p>
+          <p style="color: #ccc; text-align: center; font-size: 14pt; margin: 0 0 10px 0;">/</p>
+
+          <div style="display: flex; flex-direction: column; gap: 0;">
+            <div class="keyword-row">
+              <div class="keyword-label">키워드 1</div>
+              <div class="keyword-desc">
+                <p style="font-size: 11pt; color: #444;"><strong>키워드1</strong>을 설명하는 문장을 입력해 주세요.<br>키워드1에 관한 현상이 어떻게 변화하고 있는지, 왜 중요한지 등을 간략하게 요약해 보세요.</p>
+              </div>
+            </div>
+            <div class="keyword-row">
+              <div class="keyword-label">키워드 2</div>
+              <div class="keyword-desc">
+                <p style="font-size: 11pt; color: #444;"><strong>키워드2</strong>를 설명하는 문장을 입력해 주세요.<br>키워드2에 관한 현상이 어떻게 변화하고 있는지, 왜 중요한지 등을 간략하게 요약해 보세요.</p>
+              </div>
+            </div>
+            <div class="keyword-row">
+              <div class="keyword-label keyword-label-blue">결론</div>
+              <div class="keyword-desc">
+                <p style="font-size: 11pt; color: var(--primary-color);"><strong>결론을 설명하는 문장</strong>을 입력해 주세요.<br>가장 중요한 문장을 첫번째로, 원인이나 배경이 되는 문장을 다음으로 배치해 보세요.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 7: Contents 05 - Cause and Effect
+           ============================================ -->
+      <section id="contents-05" style="padding-right: 80px !important;">
+        <div class="brand-logo brand-logo-left"><i class="fa-solid fa-diamond" style="font-size: 7pt; color: var(--primary-color); margin-right: 4px;"></i> <span>YOWU</span> .DEV</div>
+        <div class="vertical-text vertical-text-right">COMMONLY USED REPORT LAYOUTS</div>
+
+        <div style="text-align: center;">
+          <p class="section-label" style="text-align: center;">CONTENTS 05</p>
+          <p class="slide-subtitle" style="text-align: center;">화살표를 활용한 <strong>인과관계</strong> 페이지</p>
+          <p style="color: #ccc; text-align: center; font-size: 14pt; margin: 4px 0 0 0;">/</p>
+        </div>
+
+        <div class="content" style="padding-top: 10px; align-items: center;">
+          <p style="font-size: 14pt; color: var(--primary-color); font-weight: 600; text-align: center;">소제목이 들어갈 위치</p>
+          <p style="font-size: 9pt; color: #999; text-align: center; margin-bottom: 20px;">아래 인과관계를 설명하는 간단한 문장을 입력해보세요. 결론을 작성한 뒤, 원인과 과정을 설명하면 더욱 깔끔하게 보고할 수 있습니다.</p>
+
+          <div style="display: flex; align-items: center; gap: 0; width: 85%; margin: 0 auto;">
+            <!-- Left card (Cause) -->
+            <div class="cause-card">
+              <p style="color: rgba(255,255,255,0.7); font-size: 22pt; margin-bottom: 8px;"><i class="fa-solid fa-display"></i></p>
+              <p style="color: white; font-size: 16pt; font-weight: 700; margin-bottom: 10px;">주요 키워드 1</p>
+              <p style="color: rgba(255,255,255,0.85); font-size: 10pt; line-height: 1.6;">키워드1에 관한 <strong style="color: white;">간단한 설명</strong>을 작성해 보세요.<br>2~3줄 정도의 간략한 <strong style="color: white;">세부설명</strong>이<br>들어가는 영역입니다.</p>
+            </div>
+
+            <!-- Arrows -->
+            <div class="arrow-connector">
+              <span>&#9654;</span><span>&#9654;</span><span>&#9654;</span>
+            </div>
+
+            <!-- Right card (Effect) -->
+            <div class="effect-card">
+              <p style="color: var(--primary-color); font-size: 22pt; margin-bottom: 8px;"><i class="fa-solid fa-gear"></i></p>
+              <p style="color: var(--text-color); font-size: 16pt; font-weight: 700; margin-bottom: 10px;">주요 키워드 2</p>
+              <p style="color: #666; font-size: 10pt; line-height: 1.6;">키워드2에 관한 <strong>간단한 설명</strong>을 작성해 보세요.<br>2~3줄 정도의 간략한 <strong>세부설명</strong>이<br>들어가는 영역입니다.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 8: Contents 06 - Four columns
+           ============================================ -->
+      <section id="contents-06" style="padding-left: 80px !important;">
+        <div class="left-accent"></div>
+        <div class="vertical-text vertical-text-right">COMMONLY USED REPORT LAYOUTS</div>
+        <div class="brand-logo brand-logo-left"><i class="fa-solid fa-diamond" style="font-size: 7pt; color: var(--primary-color); margin-right: 4px;"></i> <span>YOWU</span> .DEV</div>
+
+        <p class="section-label" style="text-align: center;">CONTENTS 06</p>
+        <p class="slide-subtitle" style="text-align: center;"><strong>4단</strong>으로 <strong>내용 나누는</strong> 페이지</p>
+        <p style="font-size: 9pt; color: #999; margin-top: 2px; text-align: center;">제목 아래에는, 해당 페이지를 간략하게 요약하는 문장을 입력해 보세요.</p>
+
+        <div class="content" style="padding-top: 8px;">
+          <div class="blue-outline-bar" style="margin-top: 0;">소제목이 들어갈 위치</div>
+
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; flex: 1; margin-top: 8px;">
+            <!-- Col 1 -->
+            <div class="four-col-card">
+              <div class="four-col-header four-col-header-blue">[ 주요 키워드 1 ]</div>
+              <div class="four-col-body">
+                <p style="font-size: 10pt; text-align: center; margin-bottom: 10px;"><strong>주요 키워드 1</strong>에 대해 설명하는 문장을 입력해 주세요.</p>
+                <ul class="check-list">
+                  <li>키워드 설명을 입력하는 영역입니다.</li>
+                  <li>단추형 항목을 활용해도 좋습니다.</li>
+                  <li>주요키워드에대한 세부설명을 입력합니다.</li>
+                </ul>
+              </div>
+            </div>
+            <!-- Col 2 -->
+            <div class="four-col-card">
+              <div class="four-col-header four-col-header-blue">[ 주요 키워드 2 ]</div>
+              <div class="four-col-body">
+                <p style="font-size: 10pt; text-align: center; margin-bottom: 10px;"><strong>주요 키워드 2</strong>에 대해 설명하는 문장을 입력해 주세요.</p>
+                <ul class="check-list">
+                  <li>키워드 설명을 입력하는 영역입니다.</li>
+                  <li>시사점 서술을 활용해도 좋습니다.</li>
+                  <li>주요 키워드에대한 세부설명합니다.</li>
+                </ul>
+              </div>
+            </div>
+            <!-- Col 3 -->
+            <div class="four-col-card">
+              <div class="four-col-header four-col-header-white">[ 주요 키워드 3 ]</div>
+              <div class="four-col-body">
+                <p style="font-size: 10pt; text-align: center; margin-bottom: 10px;"><strong>주요 키워드 3</strong>에 대해 설명하는 문장을 입력해 주세요.</p>
+                <ul class="check-list">
+                  <li>키워드 설명을 입력하는 영역입니다.</li>
+                  <li>단추형 항목을 활용해도 좋습니다.</li>
+                  <li>주요키워드에대한 세부설명합니다.</li>
+                </ul>
+              </div>
+            </div>
+            <!-- Col 4 -->
+            <div class="four-col-card">
+              <div class="four-col-header four-col-header-white">[ 주요 키워드 4 ]</div>
+              <div class="four-col-body">
+                <p style="font-size: 10pt; text-align: center; margin-bottom: 10px;"><strong>주요 키워드 4</strong>에 대해 설명하는 문장을 입력해 주세요.</p>
+                <ul class="check-list">
+                  <li>키워드 설명을 입력하는 영역입니다.</li>
+                  <li>단추형 항목을 활용해도 좋습니다.</li>
+                  <li>주요키워드에대한 세부설명합니다.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+           SLIDE 9: Last Page / Thank You
+           ============================================ -->
+      <section id="last-page" style="padding: 0 !important;">
+        <div class="brand-logo" style="right: 24px; top: 18px;"><i class="fa-solid fa-diamond" style="font-size: 7pt; color: var(--primary-color); margin-right: 4px;"></i> <span>YOWU</span> .DEV</div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; height: 100%;">
+          <!-- Left: Blue photo overlay -->
+          <div style="background: linear-gradient(135deg, rgba(74, 108, 247, 0.88), rgba(55, 80, 210, 0.82)), url('') center/cover; display: flex; align-items: center; justify-content: center;">
+            <p style="color: rgba(255,255,255,0.3); font-size: 12pt;"><i class="fa-solid fa-users" style="font-size: 48pt;"></i></p>
+          </div>
+
+          <!-- Right: Thank you content -->
+          <div style="display: flex; flex-direction: column; justify-content: center; padding: 50px 50px 50px 40px;">
+            <p style="font-size: 12pt; color: #ccc; font-style: italic; font-weight: 300; letter-spacing: 0.1em; margin-bottom: 6px;">THANK YOU</p>
+            <h2 style="font-size: 48pt; font-weight: 900; color: #1a1a2e; letter-spacing: 0.3em; line-height: 1.15; margin: 0;">LAST<br>PAGE</h2>
+
+            <p style="font-size: 12pt; color: #444; line-height: 1.8; margin-top: 20px;">
+              이곳에는 <strong>마지막 인사</strong>나,<br>
+              앞에서 담지 못한 <strong>부가적인 정보</strong> 혹은<br>
+              <strong>동기를 부여할 한마디</strong>를 입력해보세요.
+            </p>
+
+            <p style="font-size: 10pt; color: var(--primary-color); margin-top: 16px; font-weight: 400;">직장인을 위한 콘텐츠 연구소</p>
+
+            <div style="margin-top: 20px;">
+              <p style="font-size: 9pt; color: #666; margin: 3px 0;"><strong>DESIGNER</strong> : yowu</p>
+              <p style="font-size: 9pt; color: #666; margin: 3px 0;"><strong>MAIL</strong> : contact@yowu.dev</p>
+              <p style="font-size: 9pt; color: #666; margin: 3px 0;"><strong>PHONE</strong> : 010-16XX-0X06</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js-plugins@latest/chart/plugin.js"></script>
+  <script>
+    Reveal.initialize({
+      width: 1280,
+      height: 720,
+      margin: 0,
+      controls: false,
+      progress: true,
+      slideNumber: false,
+      hash: true,
+      transition: 'fade',
+      transitionSpeed: 'default',
+      center: false,
+      plugins: [ RevealChart ],
+      chart: {
+        defaults: Object.assign({
+          color: 'rgba(0, 0, 0, 0.8)',
+          borderColor: 'rgba(0, 0, 0, 0.8)',
+          devicePixelRatio: 2
+        }, window.location.search.includes('export') ? { animation: false } : {})
+      }
+    });
+  </script>
+</body>
+</html>
