@@ -7,5 +7,14 @@
         "description": "yowu의 개인 Claude Code 플러그인 마켓플레이스",
         "version": "0.1.0"
     },
-    "plugins": []
+    "plugins": [
+        {
+            "name": "yowu-wikijs-plugin",
+            "source": "./plugins/yowu-wikijs-plugin",
+            "description": "wiki.yowu.dev WikiJS 지식 관리 플러그인 (WikiJS MCP 통합)",
+            "version": "1.0.0",
+            "keywords": ["wikijs", "knowledge-management", "mcp"],
+            "category": "productivity"
+        }
+    ]
 }

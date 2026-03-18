@@ -1,0 +1,22 @@
+{
+    "name": "yowu-wikijs-plugin",
+    "description": "wiki.yowu.dev 지식 관리 플러그인. WikiJS MCP를 통한 검색, 생성, 수정, 삭제 + 자동 분류/관련 문서 링킹.",
+    "version": "1.0.0",
+    "author": {
+        "name": "yowu"
+    },
+    "mcpServers": {
+        "wikijs": {
+            "command": "npx",
+            "args": ["-y", "@yowu-dev/requarks-wiki-mcp"],
+            "env": {
+                "WIKI_BASE_URL": "${WIKI_BASE_URL:-https://wiki.yowu.dev}",
+                "WIKI_API_TOKEN": "${WIKI_API_TOKEN}",
+                "WIKI_DEFAULT_LOCALE": "${WIKI_DEFAULT_LOCALE:-ko}",
+                "WIKI_DEFAULT_EDITOR": "markdown",
+                "WIKI_MUTATIONS_ENABLED": "${WIKI_MUTATIONS_ENABLED:-true}",
+                "WIKI_MUTATION_DRY_RUN": "${WIKI_MUTATION_DRY_RUN:-false}"
+            }
+        }
+    }
+}
