@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CLI Tools in Rust</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-aLt.woff2); font-weight: 300; font-display: swap; }
+    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-bRg.woff2); font-weight: 400; font-display: swap; }
+    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-cBd.woff2); font-weight: 700; font-display: swap; }
+    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-dEb.woff2); font-weight: 800; font-display: swap; }
+    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-eHv.woff2); font-weight: 900; font-display: swap; }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+    body {
+      font-family: 'NanumSquareNeo', -apple-system, sans-serif;
+      background: #0a0a0a;
+      color: #f5f5f5;
+      line-height: 1.7;
+      overflow-x: hidden;
+      counter-reset: slide;
+    }
+
+    .slide {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 80px;
+      position: relative;
+      overflow: hidden;
+      scroll-snap-align: start;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .slide::after {
+      counter-increment: slide;
+      content: counter(slide, decimal-leading-zero);
+      position: absolute;
+      bottom: 30px;
+      right: 40px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.15);
+      font-weight: 500;
+    }
+
+    .slide--title {
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+      text-align: center;
+    }
+    .slide--title .badge {
+      display: inline-block;
+      padding: 8px 24px;
+      border: 1px solid rgba(0,210,255,0.4);
+      border-radius: 100px;
+      font-size: 14px;
+      color: #00d2ff;
+      letter-spacing: 2px;
+      margin-bottom: 40px;
+      text-transform: uppercase;
+    }
+    .slide--title h1 {
+      font-size: clamp(2.25rem, 8vw, 4rem);
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #00d2ff, #7b2ff7, #ff6b6b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .slide--title .subtitle {
+      font-size: 22px;
+      color: rgba(255,255,255,0.6);
+      font-weight: 300;
+      line-height: 1.6;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .label {
+      font-size: 13px;
+      letter-spacing: 3px;
+      color: #00d2ff;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+    h2 {
+      font-size: clamp(1.75rem, 5vw, 2.625rem);
+      font-weight: 900;
+      margin-bottom: 40px;
+      line-height: 1.3;
+    }
+    h2 .em { color: #00d2ff; }
+    h2 .em2 { color: #7b2ff7; }
+
+    .desc {
+      font-size: 15px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.7;
+      margin-bottom: 32px;
+      max-width: 700px;
+    }
+
+    pre { border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
+    pre code { font-size: 14px; line-height: 1.6; padding: 24px !important; }
+
+    .stat-row { display: flex; gap: 24px; margin-bottom: 32px; }
+    .stat-box {
+      flex: 1;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 24px;
+      text-align: center;
+    }
+    .stat-num {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, #00d2ff, #7b2ff7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 8px;
+    }
+
+    .slide--closing {
+      text-align: center;
+      background: linear-gradient(135deg, #16213e, #1a1a2e, #0a0a0a);
+    }
+    .slide--closing h2 {
+      font-size: clamp(2rem, 6vw, 3rem);
+      background: linear-gradient(135deg, #00d2ff, #7b2ff7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .slide--closing p {
+      font-size: 18px;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.7;
+    }
+
+    @media (max-width: 768px) {
+      .slide { padding: 40px 24px; }
+      .stat-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="slide slide--title">
+    <div class="badge">Tech Talk</div>
+    <h1>Rust로 만드는<br>CLI Tools</h1>
+    <p class="subtitle">
+      빠르고, 안전하고, 배포가 간편한<br>
+      차세대 커맨드라인 도구 개발기
+    </p>
+  </div>
+
+  <div class="slide">
+    <div class="label">Why Rust</div>
+    <h2><span class="em">Zero-cost abstractions</span>과<br>메모리 안전성</h2>
+    <p class="desc">
+      Rust는 가비지 컬렉터 없이 메모리 안전성을 보장합니다.
+      소유권 시스템 덕분에 컴파일 타임에 대부분의 버그를 잡아냅니다.
+    </p>
+    <pre><code class="language-rust">use clap::Parser;
+
+#[derive(Parser)]
+#[command(name = "rtk", about = "Rust Token Killer")]
+struct Cli {
+    #[arg(short, long)]
+    verbose: bool,
+
+    #[command(subcommand)]
+    command: Commands,
+}</code></pre>
+  </div>
+
+  <div class="slide">
+    <div class="label">Performance</div>
+    <h2>벤치마크: <span class="em">Node.js</span> vs <span class="em2">Rust</span></h2>
+    <p class="desc">
+      동일한 파일 처리 작업에서 Rust CLI가 압도적인 성능 차이를 보여줍니다.
+    </p>
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="stat-num">47x</div>
+        <div class="stat-label">실행 속도 향상</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">1/20</div>
+        <div class="stat-label">메모리 사용량</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">5MB</div>
+        <div class="stat-label">단일 바이너리 크기</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide slide--closing">
+    <h2>Start Building<br>with Rust</h2>
+    <p>
+      오늘부터 당신의 CLI 도구를<br>
+      Rust로 다시 만들어 보세요.
+    </p>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>개발자 요우 — from Backend Developer to Product Engineer</title>
+
+  <!-- highlight.js Dark Theme -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <!-- KaTeX CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+
+  <style>
+    /* ============================================================
+       NanumSquareNeo @font-face
+    ============================================================ */
+    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-aLt.woff2); font-weight: 300; font-display: swap; }
+    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-bRg.woff2); font-weight: 400; font-display: swap; }
+    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-cBd.woff2); font-weight: 700; font-display: swap; }
+    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-dEb.woff2); font-weight: 800; font-display: swap; }
+    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-eHv.woff2); font-weight: 900; font-display: swap; }
+
+    /* ============================================================
+       CSS Variables — Dark Theme (frontend-design)
+    ============================================================ */
+    :root {
+      --bg-base: #080b14;
+      --bg-surface: rgba(255, 255, 255, 0.04);
+      --bg-glass: rgba(255, 255, 255, 0.07);
+      --bg-glass-hover: rgba(255, 255, 255, 0.11);
+
+      --color-primary: #00d2ff;
+      --color-secondary: #7b2ff7;
+      --color-accent: #ff6b6b;
+      --color-success: #00f5a0;
+
+      --gradient-main: linear-gradient(135deg, #00d2ff 0%, #7b2ff7 60%, #ff6b6b 100%);
+      --gradient-subtle: linear-gradient(135deg, rgba(0,210,255,0.15) 0%, rgba(123,47,247,0.15) 100%);
+      --gradient-border: linear-gradient(135deg, #00d2ff, #7b2ff7, #ff6b6b);
+
+      --text-primary: #f0f4ff;
+      --text-secondary: rgba(240, 244, 255, 0.6);
+      --text-muted: rgba(240, 244, 255, 0.35);
+
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(0, 210, 255, 0.3);
+
+      --glow-cyan: 0 0 40px rgba(0, 210, 255, 0.25), 0 0 80px rgba(0, 210, 255, 0.1);
+      --glow-purple: 0 0 40px rgba(123, 47, 247, 0.3), 0 0 80px rgba(123, 47, 247, 0.1);
+
+      --font: 'NanumSquareNeo', 'Noto Sans KR', -apple-system, sans-serif;
+      --radius: 16px;
+      --radius-sm: 8px;
+    }
+
+    /* ============================================================
+       Reset & Base
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      scroll-snap-type: y mandatory;
+      overflow-y: scroll;
+      background: var(--bg-base);
+    }
+
+    body {
+      font-family: var(--font);
+      color: var(--text-primary);
+      background: var(--bg-base);
+      counter-reset: slide;
+    }
+
+    /* ============================================================
+       CSS Counter — Page Numbers
+    ============================================================ */
+    .slide {
+      counter-increment: slide;
+      position: relative;
+    }
+    .slide::after {
+      content: counter(slide, decimal-leading-zero) " / 10";
+      position: absolute;
+      bottom: 24px;
+      right: 32px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      z-index: 100;
+    }
+    .slide--title::after { display: none; }
+
+    /* ============================================================
+       Slide Base Layout
+    ============================================================ */
+    .slide {
+      height: 100vh;
+      overflow: hidden;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 40px;
+      position: relative;
+    }
+
+    .slide--overflow {
+      min-height: 100vh;
+      height: auto;
+      overflow: visible;
+    }
+
+    /* Ambient Background Mesh */
+    .slide::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 20% 30%, rgba(0, 210, 255, 0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 60% at 80% 70%, rgba(123, 47, 247, 0.07) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .slide__inner {
+      width: 100%;
+      max-width: 960px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .slide__inner--narrow {
+      max-width: 720px;
+    }
+
+    /* ============================================================
+       Common Components
+    ============================================================ */
+    .label {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      margin-bottom: 16px;
+    }
+
+    .heading {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 900;
+      line-height: 1.15;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+    }
+
+    .heading .em {
+      background: var(--gradient-main);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .desc {
+      font-size: 17px;
+      font-weight: 400;
+      line-height: 1.8;
+      color: var(--text-secondary);
+    }
+
+    /* Gradient Text */
+    .gradient-text {
+      background: var(--gradient-main);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Glass Card */
+    .glass-card {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: background 0.3s, border-color 0.3s, transform 0.3s;
+    }
+
+    .glass-card:hover {
+      background: var(--bg-glass-hover);
+      border-color: rgba(0, 210, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    /* Gradient Border Card */
+    .gradient-border-card {
+      position: relative;
+      border-radius: var(--radius);
+    }
+    .gradient-border-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius);
+      padding: 1px;
+      background: var(--gradient-border);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0.4;
+    }
+
+    /* Tag / Chip */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(0, 210, 255, 0.1);
+      border: 1px solid rgba(0, 210, 255, 0.25);
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--color-primary);
+      letter-spacing: 0.02em;
+    }
+
+    .tag--purple {
+      background: rgba(123, 47, 247, 0.12);
+      border-color: rgba(123, 47, 247, 0.3);
+      color: #b06fff;
+    }
+
+    /* Divider */
+    .divider {
+      width: 48px;
+      height: 3px;
+      background: var(--gradient-main);
+      border-radius: 2px;
+      margin: 24px 0;
+    }
+
+    /* ============================================================
+       Slide 1 — Title
+    ============================================================ */
+    .slide--title {
+      background: var(--bg-base);
+      overflow: hidden;
+    }
+
+    .slide--title::before {
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 50%, rgba(0, 210, 255, 0.1) 0%, transparent 55%),
+        radial-gradient(ellipse 60% 80% at 20% 80%, rgba(123, 47, 247, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 50% at 85% 15%, rgba(255, 107, 107, 0.08) 0%, transparent 50%);
+    }
+
+    .title-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .title-eyebrow .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      box-shadow: 0 0 12px var(--color-primary);
+    }
+
+    .title-main {
+      font-size: clamp(3.5rem, 9vw, 7rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+    }
+
+    .title-sub {
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      font-weight: 300;
+      color: var(--text-secondary);
+      letter-spacing: 0.04em;
+      margin-bottom: 40px;
+    }
+
+    .title-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .title-icons {
+      position: absolute;
+      right: 5%;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      opacity: 0.15;
+    }
+
+    .title-icons .iconify {
+      font-size: 80px;
+      color: var(--color-primary);
+    }
+
+    /* Glow Orb */
+    .glow-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+    }
+    .glow-orb--cyan {
+      width: 500px;
+      height: 500px;
+      background: rgba(0, 210, 255, 0.12);
+      top: -150px;
+      right: -100px;
+    }
+    .glow-orb--purple {
+      width: 400px;
+      height: 400px;
+      background: rgba(123, 47, 247, 0.12);
+      bottom: -100px;
+      left: -80px;
+    }
+
+    /* ============================================================
+       Slide 2 — Stat Grid
+    ============================================================ */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .stat-box {
+      padding: 32px 24px;
+      text-align: center;
+      position: relative;
+    }
+
+    .stat-box__icon {
+      margin-bottom: 16px;
+    }
+
+    .stat-box__icon .iconify {
+      font-size: 28px;
+      color: var(--color-primary);
+    }
+
+    .stat-box__num {
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      font-weight: 900;
+      line-height: 1;
+      background: var(--gradient-main);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    .stat-box__label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .profile-intro {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .profile-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--gradient-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 900;
+      color: #fff;
+      flex-shrink: 0;
+      box-shadow: var(--glow-cyan);
+    }
+
+    .profile-name {
+      font-size: 1.6rem;
+      font-weight: 900;
+    }
+
+    .profile-role {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* ============================================================
+       Slide 3 — Radar Chart
+    ============================================================ */
+    .chart-container {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    /* ============================================================
+       Slide 4 — Timeline
+    ============================================================ */
+    .slide--timeline {
+      min-height: 100vh;
+      height: auto;
+      overflow: visible;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 48px;
+      margin-top: 32px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 12px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--color-primary), var(--color-secondary));
+      border-radius: 1px;
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 28px;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -40px;
+      top: 6px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      box-shadow: 0 0 12px var(--color-primary);
+      border: 2px solid var(--bg-base);
+    }
+
+    .timeline-year {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      color: var(--color-primary);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .timeline-company {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+    }
+
+    .timeline-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* ============================================================
+       Slide 5 — Mermaid Architecture
+    ============================================================ */
+    .mermaid-wrap {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius);
+      padding: 32px;
+      backdrop-filter: blur(20px);
+      overflow: auto;
+    }
+
+    .mermaid {
+      font-family: var(--font);
+    }
+
+    /* ============================================================
+       Slide 6 — Bar Chart
+    ============================================================ */
+    .chart-bar-wrap {
+      position: relative;
+      width: 100%;
+      max-height: 380px;
+    }
+
+    /* ============================================================
+       Slide 7 — Card Grid (OpenSource)
+    ============================================================ */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-top: 36px;
+    }
+
+    .card {
+      padding: 28px;
+      position: relative;
+    }
+
+    .card__icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(0,210,255,0.15), rgba(123,47,247,0.15));
+      border: 1px solid rgba(0,210,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .card__icon .iconify {
+      font-size: 22px;
+      color: var(--color-primary);
+    }
+
+    .card__title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      font-family: 'Consolas', 'Monaco', monospace;
+    }
+
+    .card__desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .card__badge {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 3px 10px;
+      background: rgba(0,210,255,0.08);
+      border: 1px solid rgba(0,210,255,0.2);
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--color-primary);
+      letter-spacing: 0.06em;
+    }
+
+    /* ============================================================
+       Slide 8 — Code + Talks
+    ============================================================ */
+    .slide--code-talk {
+      min-height: 100vh;
+      height: auto;
+      overflow: visible;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-top: 32px;
+      align-items: start;
+    }
+
+    .talk-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .talk-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding: 14px 18px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+    }
+
+    .talk-item__year {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: var(--color-primary);
+      white-space: nowrap;
+      padding-top: 2px;
+    }
+
+    .talk-item__title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+
+    .code-section h3 {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .code-section pre {
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      font-size: 12.5px;
+      line-height: 1.6;
+    }
+
+    /* ============================================================
+       Slide 9 — Math / Growth Formula
+    ============================================================ */
+    .math-block {
+      background: var(--bg-glass);
+      border: 1px solid rgba(0,210,255,0.15);
+      border-radius: var(--radius);
+      padding: 36px;
+      text-align: center;
+      margin: 28px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .math-block::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0,210,255,0.05), rgba(123,47,247,0.05));
+    }
+
+    .math-block .katex-display {
+      margin: 0;
+    }
+
+    .math-inline-desc {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    .math-legend {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 16px;
+    }
+
+    .quote-box {
+      margin-top: 28px;
+      padding: 28px 32px;
+      border-left: 3px solid var(--color-primary);
+      background: rgba(0,210,255,0.04);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+
+    .quote-box__text {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.7;
+    }
+
+    .quote-box__source {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ============================================================
+       Slide 10 — Closing
+    ============================================================ */
+    .slide--closing::before {
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 50%, rgba(123, 47, 247, 0.1) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 10% 90%, rgba(0, 210, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse 40% 40% at 90% 10%, rgba(255,107,107,0.07) 0%, transparent 50%);
+    }
+
+    .closing-title {
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 900;
+      line-height: 1.05;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .closing-sub {
+      text-align: center;
+      font-size: 18px;
+      color: var(--text-secondary);
+      margin-bottom: 48px;
+    }
+
+    .contact-links {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    .contact-link {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 24px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 15px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .contact-link:hover {
+      background: var(--bg-glass-hover);
+      border-color: rgba(0,210,255,0.25);
+    }
+
+    .contact-link .iconify {
+      font-size: 20px;
+      color: var(--color-primary);
+      flex-shrink: 0;
+    }
+
+    .contact-link span {
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    /* ============================================================
+       Responsive 768px
+    ============================================================ */
+    @media (max-width: 768px) {
+      .slide {
+        padding: 48px 24px;
+      }
+
+      .stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+      }
+
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+
+      .title-icons {
+        display: none;
+      }
+
+      .title-main {
+        font-size: 3rem;
+      }
+
+      .timeline {
+        padding-left: 36px;
+      }
+
+      .chart-container {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       Slide 1 — Title
+  ============================================================ -->
+  <section class="slide slide--title">
+    <div class="glow-orb glow-orb--cyan"></div>
+    <div class="glow-orb glow-orb--purple"></div>
+
+    <div class="slide__inner">
+      <div class="title-eyebrow">
+        <div class="dot"></div>
+        <span class="label">Portfolio 2025</span>
+      </div>
+
+      <h1 class="title-main">
+        <span class="gradient-text">개발자 요우</span>
+      </h1>
+
+      <p class="title-sub">from Backend Developer to Product Engineer</p>
+
+      <div class="title-tags">
+        <span class="tag">
+          <span class="iconify" data-icon="lucide:code-2"></span>
+          Kotlin
+        </span>
+        <span class="tag">
+          <span class="iconify" data-icon="lucide:server"></span>
+          Spring Boot
+        </span>
+        <span class="tag tag--purple">
+          <span class="iconify" data-icon="lucide:layers"></span>
+          Node.js
+        </span>
+        <span class="tag tag--purple">
+          <span class="iconify" data-icon="lucide:database"></span>
+          Kubernetes
+        </span>
+      </div>
+    </div>
+
+    <div class="title-icons" aria-hidden="true">
+      <span class="iconify" data-icon="lucide:code-2"></span>
+      <span class="iconify" data-icon="lucide:server"></span>
+      <span class="iconify" data-icon="lucide:database"></span>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       Slide 2 — Profile & Stat Grid
+  ============================================================ -->
+  <section class="slide">
+    <div class="slide__inner">
+      <p class="label">Profile</p>
+
+      <div class="profile-intro">
+        <div class="profile-avatar">요</div>
+        <div>
+          <h2 class="heading" style="font-size:1.8rem; margin-bottom:6px;">유용우 <span class="em">(요우)</span></h2>
+          <p class="profile-role">Backend Developer · Product Engineer · Open Source Enthusiast</p>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="stat-grid">
+        <div class="stat-box glass-card gradient-border-card">
+          <div class="stat-box__icon">
+            <span class="iconify" data-icon="lucide:briefcase"></span>
+          </div>
+          <div class="stat-box__num">10+</div>
+          <div class="stat-box__label">Years Experience</div>
+        </div>
+
+        <div class="stat-box glass-card gradient-border-card">
+          <div class="stat-box__icon">
+            <span class="iconify" data-icon="lucide:file-text"></span>
+          </div>
+          <div class="stat-box__num">400+</div>
+          <div class="stat-box__label">Tech Posts</div>
+        </div>
+
+        <div class="stat-box glass-card gradient-border-card">
+          <div class="stat-box__icon">
+            <span class="iconify" data-icon="lucide:star"></span>
+          </div>
+          <div class="stat-box__num">350+</div>
+          <div class="stat-box__label">GitHub Stars</div>
+        </div>
+
+        <div class="stat-box glass-card gradient-border-card">
+          <div class="stat-box__icon">
+            <span class="iconify" data-icon="lucide:building-2"></span>
+          </div>
+          <div class="stat-box__num">5</div>
+          <div class="stat-box__label">Companies</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       Slide 3 — Tech Stack Radar Chart (Chart.js)
+  ============================================================ -->
+  <section class="slide">
+    <div class="slide__inner" style="display:flex; gap:48px; align-items:center;">
+      <div style="flex:1; min-width:0;">
+        <p class="label">Tech Stack</p>
+        <h2 class="heading">기술 역량 <span class="em">레이더</span></h2>
+        <div class="divider"></div>
+        <p class="desc">
+          10년간의 백엔드 개발 경험을 바탕으로<br>
+          풀스택 역량과 인프라 이해를 갖춘<br>
+          <strong style="color:var(--color-primary)">Product Engineer</strong>로 성장했습니다.
+        </p>
+        <div style="margin-top:24px; display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:10px; font-size:13px; color:var(--text-secondary);">
+            <span style="width:10px;height:10px;border-radius:50%;background:var(--color-primary);display:inline-block;"></span>
+            Backend · Database 최고 강점
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; font-size:13px; color:var(--text-secondary);">
+            <span style="width:10px;height:10px;border-radius:50%;background:var(--color-secondary);display:inline-block;"></span>
+            Infrastructure · DevOps 준수
+          </div>
+        </div>
+      </div>
+      <div class="chart-container" style="flex:1; min-width:0;">
+        <canvas id="radarChart"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       Slide 4 — Career Timeline
+  ============================================================ -->
+  <section class="slide slide--timeline">
+    <div class="slide__inner">
+      <p class="label">Career</p>
+      <h2 class="heading">커리어 <span class="em">타임라인</span></h2>
+      <div class="divider"></div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 48px; margin-top:8px;">
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-year">2014</div>
+            <div class="timeline-company">키니 (KYNY)</div>
+            <div class="timeline-desc">첫 스타트업 · 서버 개발 시작</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2015</div>
+            <div class="timeline-company">이큐브랩 (Ecube Labs)</div>
+            <div class="timeline-desc">IoT 스타트업 · 도시 쓰레기량 관제 백엔드</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2016</div>
+            <div class="timeline-company">플레이팅 (Plating)</div>
+            <div class="timeline-desc">푸드테크 · E-Commerce/물류 백엔드</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2018</div>
+            <div class="timeline-company">야놀자 (Yanolja)</div>
+            <div class="timeline-desc">숙박/레저 OTA · Node.js BFF API</div>
+          </div>
+        </div>
+
+        <div class="timeline" style="margin-top:0;">
+          <div class="timeline-item">
+            <div class="timeline-year">2021</div>
+            <div class="timeline-company">네이버 쇼핑라이브</div>
+            <div class="timeline-desc">비디오커머스 · Java/Spring Boot</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2024</div>
+            <div class="timeline-company">네이버 쇼핑앱</div>
+            <div class="timeline-desc">쇼핑 앱 BFF · Kotlin/Coroutine</div>
+          </div>
+          <div class="timeline-item" style="margin-bottom:0;">
+            <div class="timeline-year">2025</div>
+            <div class="timeline-company" style="color:var(--color-primary);">네이버 버티컬 서버</div>
+            <div class="timeline-desc">버티컬 전시 서버 · Kotlin/WebFlux</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       Slide 5 — Architecture Diagram (Mermaid)
+  ============================================================ -->
+  <section class="slide slide--overflow">
+    <div class="slide__inner">
+      <p class="label">Tech Stack</p>
+      <h2 class="heading">요우의 <span class="em">기술 스택</span></h2>
+      <div class="divider"></div>
+
+      <div class="mermaid-wrap">
+        <pre class="mermaid">
+graph LR
+    Lang[Kotlin / Java / TS] --> Backend[Spring Boot + WebFlux]
+    Lang --> Front[React / Next.js]
+    Backend --> DB[(MySQL · MongoDB · Redis)]
+    Backend --> Stream[Kafka · OpenSearch]
+    Backend --> Infra[K8s · Docker · AWS]
+
+    style Lang fill:#1a2235,stroke:#7b2ff7,color:#f0f4ff
+    style Backend fill:#1a2235,stroke:#00d2ff,color:#f0f4ff
+    style Front fill:#1a2235,stroke:#00d2ff,color:#f0f4ff
+    style DB fill:#0d1929,stroke:#444,color:#9aa5c4
+    style Stream fill:#1a2235,stroke:#ff6b6b,color:#f0f4ff
+    style Infra fill:#0d1929,stroke:#ff6b6b,color:#f0f4ff
+        </pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       Slide 6 — Blog Posts Bar Chart (Chart.js)
+  ============================================================ -->
+  <section class="slide">
+    <div class="slide__inner">
+      <p class="label">Career Journey</p>
+      <h2 class="heading">회사별 <span class="em">재직 기간</span></h2>
+      <div class="divider"></div>
+
+      <div class="chart-bar-wrap glass-card" style="padding:28px; border-radius:var(--radius);">
+        <canvas id="barChart" style="max-height:320px;"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       Slide 7 — Open Source Projects (Card Grid + Iconify)
+  ============================================================ -->
+  <section class="slide">
+    <div class="slide__inner">
+      <p class="label">Open Source</p>
+      <h2 class="heading"><span class="em">오픈소스</span> 프로젝트</h2>
+      <div class="divider"></div>
+
+      <div class="card-grid">
+        <div class="card glass-card gradient-border-card">
+          <div class="card__icon">
+            <span class="iconify" data-icon="lucide:file-user"></span>
+          </div>
+          <div class="card__title">resume-nextjs</div>
+          <div class="card__desc">next.js 로 누구나 쉽게 만드는 웹 이력서 프로젝트. Owner &amp; Maintainer.</div>
+          <span class="card__badge">Next.js · TypeScript</span>
+        </div>
+
+        <div class="card glass-card gradient-border-card">
+          <div class="card__icon">
+            <span class="iconify" data-icon="lucide:wrench"></span>
+          </div>
+          <div class="card__title">yowu-devtools</div>
+          <div class="card__desc">프라이버시 중심 클라이언트 사이드 개발자 도구 모음. JSON Format, JWT, URL Parser 등 100% 로컬 처리.</div>
+          <span class="card__badge">React · Vite · TypeScript</span>
+        </div>
+
+        <div class="card glass-card gradient-border-card">
+          <div class="card__icon">
+            <span class="iconify" data-icon="lucide:terminal"></span>
+          </div>
+          <div class="card__title">r2curl</div>
+          <div class="card__desc">Node.js HTTP Request Object를 cURL Command로 변환하는 유틸리티. Owner &amp; Maintainer.</div>
+          <span class="card__badge">TypeScript · TDD</span>
+        </div>
+
+        <div class="card glass-card gradient-border-card">
+          <div class="card__icon">
+            <span class="iconify" data-icon="lucide:printer"></span>
+          </div>
+          <div class="card__title">node-escpos</div>
+          <div class="card__desc">Node.js용 ESC/POS 프린터 드라이버. Collaborator로 기능 추가 및 Issue Resolve 기여.</div>
+          <span class="card__badge">Node.js · Collaborator</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       Slide 8 — Talks & Code (highlight.js)
+  ============================================================ -->
+  <section class="slide slide--code-talk">
+    <div class="slide__inner">
+      <p class="label">Knowledge Sharing</p>
+      <h2 class="heading">발표 &amp; <span class="em">지식 공유</span></h2>
+      <div class="divider"></div>
+
+      <div class="two-col">
+        <div>
+          <ul class="talk-list">
+            <li class="talk-item">
+              <span class="talk-item__year">2025</span>
+              <span class="talk-item__title">AI 시대 사라지는 건 AI 안 쓰는 개발자 뿐 (잡코리아 밋업)</span>
+            </li>
+            <li class="talk-item">
+              <span class="talk-item__year">2024</span>
+              <span class="talk-item__title">가대생 개발자들의 무물 TechTalk (GDGC on CUK)</span>
+            </li>
+            <li class="talk-item">
+              <span class="talk-item__year">2023</span>
+              <span class="talk-item__title">5년만에 돌아온 컴공 특강 (가톨릭대)</span>
+            </li>
+            <li class="talk-item">
+              <span class="talk-item__year">2020</span>
+              <span class="talk-item__title">Ubuntu 20.04 LTS Features (Ubuntu Korea)</span>
+            </li>
+            <li class="talk-item">
+              <span class="talk-item__year">2017</span>
+              <span class="talk-item__title">개발자가 되기전 알려주면 좋았을 것들 (OSS 캠프)</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="code-section">
+          <h3>r2curl — 사용 예시</h3>
+          <pre><code class="language-typescript">import r2curl from 'r2curl';
+
+const request = {
+  url: 'https://api.example.com/users',
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    name: '요우',
+    role: 'Backend Engineer'
+  })
+};
+
+const curl = r2curl(request);
+console.log(curl);
+// curl -X POST 'https://api.example.com/users' \
+//   -H 'Content-Type: application/json' \
+//   -d '{"name":"요우","role":"Backend Engineer"}'</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       Slide 9 — Growth Formula (KaTeX + Quote)
+  ============================================================ -->
+  <section class="slide">
+    <div class="slide__inner slide__inner--narrow">
+      <p class="label">Philosophy</p>
+      <h2 class="heading">개발자 <span class="em">성장 공식</span></h2>
+      <div class="divider"></div>
+
+      <p class="math-inline-desc">
+        개발자의 가치 \( V \)는 경험 \( E \)와 지식공유 \( S \)의 함수입니다.<br>
+        시간이 지날수록 두 요소의 곱이 누적되어 복리로 성장합니다.
+      </p>
+
+      <div class="math-block">
+        $$ V(t) = \int_{0}^{t} \left( E(\tau) \cdot S(\tau) \right) d\tau + C_0 $$
+        <p class="math-legend">
+          여기서 \( C_0 \)는 초기 열정(Passion) · \( E \)는 실무 경험 · \( S \)는 지식공유 활동
+        </p>
+      </div>
+
+      <div class="quote-box">
+        <p class="quote-box__text">
+          "서비스 개발은 결국 개발과 비즈니스의 긴밀한<br>
+          커뮤니케이션 위에서 완성된다"
+        </p>
+        <p class="quote-box__source">— 유용우 (요우), 10년 개발 경험에서</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       Slide 10 — Closing
+  ============================================================ -->
+  <section class="slide slide--closing">
+    <div class="slide__inner" style="text-align:center;">
+      <p class="label" style="display:block; text-align:center; margin-bottom:24px;">Contact</p>
+
+      <h2 class="closing-title">
+        <span class="gradient-text">Thank You</span>
+      </h2>
+      <p class="closing-sub">함께 더 나은 서비스를 만들어 갑시다</p>
+
+      <div class="contact-links">
+        <a href="mailto:me@yowu.dev" class="contact-link">
+          <span class="iconify" data-icon="lucide:mail"></span>
+          <div>
+            me@yowu.dev
+            <br><span>이메일로 연락하기</span>
+          </div>
+        </a>
+        <a href="https://wiki.yowu.dev" target="_blank" class="contact-link">
+          <span class="iconify" data-icon="lucide:globe"></span>
+          <div>
+            wiki.yowu.dev
+            <br><span>기술 위키 & 지식베이스</span>
+          </div>
+        </a>
+        <a href="https://github.com/uyu423" target="_blank" class="contact-link">
+          <span class="iconify" data-icon="mdi:github"></span>
+          <div>
+            github.com/uyu423
+            <br><span>오픈소스 프로젝트</span>
+          </div>
+        </a>
+        <a href="https://blog.yowu.dev" target="_blank" class="contact-link">
+          <span class="iconify" data-icon="lucide:rss"></span>
+          <div>
+            blog.yowu.dev
+            <br><span>기술 블로그</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CDN Libraries
+  ============================================================ -->
+
+  <!-- highlight.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+  <!-- Mermaid -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+
+  <!-- KaTeX -->
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Iconify -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/iconify/2.0.0/iconify.min.js"></script>
+
+  <script>
+    // ── highlight.js ──────────────────────────────────────────
+    hljs.highlightAll();
+
+    // ── Mermaid ───────────────────────────────────────────────
+    mermaid.initialize({
+      theme: 'dark',
+      startOnLoad: true,
+      fontFamily: "'NanumSquareNeo', 'Noto Sans KR', sans-serif",
+      themeVariables: {
+        primaryColor: '#1a2235',
+        primaryTextColor: '#f0f4ff',
+        primaryBorderColor: '#00d2ff',
+        lineColor: '#7b2ff7',
+        secondaryColor: '#0d1929',
+        tertiaryColor: '#0a0f1e',
+        edgeLabelBackground: '#0d1929',
+        clusterBkg: '#0d1929',
+        clusterBorder: '#444',
+        titleColor: '#f0f4ff'
+      }
+    });
+
+    // ── Chart.js — Radar ──────────────────────────────────────
+    (function() {
+      var ctx = document.getElementById('radarChart');
+      if (!ctx) return;
+
+      new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: ['Backend', 'Frontend', 'Infrastructure', 'Database', 'DevOps'],
+          datasets: [
+            {
+              label: '역량 수준',
+              data: [95, 60, 80, 85, 75],
+              backgroundColor: 'rgba(0, 210, 255, 0.15)',
+              borderColor: '#00d2ff',
+              borderWidth: 2,
+              pointBackgroundColor: '#00d2ff',
+              pointBorderColor: '#080b14',
+              pointBorderWidth: 2,
+              pointRadius: 5,
+              pointHoverRadius: 7
+            }
+          ]
+        },
+        options: {
+          animation: false,
+          responsive: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            r: {
+              min: 0,
+              max: 100,
+              ticks: {
+                stepSize: 25,
+                color: 'rgba(240,244,255,0.3)',
+                font: { size: 10 },
+                backdropColor: 'transparent'
+              },
+              grid: {
+                color: 'rgba(255,255,255,0.08)'
+              },
+              angleLines: {
+                color: 'rgba(255,255,255,0.08)'
+              },
+              pointLabels: {
+                color: 'rgba(240,244,255,0.7)',
+                font: {
+                  size: 13,
+                  weight: '700',
+                  family: "'NanumSquareNeo', 'Noto Sans KR', sans-serif"
+                }
+              }
+            }
+          }
+        }
+      });
+    })();
+
+    // ── Chart.js — Bar ────────────────────────────────────────
+    (function() {
+      var ctx = document.getElementById('barChart');
+      if (!ctx) return;
+
+      var gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 320);
+      gradient.addColorStop(0, 'rgba(0, 210, 255, 0.85)');
+      gradient.addColorStop(0.5, 'rgba(123, 47, 247, 0.7)');
+      gradient.addColorStop(1, 'rgba(255, 107, 107, 0.4)');
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['KYNY', 'Ecube Labs', 'Plating', 'Yanolja', 'NAVER 쇼핑라이브', 'NAVER 쇼핑앱', 'NAVER 버티컬'],
+          datasets: [
+            {
+              label: '재직 기간 (개월)',
+              data: (function() {
+                var now = new Date();
+                var verticalMonths = (now.getFullYear() - 2025) * 12 + (now.getMonth() + 1 - 4);
+                if (verticalMonths < 1) verticalMonths = 1;
+                return [9, 7, 13, 36, 36, 14, verticalMonths];
+              })(),
+              backgroundColor: gradient,
+              borderColor: 'rgba(0, 210, 255, 0.5)',
+              borderWidth: 1,
+              borderRadius: 6,
+              borderSkipped: false
+            }
+          ]
+        },
+        options: {
+          animation: false,
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(8,11,20,0.9)',
+              borderColor: 'rgba(0,210,255,0.3)',
+              borderWidth: 1,
+              titleColor: '#00d2ff',
+              bodyColor: '#f0f4ff',
+              callbacks: {
+                label: function(ctx) {
+                  return ' ' + ctx.parsed.y + '개월';
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255,255,255,0.05)' },
+              ticks: {
+                color: 'rgba(240,244,255,0.5)',
+                font: {
+                  size: 12,
+                  family: "'NanumSquareNeo', 'Noto Sans KR', sans-serif"
+                }
+              }
+            },
+            y: {
+              grid: { color: 'rgba(255,255,255,0.05)' },
+              ticks: {
+                color: 'rgba(240,244,255,0.5)',
+                font: {
+                  size: 11,
+                  family: "'NanumSquareNeo', 'Noto Sans KR', sans-serif"
+                }
+              },
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    })();
+
+    // ── KaTeX auto-render ─────────────────────────────────────
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\(', right: '\\)', display: false },
+        { left: '\\[', right: '\\]', display: true }
+      ],
+      throwOnError: false
+    });
+  </script>
+</body>
+</html>
