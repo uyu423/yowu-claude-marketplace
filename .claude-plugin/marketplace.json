@@ -5,7 +5,7 @@
     },
     "metadata": {
         "description": "yowu의 개인 Claude Code 플러그인 마켓플레이스",
-        "version": "0.1.0"
+        "version": "0.1.1"
     },
     "plugins": [
         {
@@ -19,9 +19,9 @@
         {
             "name": "yowu-slide-plugin",
             "source": "./plugins/yowu-slide-plugin",
-            "description": "reveal.js 템플릿 기반 발표 슬라이드 생성 플러그인. 5개 고품질 레이아웃 템플릿 내장.",
-            "version": "1.0.0",
-            "keywords": ["reveal.js", "slide", "presentation", "template"],
+            "description": "HTML 스크롤텔링 기반 발표자료 생성 플러그인. 다크/라이트 테마, highlight.js 코드 블럭, frontend-design 연동 지원.",
+            "version": "2.1.0",
+            "keywords": ["scrollytelling", "slide", "presentation", "html"],
             "category": "productivity"
         }
     ]
