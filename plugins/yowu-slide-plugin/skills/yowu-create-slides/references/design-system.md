@@ -458,11 +458,11 @@ body { counter-reset: slide; }
 
 ---
 
-## 7. 반응형 (480px 이하)
+## 7. 반응형 (768px 이하)
 
 ```css
-@media (max-width: 480px) {
-  .slide { padding: 48px 20px; }
+@media (max-width: 768px) {
+  .slide { padding: 40px 24px; }
   .card-grid { grid-template-columns: 1fr; }
   .stat-row { flex-direction: column; }
   .flow-container { flex-direction: column; }

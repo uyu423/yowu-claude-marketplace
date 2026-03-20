@@ -21,6 +21,7 @@ HTML 파일의 시각 디자인 품질을 Gemini CLI로 검토하고, 반환된 
 | 파라미터 | 필수 | 설명 |
 |---------|------|------|
 | HTML 파일 경로 | Yes | 리뷰 대상 HTML 파일의 절대 경로 |
+| 디자인 경로 | No | 사용된 디자인 스타일 (예: "frontend-design", "자체 심플", "직접 제공"). Gemini에게 맥락을 전달하여 디자인 방향에 맞는 리뷰를 유도한다 |
 | 보호 규칙 | No | 호출자가 지정하는 수정 금지 항목 (예: scroll-snap, 특정 폰트) |
 
 **호출 패턴:**
@@ -53,12 +54,15 @@ command -v gemini
 아래 패턴으로 Bash 실행:
 
 ```bash
-cat "{html-file-path}" | gemini -p "$(cat "{skill-references-dir}/gemini-review-prompt.md")" -o text
+cat "{html-file-path}" | gemini -p "$(cat "{skill-references-dir}/gemini-review-prompt.md")
+
+Design path used: {design-path}" -o text
 ```
 
 - HTML 전문을 stdin으로 전달
-- 리뷰 프롬프트를 `-p` 옵션으로 전달
+- 리뷰 프롬프트를 `-p` 옵션으로 전달하며, 디자인 경로 정보를 프롬프트 끝에 추가
 - `-o text`로 plain text 출력
+- 디자인 경로가 전달되지 않은 경우 `Design path used:` 행을 생략
 - **타임아웃**: 120초
 - 타임아웃 또는 에러 발생 시 quiet pass (기존 HTML 유지, 에러 미표시)
 
