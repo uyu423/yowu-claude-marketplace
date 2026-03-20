@@ -145,14 +145,14 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 60px 24px;
+  padding: 64px 88px;
   position: relative;
   overflow: hidden;
   scroll-snap-align: start;
 }
 
 .slide__inner {
-  max-width: 720px;
+  max-width: 800px;
   margin: 0 auto;
   width: 100%;
 }
@@ -170,46 +170,46 @@ body {
 ```css
 /* 섹션 라벨 — 작은 카테고리 표시 */
 .label {
-  font-size: 12px;
+  font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.15em;
   color: var(--accent-1);
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 /* 메인 헤딩 */
 h1 {
-  font-size: clamp(2.25rem, 8vw, 3.5rem);
+  font-size: clamp(2.5rem, 8vw, 4rem);
   font-weight: 900;
   line-height: 1.15;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 h2 {
-  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  font-size: clamp(2rem, 5.5vw, 2.75rem);
   font-weight: 700;
   line-height: 1.3;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 h3 {
-  font-size: 1.25rem;
+  font-size: 1.375rem;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 /* 본문 설명 */
 .desc {
-  font-size: 1rem;
+  font-size: 18px;
   color: var(--text-secondary);
   line-height: 1.8;
-  margin-bottom: 32px;
+  margin-bottom: 36px;
 }
 
 /* 통계 숫자 */
 .stat-num {
-  font-size: clamp(1.75rem, 6vw, 2.5rem);
+  font-size: clamp(2rem, 6vw, 2.75rem);
   font-weight: 800;
   color: var(--accent-1);
 }
@@ -237,36 +237,36 @@ h2 .em3 { color: var(--accent-3); }
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 24px;
+  border-radius: 18px;
+  padding: 28px;
 }
 .card-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 14px;
 }
-.card-icon { font-size: 2rem; margin-bottom: 10px; }
-.card-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
-.card-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+.card-icon { font-size: 2.2rem; margin-bottom: 12px; }
+.card-title { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+.card-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
 ```
 
 ### Stat Box
 ```css
 .stat-row {
   display: flex;
-  gap: 12px;
-  margin-bottom: 32px;
+  gap: 14px;
+  margin-bottom: 36px;
 }
 .stat-box {
   flex: 1;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 16px;
+  border-radius: 16px;
+  padding: 20px;
   text-align: center;
 }
 .stat-label {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--text-muted);
   margin-top: 4px;
 }
@@ -299,8 +299,8 @@ h2 .em3 { color: var(--accent-3); }
   background: var(--bg);
 }
 .tl-dot.active { background: var(--accent-1); }
-.tl-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
-.tl-desc { font-size: 14px; color: var(--text-muted); }
+.tl-title { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.tl-desc { font-size: 15px; color: var(--text-muted); }
 ```
 
 ### Flow Diagram
@@ -313,22 +313,22 @@ h2 .em3 { color: var(--accent-3); }
 .flow-step {
   flex: 1;
   text-align: center;
-  padding: 28px 20px;
+  padding: 32px 24px;
   background: var(--surface);
   border: 1px solid var(--border);
 }
-.flow-step:first-child { border-radius: 16px 0 0 16px; }
-.flow-step:last-child { border-radius: 0 16px 16px 0; }
+.flow-step:first-child { border-radius: 18px 0 0 18px; }
+.flow-step:last-child { border-radius: 0 18px 18px 0; }
 .flow-num {
   display: inline-block;
-  width: 32px; height: 32px;
-  line-height: 32px;
+  width: 36px; height: 36px;
+  line-height: 36px;
   border-radius: 50%;
   background: var(--accent-gradient);
   color: #fff;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 .flow-arrow {
   display: flex;
@@ -345,18 +345,18 @@ h2 .em3 { color: var(--accent-3); }
 .quote-box {
   background: var(--surface);
   border-left: 4px solid var(--accent-1);
-  border-radius: 0 14px 14px 0;
-  padding: 24px;
-  margin-bottom: 32px;
+  border-radius: 0 16px 16px 0;
+  padding: 28px;
+  margin-bottom: 36px;
 }
 .quote-text {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 500;
   color: var(--text-primary);
   line-height: 1.8;
 }
 .quote-author {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-muted);
   margin-top: 8px;
 }
@@ -365,14 +365,14 @@ h2 .em3 { color: var(--accent-3); }
 ### Code Block (highlight.js 연동)
 ```css
 pre {
-  border-radius: 12px;
+  border-radius: 14px;
   overflow: hidden;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 pre code {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.6;
-  padding: 24px !important;
+  padding: 28px !important;
 }
 ```
 
@@ -382,9 +382,9 @@ pre code {
   display: inline-block;
   background: var(--tag-bg);
   color: var(--tag-color);
-  padding: 4px 12px;
+  padding: 5px 14px;
   border-radius: 99px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   margin: 0 4px 8px 0;
 }
@@ -395,14 +395,14 @@ pre code {
 .comparison {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
-  gap: 16px;
+  gap: 18px;
   align-items: center;
 }
 .comparison-col {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 24px;
+  border-radius: 18px;
+  padding: 28px;
 }
 .comparison-divider {
   font-size: 24px;
@@ -415,10 +415,10 @@ pre code {
 .naming-box {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 32px;
+  border-radius: 22px;
+  padding: 36px;
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 36px;
 }
 .naming-formula {
   display: flex;
@@ -448,9 +448,9 @@ body { counter-reset: slide; }
   counter-increment: slide;
   content: counter(slide, decimal-leading-zero);
   position: absolute;
-  bottom: 30px;
-  right: 40px;
-  font-size: 13px;
+  bottom: 28px;
+  right: 36px;
+  font-size: 14px;
   color: var(--text-muted);
   font-weight: 500;
 }
@@ -462,12 +462,12 @@ body { counter-reset: slide; }
 
 ```css
 @media (max-width: 480px) {
-  .slide { padding: 48px 20px; }
+  .slide { padding: 52px 24px; }
   .card-grid { grid-template-columns: 1fr; }
   .stat-row { flex-direction: column; }
   .flow-container { flex-direction: column; }
-  .flow-step:first-child { border-radius: 16px 16px 0 0; }
-  .flow-step:last-child { border-radius: 0 0 16px 16px; }
+  .flow-step:first-child { border-radius: 18px 18px 0 0; }
+  .flow-step:last-child { border-radius: 0 0 18px 18px; }
   .flow-arrow { transform: rotate(90deg); justify-content: center; }
   .comparison { grid-template-columns: 1fr; }
   .comparison-divider { transform: rotate(90deg); }
