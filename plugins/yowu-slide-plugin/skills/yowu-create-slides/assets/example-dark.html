@@ -28,7 +28,7 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 64px 88px;
+      padding: 60px 80px;
       position: relative;
       overflow: hidden;
       scroll-snap-align: start;
@@ -38,9 +38,9 @@
       counter-increment: slide;
       content: counter(slide, decimal-leading-zero);
       position: absolute;
-      bottom: 28px;
-      right: 36px;
-      font-size: 14px;
+      bottom: 30px;
+      right: 40px;
+      font-size: 13px;
       color: rgba(255,255,255,0.15);
       font-weight: 500;
     }
@@ -51,81 +51,81 @@
     }
     .slide--title .badge {
       display: inline-block;
-      padding: 9px 28px;
+      padding: 8px 24px;
       border: 1px solid rgba(0,210,255,0.4);
       border-radius: 100px;
-      font-size: 15px;
+      font-size: 14px;
       color: #00d2ff;
       letter-spacing: 2px;
-      margin-bottom: 44px;
+      margin-bottom: 40px;
       text-transform: uppercase;
       align-self: center;
       width: fit-content;
     }
     .slide--title h1 {
-      font-size: clamp(2.5rem, 8vw, 4rem);
+      font-size: clamp(2.25rem, 8vw, 4rem);
       font-weight: 900;
       line-height: 1.2;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
       background: linear-gradient(135deg, #00d2ff, #7b2ff7, #ff6b6b);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
     .slide--title .subtitle {
-      font-size: 24px;
+      font-size: 22px;
       color: rgba(255,255,255,0.6);
       font-weight: 300;
       line-height: 1.6;
-      max-width: 800px;
+      max-width: 700px;
       margin: 0 auto;
     }
 
     .label {
-      font-size: 14px;
+      font-size: 13px;
       letter-spacing: 3px;
       color: #00d2ff;
       text-transform: uppercase;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       font-weight: 500;
     }
     h2 {
-      font-size: clamp(2rem, 5.5vw, 2.75rem);
+      font-size: clamp(1.75rem, 5vw, 2.625rem);
       font-weight: 900;
-      margin-bottom: 44px;
+      margin-bottom: 40px;
       line-height: 1.3;
     }
     h2 .em { color: #00d2ff; }
     h2 .em2 { color: #7b2ff7; }
 
     .desc {
-      font-size: 18px;
+      font-size: 15px;
       color: rgba(255,255,255,0.6);
       line-height: 1.7;
-      margin-bottom: 36px;
-      max-width: 800px;
+      margin-bottom: 32px;
+      max-width: 700px;
     }
 
-    pre { border-radius: 14px; overflow: hidden; margin-bottom: 28px; }
-    pre code { font-size: 15px; line-height: 1.6; padding: 28px !important; }
+    pre { border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
+    pre code { font-size: 14px; line-height: 1.6; padding: 24px !important; }
 
-    .stat-row { display: flex; gap: 28px; margin-bottom: 36px; }
+    .stat-row { display: flex; gap: 24px; margin-bottom: 32px; }
     .stat-box {
       flex: 1;
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px;
-      padding: 28px;
+      border-radius: 14px;
+      padding: 24px;
       text-align: center;
     }
     .stat-num {
-      font-size: clamp(2rem, 4vw, 2.75rem);
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
       font-weight: 800;
       background: linear-gradient(135deg, #00d2ff, #7b2ff7);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
     .stat-label {
-      font-size: 14px;
+      font-size: 13px;
       color: rgba(255,255,255,0.4);
       margin-top: 8px;
     }
@@ -135,19 +135,19 @@
       background: linear-gradient(135deg, #16213e, #1a1a2e, #0a0a0a);
     }
     .slide--closing h2 {
-      font-size: clamp(2.25rem, 6vw, 3.25rem);
+      font-size: clamp(2rem, 6vw, 3rem);
       background: linear-gradient(135deg, #00d2ff, #7b2ff7);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
     .slide--closing p {
-      font-size: 20px;
+      font-size: 18px;
       color: rgba(255,255,255,0.5);
       line-height: 1.7;
     }
 
     @media (max-width: 768px) {
-      .slide { padding: 52px 24px; }
+      .slide { padding: 40px 24px; }
       .stat-row { flex-direction: column; }
     }
   </style>
