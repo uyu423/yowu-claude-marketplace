@@ -70,6 +70,33 @@
       50% { transform: translateY(8px); }
     }
 
+    /* === Fullscreen Toggle Button === */
+    .fs-btn {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      z-index: 100;
+      width: 40px;
+      height: 40px;
+      border-radius: 99px;
+      background: rgba(255,255,255,0.75);
+      border: 1px solid #E5E4E2;
+      color: #666;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: border-color 0.2s ease, color 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
+      padding: 0;
+    }
+    .fs-btn:hover { border-color: #6C5CE7; color: #6C5CE7; }
+    @media print { .fs-btn { display: none; } }
+
     .label {
       font-size: 12px;
       color: #6C5CE7;
@@ -219,7 +246,29 @@
     <div class="cta-tag">Q2 킥오프 미팅 참여하기</div>
   </section>
 
+  <button class="fs-btn" id="fsBtn" type="button" aria-label="전체화면 전환" title="전체화면 (F)">⛶</button>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script>hljs.highlightAll();</script>
+  <script>
+  (function () {
+    var btn = document.getElementById('fsBtn');
+    if (!btn) return;
+    var root = document.documentElement;
+    if (!root.requestFullscreen) { btn.style.display = 'none'; return; }
+    function sync() { btn.textContent = document.fullscreenElement ? '\u2715' : '\u26F6'; }
+    btn.addEventListener('click', function () {
+      if (document.fullscreenElement) { document.exitFullscreen(); }
+      else { root.requestFullscreen(); }
+    });
+    document.addEventListener('fullscreenchange', sync);
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'f' && e.key !== 'F') return;
+      var t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      btn.click();
+    });
+  })();
+  </script>
 </body>
 </html>

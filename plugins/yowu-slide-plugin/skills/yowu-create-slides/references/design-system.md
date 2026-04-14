@@ -662,9 +662,70 @@ SVG `<defs>` 마커 패턴:
 .hero-badge--highlight::before { background: var(--tag-color); }
 ```
 
+
+## 6. Fullscreen Toggle (기본 활성)
+
+발표 모드에서 브라우저 UI를 숨기기 위한 전체화면 토글 버튼. dark/light 모두 기본 포함한다. iOS Safari 등 `requestFullscreen` 미지원 환경에서는 feature detection으로 버튼이 자동 숨김된다.
+
+```css
+.fs-btn {
+  position: fixed;
+  bottom: 24px; left: 24px;
+  z-index: 100;
+  width: 40px; height: 40px;
+  border-radius: 99px;
+  background: var(--surface);
+  border: 1px solid var(--border-accent);
+  color: var(--text-secondary);
+  font-size: 18px; line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: border-color 0.2s ease, color 0.2s ease;
+  display: flex; align-items: center; justify-content: center;
+}
+.fs-btn:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+@media print { .fs-btn { display: none; } }
+```
+
+light 테마는 CSS 변수 대신 하드코딩 색상을 사용한다 (`background: rgba(255,255,255,0.75)`, `border: #E5E4E2`, `color: #666`, hover는 accent color).
+
+HTML:
+
+```html
+<button class="fs-btn" id="fsBtn" type="button" aria-label="전체화면 전환" title="전체화면 (F)">⛶</button>
+```
+
+JS (body 끝, hljs 스크립트 뒤에 배치):
+
+```js
+(function () {
+  var btn = document.getElementById('fsBtn');
+  if (!btn) return;
+  var root = document.documentElement;
+  if (!root.requestFullscreen) { btn.style.display = 'none'; return; }
+  function sync() { btn.textContent = document.fullscreenElement ? '\u2715' : '\u26F6'; }
+  btn.addEventListener('click', function () {
+    if (document.fullscreenElement) { document.exitFullscreen(); }
+    else { root.requestFullscreen(); }
+  });
+  document.addEventListener('fullscreenchange', sync);
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'f' && e.key !== 'F') return;
+    var t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+    btn.click();
+  });
+})();
+```
+
+- 아이콘: `⛶` (U+26F6) → 진입, `✕` (U+2715) → 종료
+- F 키 단축키: 전역 토글, input/textarea/contentEditable 포커스 시 비활성
+- `.slide::after` 페이지 번호(우하단)와 충돌하지 않도록 좌하단 배치
+
 ---
 
-## 6. Page Number (선택적, 다크 테마 기본 활성)
+## 7. Page Number (선택적, 다크 테마 기본 활성)
 
 ```css
 body { counter-reset: slide; }
@@ -682,7 +743,7 @@ body { counter-reset: slide; }
 
 ---
 
-## 7. 반응형 (768px 이하)
+## 8. 반응형 (768px 이하)
 
 ```css
 @media (max-width: 768px) {
@@ -722,7 +783,7 @@ body { counter-reset: slide; }
 
 ---
 
-## 8. highlight.js CDN
+## 9. highlight.js CDN
 
 ```html
 <!-- Dark theme -->
