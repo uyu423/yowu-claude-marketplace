@@ -107,10 +107,43 @@ marketplace           0.1.0     →  0.1.1    (플러그인 업그레이드에 �
 
 JSON 수정 시 기존 들여쓰기(4 spaces)와 포맷 유지.
 
+### Step 7.5: 문서 동기화
+
+업그레이드 대상 플러그인의 문서를 새 스펙에 맞게 갱신한다.
+
+**a) 버전 참조 교체**
+
+각 플러그인 README.md에 이전 버전이 하드코딩된 경우 새 버전으로 교체:
+
+```bash
+# 버전 참조 탐색 (예: "v1.0.0", "@1.0.0" 형태)
+grep -rn "OLD_VERSION" plugins/{name}/ --include="*.md"
+```
+
+누락 없이 교체됐는지 재검색으로 확인.
+
+**b) 스펙 동기화**
+
+플러그인의 README.md가 실제 코드와 일치하는지 검토한다:
+
+1. `plugins/{name}/skills/` — 실제 스킬명 목록 확인
+2. `plugins/{name}/commands/` — 실제 커맨드 목록 확인
+3. `plugins/{name}/agents/` — 실제 에이전트 목록 확인
+4. `plugins/{name}/.claude-plugin/plugin.json` — name, description, mcpServers 등 메타데이터 확인
+5. README.md의 기능 설명, 스킬/커맨드 테이블, 설치 안내가 실제 스펙과 일치하는지 비교
+6. 불일치 항목 발견 시 README.md를 실제 코드 기준으로 갱신
+
+**루트 README.md** (`./README.md`)는 플러그인 목록, 설치 방법, 구조 설명이 변경된 경우에만 업데이트한다.
+
+업데이트된 문서 파일은 Step 8의 git add에 포함한다.
+
 ### Step 8: 커밋
 
 ```bash
-git add .claude-plugin/marketplace.json plugins/{변경된 플러그인들}/.claude-plugin/plugin.json
+git add .claude-plugin/marketplace.json \
+        plugins/{변경된 플러그인들}/.claude-plugin/plugin.json \
+        plugins/{변경된 플러그인들}/README.md \
+        README.md   # 루트 문서 변경 시에만
 git commit -m "chore(version): ..."
 ```
 

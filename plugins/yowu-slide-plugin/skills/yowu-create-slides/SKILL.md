@@ -114,6 +114,20 @@ Step 1에서 사용자가 컨펌한 슬라이드 구성을 바탕으로, **구�
 - **Heading**: {핵심 메시지}
 - **Content**: {본문 요약 또는 항목 목록}
 - **Visual**: {사용할 컴포넌트 — stat-box 3개, card 4개, code block 등}
+    - 다이어그램 타입 선택 기준:
+
+      | 조건 | 사용 타입 |
+      |------|---------|
+      | sequence / 시퀀스 / 요청-응답 흐름 | Mermaid (`sequenceDiagram`) |
+      | flowchart / 분기 / if-else / 순서도 | Mermaid (`flowchart LR`) |
+      | ER / 테이블 관계 / DB 스키마 | Mermaid (`erDiagram`) |
+      | gantt / 일정 / 로드맵 | Mermaid (`gantt`) |
+      | 노드 4개 이상 아키텍처 | Mermaid (`flowchart`) |
+      | 단순 컴포넌트 관계, **노드 ≤3개**, 슬라이드 테마 색 필요 | Inline SVG (`diagram` 타입) |
+
+    - `diagram` 타입 (Inline SVG): `viewBox="0 0 600 {높이}"` — 노드 3개 이하 전용. 노드(`<g class="diag-node">`), 엣지(`<line class="diag-edge">`), `<defs>` 마커. fill/stroke는 CSS 변수 참조. **마커 id는 슬라이드마다 고유값** (예: `id="diag-arrow-s5"`) — Mermaid/다중 diagram 슬라이드 공존 시 id 중복 방지.
+    - `flow` 5-step 변형: `.workflow-grid` grid + `.wf-step::after` 화살표. `.flow-arrow` div 불필요.
+    - `title` 히어로 배지: `.hero-badge-row` + `.hero-badge`. Iconify 없이 dot + 텍스트로 키포인트 3-4개 표시.
 - **Notes**: {특이사항 — min-height 필요 여부, CDN 라이브러리, overflow 전환 등}
 ```
 
@@ -230,6 +244,9 @@ gemini CLI 미설치 시 자동으로 quiet pass되므로 별도 분기 처리�
 | `naming`     | 이름/공식     | naming-box (chip + 결과 + 설명)               | 브랜딩, 합성어 설명, 공식/수식       |
 | `code-comparison` | 코드 비교 | 2열 코드 블럭 (언어/버전/전후 비교)          | "JS vs TS", "before/after", 문법 비교 |
 | `closing`    | 마무리        | CTA 버튼, 감사 메시지, 연락처                 | 마지막 슬라이드, Q&A                 |
+| `diagram`    | SVG 아키텍처 다이어그램 | Inline SVG (`<rect>` + `<path>` + `<marker>` + CSS 변수 참조) | 컴포넌트 관계, 데이터 흐름 — JS 없이 테마 연동 다이어그램이 필요할 때 |
+
+> **`flow` 5-step 변형**: step이 정확히 5개이면 `.workflow-grid` + `::after` 화살표 사용 권장. `.flow-arrow` div 불필요. `design-system.md` 섹션 5 참조.
 
 ---
 
@@ -297,7 +314,7 @@ body {
 ```
 
 10. **접근성**: `<html lang="ko|en">` 설정. WCAG AA 이상의 색상 대비 유지. heading 레벨을 `h1` → `h2` → `h3` 순서로 사용
-11. **Flex 컨테이너 내 인라인 요소**: badge, tag, pill 등 인라인 요소가 flex column 컨테이너의 직접 자식일 때 반드시 `align-self: center; width: fit-content;`을 추가한다. 누락 시 전체 너비로 늘어나는 버그 발생
+11. **Flex 컨테이너 내 인라인 요소**: `.hero-badge-row`, badge, tag, pill 등 인라인 요소가 flex column 컨테이너의 직접 자식일 때 반드시 `align-self: center; width: fit-content;`을 추가한다. 누락 시 전체 너비로 늘어나는 버그 발생
 
 ---
 

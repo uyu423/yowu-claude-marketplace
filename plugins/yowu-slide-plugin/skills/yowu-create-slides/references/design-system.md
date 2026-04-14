@@ -438,6 +438,230 @@ pre code {
 }
 ```
 
+### Waterfall Diagram (CSS)
+```css
+/* 의존성 타임라인, 스팬 소요시간 시각화에 사용 */
+.waterfall { margin-bottom: 24px; }
+.wf-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+.wf-label {
+  width: 180px;
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  text-align: right;
+  padding-right: 16px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 12px;
+}
+.wf-bar-container {
+  flex: 1;
+  height: 28px;
+  position: relative;
+}
+.wf-bar {
+  position: absolute;
+  height: 100%;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+```
+
+HTML 패턴:
+```html
+<div class="waterfall">
+  <div class="wf-row">
+    <div class="wf-label">Service A</div>
+    <div class="wf-bar-container">
+      <div class="wf-bar" style="left:0; width:30%; background:rgba(0,210,255,0.25);">300ms</div>
+    </div>
+  </div>
+  <div class="wf-row">
+    <div class="wf-label" style="padding-left:16px; color:var(--accent-3);">Service B ← 병목</div>
+    <div class="wf-bar-container">
+      <div class="wf-bar" style="left:5%; width:60%; background:var(--accent-3); font-weight:700;">600ms ← 병목!</div>
+    </div>
+  </div>
+</div>
+```
+
+`left`와 `width`는 퍼센트로 타임라인상 위치와 소요시간 비율을 표현한다.
+강조 바: `background: var(--accent-3)`으로 병목 구간 하이라이트.
+
+---
+
+### Inline SVG Diagram
+```css
+.diagram-wrap {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+}
+.diagram-wrap svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.diagram-wrap svg text {
+  font-family: var(--font-family);
+  fill: var(--text-primary);
+}
+.diagram-wrap .diag-node rect {
+  fill: var(--surface);
+  stroke: var(--border-accent);
+}
+.diagram-wrap .diag-node text {
+  font-size: 13px;
+  font-weight: 600;
+  fill: var(--text-primary);
+}
+.diagram-wrap .diag-node--accent rect {
+  fill: none;
+  stroke: var(--accent-1);
+  stroke-width: 2;
+}
+.diagram-wrap .diag-node--accent text {
+  fill: var(--accent-1);
+}
+.diagram-wrap .diag-edge {
+  fill: none;
+  stroke: var(--border-accent);
+  stroke-width: 1.5;
+}
+.diagram-wrap .diag-edge--accent {
+  stroke: var(--accent-1);
+  stroke-width: 2;
+}
+.diagram-wrap .diag-label {
+  font-size: 11px;
+  fill: var(--text-muted);
+}
+```
+
+SVG `<defs>` 마커 패턴:
+<!-- 슬라이드 번호를 N에 넣어 전역 id 충돌 방지 -->
+```html
+<defs>
+  <marker id="diag-arrow-s{N}" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+    <path d="M0,0 L0,6 L8,3 z" style="fill: var(--border-accent)" />
+  </marker>
+  <marker id="diag-arrow-accent-s{N}" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+    <path d="M0,0 L0,6 L8,3 z" style="fill: var(--accent-1)" />
+  </marker>
+</defs>
+```
+
+> **주의**: HTML 문서에서 `id`는 전역 고유해야 합니다. 같은 프레젠테이션에 `diagram` 슬라이드가 여러 장이거나 Mermaid와 공존할 때, `id="arrow"` 중복은 `url(#arrow)` 참조 오작동을 유발합니다. 반드시 슬라이드 번호를 포함하세요 (예: `diag-arrow-s5`).
+
+노드 7개 이하 → `diagram` 타입. 초과 또는 시퀀스/ER 다이어그램 → Mermaid CDN 사용.
+
+---
+
+### Workflow Grid
+```css
+.workflow-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+}
+.wf-step {
+  position: relative;
+  text-align: center;
+  padding: 28px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-right: none;
+}
+.wf-step:first-child { border-radius: 16px 0 0 16px; }
+.wf-step:last-child {
+  border-radius: 0 16px 16px 0;
+  border-right: 1px solid var(--border);
+}
+.wf-step::after {
+  content: '';
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 10px solid var(--border-accent);
+  z-index: 1;
+}
+.wf-step:last-child::after { display: none; }
+.wf-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent-gradient);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  margin: 0 auto 10px;
+}
+.wf-icon { font-size: 1.5rem; margin-bottom: 8px; display: block; }
+.wf-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+.wf-desc { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+```
+
+---
+
+### Hero Badge Row
+```css
+.hero-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 32px;
+  align-self: center;
+  width: fit-content;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--surface);
+  border: 1px solid var(--border-accent);
+  border-radius: 99px;
+  padding: 6px 14px 6px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.hero-badge::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-1);
+  flex-shrink: 0;
+}
+.hero-badge--2::before { background: var(--accent-2); }
+.hero-badge--3::before { background: var(--accent-3); }
+.hero-badge--highlight {
+  background: var(--tag-bg);
+  color: var(--tag-color);
+  border-color: transparent;
+}
+.hero-badge--highlight::before { background: var(--tag-color); }
+```
+
 ---
 
 ## 6. Page Number (선택적, 다크 테마 기본 활성)
@@ -471,6 +695,28 @@ body { counter-reset: slide; }
   .flow-arrow { transform: rotate(90deg); justify-content: center; }
   .comparison { grid-template-columns: 1fr; }
   .comparison-divider { transform: rotate(90deg); }
+  .workflow-grid { grid-template-columns: 1fr; }
+  .wf-step {
+    border-right: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: 0;
+  }
+  .wf-step:first-child { border-radius: 16px 16px 0 0; }
+  .wf-step:last-child {
+    border-radius: 0 0 16px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .wf-step::after {
+    right: auto;
+    left: 50%;
+    top: auto;
+    bottom: -10px;
+    transform: translateX(-50%);
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 10px solid var(--border-accent);
+    border-bottom: none;
+  }
 }
 ```
 
