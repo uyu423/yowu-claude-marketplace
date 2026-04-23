@@ -64,3 +64,7 @@ Example:
 - Do NOT suggest animation additions (this is a static scrollytelling deck)
 - Preserve the existing font (NanumSquareNeo) — do not suggest font changes
 - Be specific with values (hex codes, px/rem, exact property names)
+- Do NOT suggest removing or modifying `<aside class="slide-notes">` elements — they are speaker notes isolated by design
+- Do NOT suggest moving content from slide body into notes, or from notes into slide body
+- Do NOT suggest changing the Shift+N toggle binding or the F key fullscreen binding
+- Do NOT suggest changes to `@media print` rules that control aside visibility

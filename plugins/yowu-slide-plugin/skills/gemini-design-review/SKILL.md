@@ -81,6 +81,9 @@ Gemini가 반환한 개선 지침을 **그대로** Edit 도구로 CSS/HTML에 �
 - `scroll-snap 보호` → scroll-snap 관련 CSS 변경 지침만 제외
 - `폰트 보호: NanumSquareNeo` → 폰트 변경 지침만 제외
 - `레이아웃 보호: 100vh` → 섹션 높이 변경 지침만 제외
+- `콘텐츠 보호: 텍스트 원문` → Gemini가 제목·본문·노트 문구를 수정하라고 해도 무시. 시각 디자인만 적용
+- `구조 보호: 슬라이드 타입 클래스` → `slide--{type}` 클래스명 변경, `<aside class="slide-notes">` 제거 지침 무시
+- `위계 보호: label/heading/desc 3단 구조` → label 제거, heading과 description 병합 지침 무시
 
 보호 규칙에 해당하지 않는 모든 지침은 무조건 적용한다.
 

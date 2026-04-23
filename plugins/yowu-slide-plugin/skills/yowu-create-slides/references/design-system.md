@@ -165,6 +165,71 @@ body {
 
 ---
 
+## 3.5 Speaker Notes (발표자 노트)
+
+```css
+/* Speaker Notes — 기본 숨김, body.notes-visible 시 표시 */
+aside.slide-notes {
+  display: none;
+  margin-top: 32px;
+  padding: 20px 24px;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 3px solid var(--accent-1);
+  border-radius: 0 12px 12px 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  max-width: 720px;
+}
+body.notes-visible aside.slide-notes {
+  display: block;
+}
+aside.slide-notes h4 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent-1);
+  margin: 12px 0 4px;
+  font-weight: 700;
+}
+aside.slide-notes h4:first-child { margin-top: 0; }
+aside.slide-notes ul { padding-left: 20px; }
+
+/* 노트 토글 버튼 — Fullscreen 버튼(좌하단) 옆에 배치 */
+.notes-btn {
+  position: fixed;
+  bottom: 24px;
+  left: 72px;
+  z-index: 100;
+  width: 40px;
+  height: 40px;
+  border-radius: 99px;
+  background: var(--surface);
+  border: 1px solid var(--border-accent);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.notes-btn[aria-pressed="true"] { color: var(--accent-1); }
+
+/* 인쇄 시 노트 강제 표시 */
+@media print {
+  aside.slide-notes {
+    display: block !important;
+    page-break-inside: avoid;
+  }
+  .notes-btn,
+  .fs-btn { display: none; }
+}
+```
+
+---
+
 ## 4. 타이포그래피 스케일
 
 ```css
@@ -562,7 +627,7 @@ SVG `<defs>` 마커 패턴:
 
 > **주의**: HTML 문서에서 `id`는 전역 고유해야 합니다. 같은 프레젠테이션에 `diagram` 슬라이드가 여러 장이거나 Mermaid와 공존할 때, `id="arrow"` 중복은 `url(#arrow)` 참조 오작동을 유발합니다. 반드시 슬라이드 번호를 포함하세요 (예: `diag-arrow-s5`).
 
-노드 7개 이하 → `diagram` 타입. 초과 또는 시퀀스/ER 다이어그램 → Mermaid CDN 사용.
+노드 **3개 이하** → `diagram` 타입 (Inline SVG, SKILL.md 기준). 노드 4개 이상 또는 시퀀스/ER 다이어그램 → Mermaid CDN 사용 (가이드 §7.5: 설명용 다이어그램은 5개 이하 권장).
 
 ---
 
