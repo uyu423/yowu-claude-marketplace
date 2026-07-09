@@ -1,23 +1,26 @@
 ---
 name: yowu-create-slides
-description: 깔끔하고 전문적인 HTML 기반 발표자료를 단일 파일로 생성한다.  수직 스크롤 + scroll-snap 방식의 스크롤텔링 프레젠테이션으로, 슬라이드 라이브러리 없이 순수 HTML+CSS로 구현한다.  다크/라이트 테마, highlight.js 코드 블럭, 디자인 시스템을 지원하며 frontend-design 스킬 연동으로 화려한 비주얼도 선택 가능하다.  트리거: "make a presentation", "create slides", "build a deck", "발표자료", "프레젠테이션", "슬라이드", "제안서", "발표 만들어", "ppt", "keynote", "pitch deck", "tech talk", "발표 만들어줘".
+description: 깔끔하고 전문적인 HTML 기반 발표자료를 단일 파일로 생성한다.  deck(페이지 넘김) 엔진 기반의 인터랙티브 프레젠테이션으로, 슬라이드 라이브러리 없이 순수 HTML+CSS+바닐라 JS로 구현한다.  해상도 독립 16:9, 키보드/터치/진행바 네비게이션, 발표자 보기, 등장 애니메이션, 라이트박스, 비디오, 발표자 노트를 콘텐츠에 따라 자동 적용한다.  다크/라이트 테마, highlight.js 코드 블럭을 지원하며 frontend-design 스킬 연동으로 화려한 비주얼도 선택 가능하다.  트리거: "make a presentation", "create slides", "build a deck", "발표자료", "프레젠테이션", "슬라이드", "제안서", "발표 만들어", "ppt", "keynote", "pitch deck", "tech talk", "발표 만들어줘".
 ---
 
-# Scrollytelling Presentation Generator
+# Interactive Deck Presentation Generator
 
 ## Philosophy
 
 이 skill은 reveal.js 같은 슬라이드 라이브러리를 사용하지 않는다.
-대신 **수직 스크롤 기반의 스토리텔링** 접근법을 사용한다.
+대신 **순수 HTML+CSS+바닐라 JS로 구현한 deck(페이지 넘김) 엔진**을 사용한다.
+`position:absolute` 슬라이드를 `.on` 단일 클래스로 교차 전환하며, 상용 프레젠테이션 SW급 인터랙션을 단일 파일에 담는다.
 
 핵심 원칙:
 
-- **단일 HTML 파일**: 모든 CSS는 `<style>` 인라인, JS는 최소한만 허용
-- **100vh 섹션**: 각 섹션이 전체 화면을 차지하며 스크롤로 자연스럽게 이동
-- **콘텐츠 중심**: 화려한 애니메이션 대신 타이포그래피와 여백으로 깔끔함 달성
-- **디자인 시스템 기반**: 일관된 컴포넌트와 컬러 팔레트 사용
+- **단일 HTML 파일**: 모든 CSS는 `<style>` 인라인. JS는 정본(`references/design-system.md`)의 모듈을 그대로 인라인 삽입 (재발명 금지)
+- **deck 페이지 넘김**: `position:absolute + .on` 전환. 키보드/터치/진행바 HUD/딥링크 네비게이션
+- **해상도 독립 16:9**: `vh/vw + clamp()` 유동 타이포로 어떤 화면에서도 비율 유지, 모바일은 세로 스크롤 폴백
+- **상태 모델 일관성**: `.on` 단일 진실원을 CSS·시퀀서·비디오·라이트박스·발표자 보기가 공유
+- **자율 적용**: 콘텐츠 신호를 보고 AI가 인터랙션 기능(시퀀서/드로잉/라이트박스/비디오/발표자 보기)을 스스로 선택·적용 (Step 0.5)
+- **콘텐츠 중심**: 절제된 등장 애니메이션 + 타이포그래피·여백으로 완성도 달성
 
-품질 기준: 한국 디자인 에이전시가 만든 랜딩페이지 수준의 완성도.
+품질 기준: 상용 프레젠테이션 SW급 인터랙티브 덱 — 한국 디자인 에이전시가 만든 랜딩페이지 수준의 완성도.
 
 ---
 
@@ -69,6 +72,45 @@ description: 깔끔하고 전문적인 HTML 기반 발표자료를 단일 파일
 
 **목표 동사 검증** (가이드 §3.2):
 목표 문장에 "설명한다·소개한다·공유한다·알린다"가 포함되면 행동 동사(결정·채택·적용·등록·승인·연락·파일럿)로 치환 제안을 Step 1 제안 블록에 포함한다. 허용 동사 목록은 `references/content-rules.md` 섹션 6 참조.
+
+### Step 0.5: Capability Planning (자율 기능 결정)
+
+**v3의 핵심 단계.** deck 엔진의 인터랙션 기능은 **사용자의 별도 지시 없이도 AI가 콘텐츠·목적·에셋을 스캔해 스스로 on/off를 결정**한다. 아래 매트릭스를 따라 각 기능을 판정하고, 결정 근거를 1줄씩 기록하여 Step 1 컨펌 블록의 "자동 적용" 항목에 노출한다(자동이되 투명하게 — 사용자가 원하면 끌 수 있다).
+
+**A. Always-On Baseline** (콘텐츠와 무관하게 항상 포함, 판단 불필요):
+deck 골격(core) · 유동 캔버스/반응형/인쇄(fluid) · 네비게이션 HUD(nav-hud) · 등장 애니메이션(reveal) · 발표자 노트(notes) · 발표자 보기(presenter) · 기본 컴포넌트(components).
+→ 정본 `references/design-system.md`의 baseline 모듈을 모두 삽입한다.
+
+**B. Content-Triggered Auto-Apply** (신호 감지 시 자동 활성 — 해당 feature 모듈 삽입):
+
+| 감지 신호 (콘텐츠에서 찾는 것) | 자동 적용 (정본 모듈) |
+|---|---|
+| 코드 블럭 존재 | highlight.js (§16) |
+| 순차적 항목·빌드업·단계별 강조 | 등장 시퀀서 `sequencer` (§10) |
+| 프로세스·플로우·파이프라인·의존 관계 | SVG 순차 드로잉 `svg-drawing` (§11) |
+| 이미지·스크린샷·도표·복잡한 SVG 다이어그램 | 라이트박스 `lightbox` (§12) |
+| `.mp4`/데모 영상 에셋이 실제 존재 | 비디오 거버넌스 `video` (§13) |
+| 정량 데이터·비교·추이(막대) / 조직·계층·팀 | CSS 수제 차트·조직도 `dataviz` (§14) |
+| 인트로 애니메이션 에셋(`*.anim.js` 등) 실제 존재 | Lottie 인트로 `lottie` (§15) |
+| 슬라이드 10장 초과 | **결론형 제목**의 로드맵/여정 슬라이드(선택: `title` 타입 구간 디바이더). 제목에 "목차/Agenda/개요" 금지 — **M1·M4가 로드맵 지침보다 항상 우선**. 점프네비 신설 금지(딥링크 `#n`·Home/End로 충분) |
+| 복잡한 다이어그램(노드 4+/시퀀스/ER/간트) | Mermaid (Allowed CDN) |
+| 수학 수식 | KaTeX (Allowed CDN) |
+
+**판정 원칙**:
+- feature 모듈은 신호가 **있을 때만** 삽입한다(파일 크기 최적화). 신호가 없으면 코드를 넣지 않는다.
+- 에셋 의존 기능(video/lottie)은 **에셋이 실제 존재할 때만** 활성화. 없으면 CSS 대체(정적 히어로/스크린샷 placeholder)로 폴백.
+- 발표자 보기는 baseline이지만, "순수 열람용 문서 배포"가 목적이면 생략 가능.
+- 확신이 낮으면 켠다(그레이스풀 폴백이 있으므로 켜서 손해가 적다). 단, 근거를 로그에 남긴다.
+
+**결정 로그 형식** (Step 1 컨펌 블록 + Step 8 메타 블록에 기록):
+```
+[자동 적용]
+- 시퀀서: '3단계 검증 프로세스' 감지 → ON
+- 라이트박스: 스크린샷 4장 → ON
+- 발표자 보기: '경영진 보고' 목적 → ON (baseline)
+- 비디오: .mp4 에셋 없음 → OFF
+- Lottie: 인트로 에셋 없음 → OFF (정적 히어로 대체)
+```
 
 ### Step 1: 사용자 컨펌 (필수)
 
@@ -127,12 +169,14 @@ description: 깔끔하고 전문적인 HTML 기반 발표자료를 단일 파일
 
 **frontend-design 사용 시 경계 규칙:**
 frontend-design skill의 **컬러, 그라디언트, 글래스모피즘, 텍스처 스타일**만 차용한다.
-레이아웃 구조(100vh 섹션, scroll-snap), 폰트(@font-face 나눔스퀘어 네오), JS 제한은 **본 스킬의 규칙을 우선**한다.
+레이아웃 구조(deck 엔진), 폰트(@font-face 나눔스퀘어 네오), 인터랙션 JS(정본 모듈)는 **본 스킬의 규칙을 우선**한다.
 
 **어떤 선택이든 유지되는 공통 규칙:**
 - 단일 HTML 파일 출력
-- `scroll-snap-type: y mandatory` + `height: 100vh` 페이지 단위 스크롤
+- deck 페이지 넘김 엔진 (`position:absolute + .on`, 정본 core 모듈) — scroll-snap 미사용
+- 해상도 독립 16:9 유동 캔버스 + 모바일 세로 스크롤 폴백 (정본 fluid 모듈)
 - 나눔스퀘어 네오 폰트 (@font-face)
+- baseline 인터랙션(네비 HUD·등장 애니·발표자 보기·발표자 노트) 항상 포함
 - highlight.js CDN (코드 블럭 포함 시)
 
 **사용자 제공 가이드 사용 시:**
@@ -191,7 +235,7 @@ Timed 모드인 경우: 총 슬라이드 수는 `목표분 × 1~1.5` 범위로 �
 
 **구조 가이드라인:**
 - 콘텐츠가 5개 이하면 5~7개 섹션도 충분하다. 무리하게 늘리지 않는다.
-- 15장을 초과하면 목차 섹션을 추가하고 PART 디바이더로 챕터를 나눈다.
+- 15장을 초과하면 **결론형 제목의 로드맵/여정 슬라이드**(예: "오늘 세 가지를 결정한다")를 **타이틀 다음에** 두고, 선택적으로 `title` 타입 구간 디바이더로 챕터를 나눈다. 제목에 "목차/Agenda/개요"라는 단어를 쓰지 않는다. 첫 슬라이드는 언제나 훅 타이틀(`slide--title`)이며, **M1(첫 슬라이드=slide--title)·M4(목차/개요형 제목 금지)는 로드맵 지침보다 항상 우선한다**. 존재하지 않는 점프네비를 만들지 않는다.
 - 구조 패턴: `title → context/problem → solution → details(2-4장) → evidence → next-steps → closing`
 
 ### Step 3.5: 개요 검증
@@ -207,10 +251,15 @@ HTML Skeleton 생성 전에 아웃라인 자체를 점검한다. 아래 항목�
 
 ### Step 4: HTML Skeleton 작성
 
-아웃라인이 확정되면, **HTML의 뼈대(Head + CSS)만 먼저 Write**한다.
-이 단계에서는 `<body>` 안에 슬라이드 콘텐츠를 넣지 않는다.
+아웃라인이 확정되면, **HTML의 뼈대(Head + CSS + 엔진 JS)만 먼저 Write**한다.
+이 단계에서는 `<div class="deck">`를 비워둔다(슬라이드 콘텐츠는 Step 5에서 append).
 
-**Write로 생성하는 Skeleton 구조:**
+**정본 조립 원칙 — 재발명 금지**: CSS/JS는 직접 타이핑하지 않고 `references/design-system.md`의 모듈을 **그대로 복사해 인라인 삽입**한다.
+- **baseline 모듈**(core / fluid / nav-hud / reveal / notes / presenter / components) — 항상 삽입
+- **feature 모듈**(sequencer / svg-drawing / lightbox / video / dataviz / lottie) — Step 0.5 판정 결과에 따라 삽입
+- 삽입 순서는 정본 **§17 조립 가이드**를 따른다
+
+**Skeleton 구조:**
 
 ```html
 <!DOCTYPE html>
@@ -219,38 +268,47 @@ HTML Skeleton 생성 전에 아웃라인 자체를 점검한다. 아래 항목�
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{발표 제목}</title>
-    {highlight.js CSS CDN link — 코드 블럭이 있을 때만}
-    {기타 필요한 CDN CSS — KaTeX 등}
+    <script>/* 정본 §8 presenter-headscript — 반드시 첫 페인트 전, 최상단 */</script>
+    {highlight.js / KaTeX CSS CDN — 신호 있을 때만}
     <style>
-      {나눔스퀘어 네오 @font-face 블럭 전체}
-      {CSS 변수 — :root 테마 정의}
-      {전체 레이아웃 CSS — scroll-snap, .slide 공통, 페이지 번호 counter}
-      {모든 슬라이드 타입별 CSS — slide--title, slide--content, slide--card-grid 등}
-      {반응형 @media 쿼리}
+      /* 순서: §2 @font-face → §1 테마 토큰(:root) → 모듈 CSS */
+      {§2 나눔스퀘어 네오 @font-face}
+      {§1 테마 토큰 :root — Dark 또는 Light}
+      {§3 core-css}{§4 fluid-css + fluid-responsive}{§5 nav-hud-css}
+      {§6 reveal-css}{§7 notes-css}{§8 presenter-css}{§9 components-css — 사용분만}
+      {feature CSS — §10~§14 중 Step 0.5에서 켠 것만}
     </style>
   </head>
   <body>
+    {§5 nav-hud-markup — HUD + fs-btn + notesBtn}
+    <div class="stagebg"></div>            <!-- 선택적 배경 -->
+    <div class="deck">
+      <!-- Step 5에서 슬라이드 append -->
+    </div>
+    {§8 presenter-markup — 발표자 창 UI}
 
-  {CDN scripts — highlight.js, Mermaid 등 필요한 것만}
-  <button class="fs-btn" id="fsBtn" type="button" aria-label="전체화면 전환" title="전체화면 (F)">⛶</button>
-  <button class="notes-btn" id="notesBtn" type="button" aria-label="발표자 노트 토글" title="노트 (Shift+N)" aria-pressed="false">N</button>
-  <script>
-    hljs.highlightAll();
-  </script>
-  <script>{Fullscreen 토글 스크립트 — design-system.md §6}</script>
-  <script>{Notes 토글 스크립트 — references/note-protocol.md §5}</script>
+    <!-- 스크립트: core → nav-hud → notes → presenter → feature → highlight -->
+    <script>{§3 core-js}</script>
+    <script>{§5 nav-hud-js}</script>
+    <script>{§7 notes-js}</script>
+    <script>{§8 presenter-js}</script>
+    {feature JS — §10 sequencer / §13 video / §12 lightbox / §15 lottie 중 켠 것}
+    {highlight.js — 코드 있을 때}
   </body>
 </html>
 ```
 
-**핵심**: CSS는 아웃라인에 명시된 **모든 슬라이드 타입의 스타일을 한 번에** 포함한다.
-이후 슬라이드 append 시 CSS를 추가로 수정할 필요가 없도록 설계한다.
+**핵심**:
+- `<head>` 최상단 presenter-headscript는 **필수**(FOUC 방지) — 발표자 보기가 baseline이므로 항상 넣는다
+- **core-js가 반드시 첫 스크립트** — 다른 모듈이 `window.__deck*` 훅에 의존한다
+- 페이지 총수는 core-js가 `slides.length`로 **자동 계산** — CSS/마크업에 하드코딩하지 않는다
+- CSS는 아웃라인의 **모든 슬라이드 타입 스타일을 한 번에** 포함해 이후 append 시 CSS 수정이 없도록 한다
 
-**Speaker Notes**: 각 `<section class="slide">` 내부 끝에 `<aside class="slide-notes" hidden>`을 포함한다. 5요소 마크업은 `references/note-protocol.md` 참조. Mermaid/Chart.js를 aside 내부에 넣지 않는다.
+**Speaker Notes**: 각 `<section class="slide">` 끝에 `<aside class="slide-notes" hidden>` 포함. 이 노트는 **발표자 보기(presenter)의 대본 데이터 소스**이기도 하다(정본 §8). 5요소 마크업은 `references/note-protocol.md` 참조. Mermaid/Chart.js를 aside 내부에 넣지 않는다.
 
 ### Step 5: 슬라이드 Append
 
-Skeleton이 준비되면, **Edit 도구로 `</body>` 직전에 슬라이드를 순차 append**한다.
+Skeleton이 준비되면, **Edit 도구로 `<div class="deck">` 안쪽(닫는 `</div>` 직전)에 슬라이드를 순차 append**한다.
 한 번에 전체를 쓰지 않고, 적절한 단위로 나누어 추가한다.
 
 **Append 단위 (자율 판단):**
@@ -261,8 +319,8 @@ Skeleton이 준비되면, **Edit 도구로 `</body>` 직전에 슬라이드를 �
 
 **Append 방법:**
 
-각 Edit에서 `</body>` 태그 또는 CDN `<script>` 블럭 직전의 빈 줄을 `old_string`으로 잡고,
-해당 위치에 `<section>` 블럭을 삽입한다.
+각 Edit에서 `<div class="deck">`의 닫는 `</div>` 또는 이전 슬라이드의 `</section>`을 `old_string`으로 잡고,
+해당 위치에 `<section>` 블럭을 삽입한다. (deck 컨테이너 밖에 슬라이드를 두지 않는다)
 
 ```
 Edit:
@@ -276,8 +334,11 @@ Edit:
 **각 `<section>` 블록 구성** (가이드 §2.2, §6.1):
 
 ```html
-<section class="slide slide--{type}">
-  <!-- 슬라이드 콘텐츠 — heading, body, visual -->
+<section class="slide slide--{type}" data-name="{slug}">
+  <div class="slide__inner">
+    <!-- 슬라이드 콘텐츠 — label/heading/desc/visual. 주요 요소에 .rv + style="--d:.08s" 스태거 등장 -->
+    <!-- 시퀀서(§10) 신호가 있으면 <div data-seq data-interval="600"> 안에 [data-step] 배치 -->
+  </div>
 
   <aside class="slide-notes" hidden>
     <h4>요지</h4><p>{한 문장 결론}</p>
@@ -305,7 +366,7 @@ Lite 모드: 요지, 핵심, 소요 시간 3요소만 필수.
 모든 슬라이드 append가 완료되면:
 
 1. 최종 HTML 파일의 슬라이드 수가 아웃라인과 일치하는지 확인한다
-2. 페이지 번호 카운터의 총 수(`/ {N}`)가 실제 슬라이드 수와 맞는지 검증한다
+2. 페이지 총수는 core-js가 `slides.length`로 자동 계산하므로 하드코딩 동기화가 불필요하다. 대신 `<div class="deck">` 안에만 `.slide`가 있고, HUD·발표자 마크업 등 비(非)슬라이드 요소에 `.slide` 클래스가 섞이지 않았는지 확인한다
 3. 임시 아웃라인 파일이 있으면 삭제한다
 
 ### Step 6.5: 자기 검증 (Strict 모드 전용)
@@ -320,6 +381,7 @@ Lite 모드: 요지, 핵심, 소요 시간 3요소만 필수.
 | M2 | 마지막 슬라이드 | `class`에 `slide--closing` 포함 |
 | M3 | 마지막 슬라이드 제목 | "감사합니다/Thank you/Q&A" 단독이 아님 |
 | M4 | 모든 슬라이드 제목 | "소개/개요/목차/결론" 단독이 아님 |
+| M5 | 엔진 무결성 | `__deckGo` · 더블 rAF(`requestAnimationFrame` 중첩 호출) · `slides.length` · `?presenter` · `hudBar` 가 결과물에 모두 존재 |
 
 **실패 시**: 해당 슬라이드만 Edit으로 수정 (1회 한정). 재시도 후에도 실패하면 통과 처리 + 메타 블록에 `[SELF-CHECK WARN]` 기록.
 
@@ -335,12 +397,13 @@ gemini CLI 미설치 시 자동으로 quiet pass되므로 별도 분기 처리�
 `gemini-design-review` 스킬에 아래 컨텍스트를 전달한다:
 - **HTML 파일 경로**: 방금 생성한 HTML 파일의 절대 경로
 - **보호 규칙**:
-  - `scroll-snap 보호` — scroll-snap 관련 CSS 변경 금지
+  - `엔진 보호: deck` — `.slide.on` 토글, `position:absolute` 슬라이드, `.deck` 컨테이너, HUD(`#hudBar`/`#hudMeta`), 전환 JS 변경 금지
+  - `애니 보호: 의도된 모션` — `.rv` 등장, `[data-seq]/[data-step]` 시퀀서, `.fc .eg` SVG 드로잉은 정상 기능. 제거 금지(타이밍·이징 보정만 허용)
   - `폰트 보호: NanumSquareNeo` — 폰트 변경 금지
-  - `레이아웃 보호: 100vh` — 섹션 높이 변경 금지
   - `콘텐츠 보호: 텍스트 원문` — 제목·본문·노트 문구 수정 금지 (Gemini는 시각만 리뷰)
   - `구조 보호: 슬라이드 타입 클래스` — `slide--{type}` 클래스명 및 `<aside class="slide-notes">` 구조 변경 금지
   - `위계 보호: label/heading/desc 3단 구조` — label 제거·병합 지침 무시
+  - `키 보호: 네비게이션` — 방향키/Space/PageUp·Down/Home/End, F(전체화면), Shift+N(노트), P(발표자 보기) 바인딩 변경 금지
 
 스킬이 지침을 적용하면 결과를 사용자에게 요약 보고하고, 스킵되면 아무 메시지 없이 다음 단계로 진행한다.
 
@@ -357,6 +420,7 @@ gemini CLI 미설치 시 자동으로 quiet pass되므로 별도 분기 처리�
 - 청중: {확인됨|추정: ...}
 - 목표: {행동 동사 포함 한 문장}
 - 플레이스홀더: {개수}개 — {목록}
+- 자동 적용 기능: {Step 0.5 결정 로그 — 켠 feature 모듈 + 근거, 끈 것 + 이유}
 - Self-check: {PASS|WARN: ...}
 - 가이드 규칙 비활성화: {없음|비활성 규칙 + 이유}
 ```
@@ -384,9 +448,13 @@ gemini CLI 미설치 시 자동으로 quiet pass되므로 별도 분기 처리�
 | `quote`      | 인용/강조     | quote-box (좌측 보더 + 텍스트 + 출처)         | 핵심 메시지 강조, 사용자 후기, 인용  |
 | `comparison` | 비교          | 2열 비교 (before/after, A/B)                  | "기존 vs 신규", "A vs B" 대비 구조   |
 | `naming`     | 이름/공식     | naming-box (chip + 결과 + 설명)               | 브랜딩, 합성어 설명, 공식/수식       |
-| `code-comparison` | 코드 비교 | 2열 코드 블럭 (언어/버전/전후 비교)          | "JS vs TS", "before/after", 문법 비교 |
+| `code-comparison` | 코드 비교 | 2열 `.code-cmp` 코드 블럭 (`.cmp-head`+`<pre>`, 정본 §9) | "JS vs TS", "before/after", 문법 비교 |
 | `closing`    | 마무리        | CTA 버튼, 감사 메시지, 연락처                 | 마지막 슬라이드, Q&A                 |
 | `diagram`    | SVG 아키텍처 다이어그램 | Inline SVG (`<rect>` + `<path>` + `<marker>` + CSS 변수 참조) | 컴포넌트 관계, 데이터 흐름 — JS 없이 테마 연동 다이어그램이 필요할 때 |
+| `media`      | 비디오/이미지 데모 | `.media-frame`(확정높이→aspect-ratio) + `<video>`/`<img>` | .mp4 데모, 앱 시연, 스크린샷 (video 모듈 자동 재생, 클릭 시 라이트박스 확대) |
+| `org`        | 조직도/팀 구조 | `.org-tier` + `.org-card` 커넥터 (정본 §14) | 조직·계층·팀·역할 분담 구조 |
+| `chart`      | CSS 데이터 시각화 | `.md-plot` 막대·워터폴 (정본 §14) | 정량 비교·추이 — 단순 차트는 Chart.js 대신 이것 우선 |
+| `process`    | 순차 프로세스 애니 | `[data-seq]/[data-step]` 시퀀서 + `.fc` SVG 드로잉 | 단계별 빌드업, 파이프라인, 흐름을 순차 점등으로 |
 
 > **`flow` 5-step 변형**: step이 정확히 5개이면 `.workflow-grid` + `::after` 화살표 사용 권장. `.flow-arrow` div 불필요. `design-system.md` 섹션 5 참조.
 
@@ -394,67 +462,15 @@ gemini CLI 미설치 시 자동으로 quiet pass되므로 별도 분기 처리�
 
 ## HTML Structure Rules
 
-1. **단일 파일**: 외부 CSS 파일 없음. 모든 스타일은 `<style>` 태그 안에
-2. **CSS 변수**: `:root`에 테마 변수 정의, 컴포넌트에서 참조
-3. **섹션 구조**: 테마와 무관하게 `<section class="slide slide--{type}">` 통일. 테마 차이는 CSS 변수와 body 클래스로만 처리
-4. **페이지 단위 스크롤**: `html { scroll-snap-type: y mandatory; }` + 각 섹션에 `scroll-snap-align: start;`
-5. **섹션 높이**: 기본 `height: 100vh` + `overflow: hidden`. 단, 콘텐츠가 많은 섹션(카드 5개 이상, 코드 30줄 이상, 타임라인 5단계 이상)은 `min-height: 100vh` + `overflow: visible`로 전환. `scroll-snap-align`은 유지
-6. **콘텐츠 폭**: 기본 텍스트 `max-width: 720px`. 카드 그리드, 비교, 플로우 등 다열 레이아웃은 `max-width: 960px`까지 허용
-7. **나눔스퀘어 네오 폰트**: `@font-face` 블럭으로 직접 선언. 아래 코드를 그대로 사용:
-
-```css
-@font-face {
-  font-family: 'NanumSquareNeo';
-  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-aLt.woff2);
-  font-weight: 300;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'NanumSquareNeo';
-  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-bRg.woff2);
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'NanumSquareNeo';
-  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-cBd.woff2);
-  font-weight: 700;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'NanumSquareNeo';
-  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-dEb.woff2);
-  font-weight: 800;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'NanumSquareNeo';
-  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-eHv.woff2);
-  font-weight: 900;
-  font-display: swap;
-}
-```
-
-폰트 URL 로드에 실패하면 `'Noto Sans KR', -apple-system, sans-serif`를 fallback으로 사용한다. 8. **반응형**: `@media (max-width: 768px)` 브레이크포인트 포함 9. **페이지 번호**: CSS counter로 자동 페이지 번호 표시. 반드시 `position: absolute` 사용 (`position: fixed` 금지 — fixed 사용 시 모든 슬라이드의 번호가 겹쳐 마지막 번호만 보이는 버그 발생). 구현 패턴:
-
-```css
-body {
-  counter-reset: slide;
-}
-.slide {
-  counter-increment: slide;
-  position: relative;
-}
-.slide::after {
-  content: counter(slide, decimal-leading-zero) ' / {총 슬라이드 수}';
-  position: absolute; /* fixed 절대 금지 */
-  bottom: 24px;
-  right: 32px;
-  font-size: 13px;
-  color: var(--text-muted);
-}
-```
-
+1. **단일 파일**: 외부 CSS/JS 파일 없음. 모든 스타일은 `<style>`, 스크립트는 `<script>`에 인라인(정본 모듈 복사)
+2. **CSS 변수**: `:root`에 테마 토큰 정의(정본 §1), 컴포넌트는 `var(--*)`만 참조(하드코딩 금지)
+3. **섹션 구조**: `<section class="slide slide--{type}" data-name="{slug}">`를 `<div class="deck">` 안에 배치. 테마 차이는 CSS 변수로만 처리
+4. **deck 페이지 넘김**: `.slide { position:absolute; inset:0 }` + `.slide.on` 토글 전환(정본 §3). scroll-snap 미사용. `body { overflow:hidden }` (모바일은 정본 §4가 자동 해제)
+5. **콘텐츠 오버플로우**: `.slide`는 세로 중앙 정렬(`justify-content:center`). 콘텐츠가 넘치면 슬라이드를 분할하거나 밀도를 낮춘다 — 페이지 넘김에서는 스크롤로 도망갈 수 없다
+6. **콘텐츠 폭**: `.slide__inner`는 `min(1160px, 100%)`. 텍스트 위주 슬라이드는 `max-width: 820px`
+7. **나눔스퀘어 네오 폰트**: 정본 §2 `@font-face` 블럭을 그대로 삽입한다. 로드 실패 시 `'Noto Sans KR', -apple-system, sans-serif` fallback(정본 변수에 포함). 모노 폰트(kicker/HUD/타이머)는 시스템 스택이라 CDN 불필요
+8. **유동 캔버스**: 폰트·간격은 `clamp()` 중심(정본 §4). 타이틀은 세로/가로 동시 대응 `clamp(.., min(..vh, ..vw), ..)`. 모바일은 `@media (max-width:820px)`에서 세로 스크롤 폴백 + `100dvh`(iOS 주소창 대응)
+9. **페이지 번호**: HUD의 `#hudMeta`가 `01 / N`을 JS로 **자동** 표시(정본 §3/§5). `.slide::after` counter로 총수를 하드코딩하는 방식은 쓰지 않는다 — 슬라이드 추가/삭제가 자동 반영된다
 10. **접근성**: `<html lang="ko|en">` 설정. WCAG AA 이상의 색상 대비 유지. heading 레벨을 `h1` → `h2` → `h3` 순서로 사용
 11. **Flex 컨테이너 내 인라인 요소**: `.hero-badge-row`, badge, tag, pill 등 인라인 요소가 flex column 컨테이너의 직접 자식일 때 반드시 `align-self: center; width: fit-content;`을 추가한다. 누락 시 전체 너비로 늘어나는 버그 발생
 
@@ -467,6 +483,8 @@ body {
 아래 값은 **모든 디자인 경로**(자체 심플, frontend-design, 직접 제공)에 적용되는 최소 베이스라인이다.
 AI는 이 값을 **하한선**으로 사용하되, 콘텐츠 밀도와 슬라이드 구성에 따라 더 크게 조정할 수 있다.
 단, 이 값보다 **작게** 설정하지 않는다.
+
+> **v3 note**: deck 엔진의 레이아웃 치수(슬라이드 padding, `.slide__inner` 폭)와 유동 타이포는 **정본 §3/§4를 우선**한다. 정본은 `vh` 기반 `clamp()`로 아래 값들을 화면 높이에 맞게 유동시키므로, 아래 표는 폰트 크기의 상대적 하한선 참고용이다.
 
 | 요소 | 베이스라인 | 비고 |
 |------|-----------|------|
@@ -514,10 +532,13 @@ AI는 이 값을 **하한선**으로 사용하되, 콘텐츠 밀도와 슬라이
 
 ## JavaScript Policy
 
-- **외부 라이브러리 추가 금지**. highlight.js CDN만 허용.
-- **Fullscreen 토글은 기본 포함**: `.fs-btn` 버튼과 `requestFullscreen` 기반 토글 스크립트는 모든 생성 결과물(dark/light)에 기본 포함한다. 사용자가 명시적으로 제외를 요청한 경우에만 생략한다. 상세 구현은 design-system.md의 "6. Fullscreen Toggle" 참조.
-- **그 외 발표 보조용 바닐라 JS는 허용**: 키보드 방향키(←→) 네비게이션, 현재 페이지 인디케이터 등 30줄 이내의 바닐라 JS는 사용자가 요청한 경우에만 추가한다.
-- 기본 생성 시에는 `hljs.highlightAll()`과 Fullscreen 토글 스크립트만 포함한다.
+v3는 인터랙티브 deck이므로 바닐라 JS를 적극 사용한다. 단, **정본 모듈만 사용**하고 새 로직을 즉흥 작성하지 않는다.
+
+- **엔진 JS는 정본 모듈 복사**: 전환·네비·시퀀서·라이트박스·비디오·발표자보기·노트 JS는 `references/design-system.md`의 해당 MODULE 블록을 **그대로** 삽입한다. 직접 재작성 금지 — 세대 토큰·더블 rAF·transition shorthand 회피 같은 렌더링 함정을 재발명하지 않기 위함이다.
+- **baseline JS는 항상 포함**: core-js(전환 엔진) → nav-hud-js → notes-js → presenter-js 순. **core-js가 반드시 첫 스크립트**(다른 모듈이 `window.__deck*` 훅에 의존).
+- **feature JS는 Step 0.5 판정에 따라**: sequencer / video / lightbox / lottie.
+- **외부 라이브러리는 화이트리스트만**: 아래 Allowed CDN Libraries 목록(highlight.js, Chart.js, Mermaid, KaTeX, Iconify, lottie-web)만 허용. 그 외 프레임워크/라이브러리 추가 금지.
+- **커스텀 JS가 꼭 필요하면**: 정본 훅(`window.__deckGo(i)`, `document`의 `deck:change` 이벤트)을 사용하고 `.on` 상태 모델을 존중한다. 전환 로직 자체를 직접 건드리지 않는다.
 
 ---
 
@@ -526,7 +547,7 @@ AI는 이 값을 **하한선**으로 사용하되, 콘텐츠 밀도와 슬라이
 - **슬라이드 라이브러리 금지**: reveal.js, impress.js, Marp 등을 사용하지 않는다
 - **일반 폰트 금지**: Arial, Inter, Roboto, system-ui를 메인 폰트로 쓰지 않는다
 - **CSS 프레임워크 금지**: Bootstrap, Tailwind 등을 사용하지 않는다
-- **과한 애니메이션 금지**: 스크롤 연동 애니메이션, 페이드인, 슬라이드인 등 사용하지 않는다 (scroll-hint bounce, hover 트랜지션은 예외)
+- **과잉 애니메이션만 금지**: 등장(`.rv`)·시퀀서·SVG 드로잉·페이지 전환은 정본이 제공하는 정상 기능이다. 다만 요소마다 제각각인 과한 모션, 무한 반복으로 시선을 뺏는 장식, 3초 넘는 인트로는 피한다. 등장 스태거는 슬라이드당 총 1초 이내를 권장한다
 - **보라+흰 클리셰 금지**: 무조건 보라색 그라디언트를 쓰지 않는다. 콘텐츠에 맞는 악센트 선택
 - **base64 이미지 금지**: 인코딩된 이미지를 넣지 않는다
 - **데이터 날조 금지**: 사용자가 제공하지 않은 수치, 연도별 추이, 발표 제목, 프로젝트명, 직무 설명 등을 추측하여 작성하지 않는다. 원본 데이터에 없는 정보는 placeholder(`[TODO: 데이터 필요]`)로 남기고 사용자에게 확인을 요청한다
@@ -542,7 +563,7 @@ AI는 이 값을 **하한선**으로 사용하되, 콘텐츠 밀도와 슬라이
 - 아이콘이 필요한 경우 emoji를 기본으로 활용한다. 더 정교한 아이콘이 필요하면 Iconify CDN을 사용한다 (아래 허용 라이브러리 참조)
 - 간단한 다이어그램은 CSS+HTML로 직접 그린다. 복잡한 플로우/시퀀스/ER 다이어그램은 Mermaid를 사용한다
 - 실제 이미지(사진, 스크린샷)가 필요한 위치에는 비율과 의도를 명시한 placeholder를 넣고, 주석으로 권장 이미지 설명을 남긴다
-- 영상/오디오 등 멀티미디어는 지원하지 않으며, 스크린샷 placeholder + 링크로 대안을 제안한다
+- 영상 데모 에셋(.mp4 등)이 **실제로 존재하면** 비디오 거버넌스 모듈(정본 §13)로 활성 슬라이드에서 자동 재생한다. 에셋이 없으면 스크린샷 placeholder + 링크로 대안을 제안한다. 오디오 단독은 지원하지 않는다
 
 ---
 
@@ -631,6 +652,16 @@ AI는 이 값을 **하한선**으로 사용하되, 콘텐츠 밀도와 슬라이
 
 마크업: `<span class="iconify" data-icon="lucide:rocket"></span>`. Lucide, Material, Font Awesome 등 20만+ 아이콘 접근 가능.
 
+### lottie-web — 인트로 애니메이션
+
+**포함 조건**: 브랜드 인트로 애니메이션 에셋(`assets/*.anim.js` 등 `window.INTRO_ANIM` 정의)이 **실제로 존재할 때만**. 없으면 정적 히어로로 대체하고 CDN을 포함하지 않는다.
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/lottie-web@5.12.2/build/player/lottie_light.min.js"></script>
+```
+
+제어 스크립트는 정본 §15 MODULE: lottie 참조. 활성 슬라이드 진입 시 1회 재생 후 유휴 세그먼트 루프, 로드 실패 시 정적 폴백.
+
 ### 요약 테이블
 
 | 라이브러리   | 포함 조건                     | 슬라이드 타입 연관           |
@@ -640,14 +671,15 @@ AI는 이 값을 **하한선**으로 사용하되, 콘텐츠 밀도와 슬라이
 | Mermaid      | 복잡한 다이어그램이 필요할 때 | `flow`, `timeline` 상위 대안 |
 | KaTeX        | 수학 수식이 등장할 때         | `content` (학술)             |
 | Iconify      | 정교한 아이콘이 필요할 때     | `card-grid`, `flow`          |
+| lottie-web   | 인트로 애니메이션 에셋이 있을 때 | `title` 인트로               |
 
 ---
 
 ## Reference Files
 
-자체 디자인시스템(선택 2) 사용 시 읽어야 하는 파일:
+슬라이드 생성 시 참조하는 파일 (`design-system.md`는 모든 디자인 경로에서 **엔진으로 필수**):
 
-- `references/design-system.md`: CSS 변수, 타이포그래피 스케일, 컴포넌트 패턴 전체
+- `references/design-system.md`: **deck 엔진 정본**. 테마 토큰, 유동 캔버스, 전환/네비/시퀀서/라이트박스/비디오/발표자보기 모듈, 컴포넌트 전체. baseline/feature 모듈을 그대로 복사해 삽입한다
 - `references/content-rules.md`: 슬라이드·노트 콘텐츠 생성 규칙 (제목/본문/수치/유형별 규칙)
 - `references/narrative-structures.md`: SCQA/PAS/BAB/StoryBrand/Pyramid 결정 트리·슬롯 배분·시간 분배·훅/CTA 패턴
 - `references/forbidden-phrases.md`: 금지 문구 목록 + 교체 원칙 (§2.4)
@@ -661,6 +693,6 @@ Gemini 디자인 리뷰 (Step 7):
 
 품질 레퍼런스 (참고용, 복사 대상 아님):
 
-- `assets/example-dark.html`: 다크 테마 4슬라이드 예시 (기술 발표)
-- `assets/example-light.html`: 라이트 테마 4슬라이드 예시 (비즈니스 전략)
+- `assets/example-dark.html`: 다크 테마 deck 예시 (기술 발표) — baseline + 대표 feature 모듈 시연
+- `assets/example-light.html`: 라이트 테마 deck 예시 (비즈니스 전략)
 - 이 파일들은 **목표 품질 수준의 적용 예시**이다. 구조, CSS 값, 컴포넌트 배치를 참고하되, 콘텐츠에 맞게 자유롭게 변형한다. 템플릿을 그대로 복사하거나 템플릿의 슬라이드 구성에 갇히지 않는다.

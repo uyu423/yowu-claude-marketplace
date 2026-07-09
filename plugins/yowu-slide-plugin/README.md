@@ -1,17 +1,23 @@
 # yowu-slide-plugin
 
-HTML 스크롤텔링 기반 발표자료 생성 플러그인. 수직 스크롤 + scroll-snap으로 페이지 단위 전환되는 프레젠테이션을 단일 HTML 파일로 생성한다.
+HTML **deck(페이지 넘김) 엔진** 기반 인터랙티브 발표자료 생성 플러그인. 슬라이드 라이브러리(reveal.js 등) 없이 순수 HTML+CSS+바닐라 JS로, 상용 프레젠테이션 SW급 인터랙션을 담은 단일 HTML 파일을 생성한다.
 
 ## 기능
 
-- **스크롤텔링 프레젠테이션**: reveal.js 없이 순수 HTML+CSS로 깔끔한 발표자료 생성
-- **테마 선택**: Dark / Light 테마 (콘텐츠 성격에 따라 자동 권장)
-- **디자인 소스 선택**: frontend-design(화려) / 자체 디자인시스템(심플) / 사용자 커스텀
-- **코드 하이라이팅**: highlight.js CDN 자동 통합
-- **페이지 단위 스크롤**: `scroll-snap-type: y mandatory`로 스페이스/스크롤 시 정확한 페이지 이동
-- **콘텐츠 품질 가드**: 환각 금지, 결론형 제목, 키워드 본문, 금지 문구 필터, 자기 검증 루브릭 (Strict 모드)
-- **발표자 노트**: 각 슬라이드에 5요소 노트(요지/전환/핵심/상호작용/Q&A 대비/소요 시간) 자동 생성, Shift+N으로 토글
-- **Strict/Lite 모드**: 기본 Strict (루브릭 전수 체크), "lite mode"·"빠른 초안" 입력으로 Lite 전환 가능
+- **deck 페이지 넘김 엔진**: `position:absolute + .on` 클래스 토글 전환. 키보드(←→ Space PageUp/Down Home/End)·클릭·터치 스와이프·진행바 HUD·딥링크(`#n`) 네비게이션
+- **해상도 독립 16:9**: `vh/vw + clamp()` 유동 타이포로 어떤 화면·프로젝터에서도 비율 유지, 모바일은 세로 스크롤 폴백(`100dvh`)
+- **발표자 보기(Presenter View)**: `P` 키로 같은 파일을 별창으로 열어 대본·경과 타이머·다음 슬라이드·진행바 표시. `postMessage`로 메인 덱과 양방향 동기화 (발표자 노트가 대본 데이터 소스)
+- **등장 애니메이션 + 시퀀서**: `.rv` 스태거 등장, `[data-seq]/[data-step]` 순차 점등, SVG `stroke-dashoffset` 순차 드로잉 (세대 토큰으로 경쟁 상태 차단)
+- **라이트박스**: 슬라이드의 SVG/이미지를 클릭하면 전체화면 확대 (SVG 색 컨텍스트 복원)
+- **비디오 거버넌스**: 활성 슬라이드의 `<video>`만 무음 자동재생, 이탈 시 정지 (에셋 있을 때 자동)
+- **CSS 수제 데이터비주얼**: 차트 라이브러리 없이 막대·워터폴·조직도를 순수 CSS로
+- **자율 적용(Auto-Apply)**: 콘텐츠 신호를 보고 AI가 위 인터랙션 기능을 **스스로 판단해 적용** (별도 지시 불필요, Step 0.5)
+- **멀티 출력**: 인쇄/PDF 선형화(`@media print`), 딥링크 공유, 전체화면(`F`)
+- **테마 선택**: Dark(기술) / Light(비즈니스), 콘텐츠 성격 자동 권장
+- **디자인 소스**: frontend-design(화려) / 자체 디자인시스템(심플) / 사용자 커스텀
+- **콘텐츠 품질 가드**: 환각 금지, 결론형 제목, 키워드 본문, 금지 문구 필터, 자기 검증 루브릭(Strict 모드)
+- **발표자 노트**: 각 슬라이드 5요소 노트(요지/전환/핵심/상호작용/Q&A 대비/소요 시간). `Shift+N` 토글, 발표자 보기 대본으로 재사용
+- **Strict/Lite 모드**: 기본 Strict, "lite mode"·"빠른 초안" 입력으로 Lite 전환
 
 ## 설치
 
@@ -26,6 +32,7 @@ HTML 스크롤텔링 기반 발표자료 생성 플러그인. 수직 스크롤 +
 | 스킬 | 설명 |
 |------|------|
 | `/yowu-slide:yowu-create-slides <주제>` | 발표자료 생성 |
+| `/yowu-slide:gemini-design-review <html>` | Gemini CLI로 시각 디자인 보완(선택, 미설치 시 quiet pass) |
 
 ### 예시
 
@@ -35,19 +42,51 @@ HTML 스크롤텔링 기반 발표자료 생성 플러그인. 수직 스크롤 +
 /yowu-slide:yowu-create-slides works/planning/slide-outline.md 에 따른 발표자료
 ```
 
+### 키보드 단축키 (생성된 덱)
+
+| 키 | 동작 |
+|----|------|
+| `→` `Space` `PageDown` | 다음 슬라이드 |
+| `←` `PageUp` | 이전 슬라이드 |
+| `Home` / `End` | 처음 / 마지막 |
+| `F` | 전체화면 토글 |
+| `P` | 발표자 보기 열기 |
+| `Shift+N` | 발표자 노트 토글 |
+| 터치 스와이프 | 슬라이드 이동(모바일) |
+
 ### 워크플로우
 
-1. **콘텐츠 이해 + 입력 검증** — 청중/목표/소스 확인, 모드 판별 (Strict/Lite/Timed)
-2. **사용자 컨펌** — 테마/디자인/슬라이드 구성/컬러 제안 (AskUserQuestion)
-3. **서사 구조 선택** — SCQA(기본)/PAS/BAB/Pyramid 등
-4. **아웃라인 + 개요 검증** — 결론형 제목, 훅·CTA 체크
-5. **HTML 생성** — Skeleton → Append (발표자 노트 포함)
-6. **자기 검증** — M1-M4 체크 (Strict 모드)
-7. **Gemini 디자인 리뷰 + 메타 블록 출력** (선택)
+1. **콘텐츠 이해 + 입력 검증** — 청중/목표/소스 확인, 모드 판별(Strict/Lite/Timed)
+2. **Capability Planning** — 콘텐츠 신호로 인터랙션 기능 자동 결정(시퀀서/드로잉/라이트박스/비디오/발표자 보기)
+3. **사용자 컨펌** — 테마/디자인/슬라이드 구성/컬러 + 자동 적용 기능 제안(AskUserQuestion)
+4. **서사 구조 + 아웃라인** — SCQA(기본)/PAS/BAB/Pyramid 등, 결론형 제목·훅·CTA 검증
+5. **HTML 생성** — 정본(design-system.md) 모듈을 조립: Skeleton(head+CSS+엔진 JS) → 슬라이드 Append
+6. **자기 검증** — M1~M5 체크(엔진 무결성 포함, Strict 모드)
+7. **Gemini 디자인 리뷰 + 메타 블록 출력**(선택)
 
 ## 기술 스택
 
-- 나눔스퀘어 네오 웹폰트 (@font-face)
-- highlight.js 11.9.0 (CDN)
-- CSS scroll-snap (페이지 단위 스크롤)
-- 단일 HTML 파일 (외부 의존성 없음)
+- deck 페이지 넘김 엔진 (`position:absolute + .on`, 세대 토큰·더블 rAF)
+- 나눔스퀘어 네오 웹폰트 (@font-face) + 시스템 모노
+- 해상도 독립 유동 캔버스 (`vh/vw + clamp()`)
+- 조건부 CDN 화이트리스트: highlight.js · Chart.js · Mermaid · KaTeX · Iconify · lottie-web (콘텐츠 신호 있을 때만)
+- 단일 HTML 파일 (외부 파일 의존성 없음)
+
+## 구조
+
+```
+skills/
+  yowu-create-slides/
+    SKILL.md                      # 생성 워크플로우 + Capability Planning + 정책
+    references/
+      design-system.md            # ★ deck 엔진 정본 (모듈 소스 — baseline/feature)
+      content-rules.md            # 콘텐츠 생성 규칙
+      narrative-structures.md     # SCQA/PAS/BAB/Pyramid/StoryBrand
+      forbidden-phrases.md        # 금지 문구
+      self-check.md               # 자기 검증 루브릭
+      note-protocol.md            # 발표자 노트 5요소 (+ 발표자 보기 대본 소스)
+    assets/
+      example-dark.html           # 골든 참조 (기술, 다크)
+      example-light.html          # 골든 참조 (비즈니스, 라이트)
+  gemini-design-review/           # 선택적 Gemini CLI 시각 리뷰
+```

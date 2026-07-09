@@ -1,273 +1,666 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2025 Q2 제품 전략</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>이탈률 12% → 7%, Q2 리텐션 개선 제안</title>
+  <!-- 정본 §8 presenter-headscript — 첫 페인트 전, 최상단 -->
+  <script>
+  if (/[?&]presenter(?:[=&]|$)/.test(location.search)) document.documentElement.className += ' presenter';
+  </script>
   <style>
-    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-aLt.woff2); font-weight: 300; font-display: swap; }
-    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-bRg.woff2); font-weight: 400; font-display: swap; }
-    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-cBd.woff2); font-weight: 700; font-display: swap; }
-    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-dEb.woff2); font-weight: 800; font-display: swap; }
-    @font-face { font-family: 'NanumSquareNeo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-eHv.woff2); font-weight: 900; font-display: swap; }
+    /* §2 나눔스퀘어 네오 */
+    @font-face { font-family:'NanumSquareNeo'; src:url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-bRg.woff2); font-weight:400; font-display:swap; }
+    @font-face { font-family:'NanumSquareNeo'; src:url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-cBd.woff2); font-weight:700; font-display:swap; }
+    @font-face { font-family:'NanumSquareNeo'; src:url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-dEb.woff2); font-weight:800; font-display:swap; }
+    @font-face { font-family:'NanumSquareNeo'; src:url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-eHv.woff2); font-weight:900; font-display:swap; }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
-    body {
-      font-family: 'NanumSquareNeo', -apple-system, sans-serif;
-      background: #FAFAF8;
-      color: #1A1A1A;
-      line-height: 1.7;
-      overflow-x: hidden;
-    }
-
-    section {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 60px 24px;
-      max-width: 720px;
-      margin: 0 auto;
-      overflow: hidden;
-      scroll-snap-align: start;
+    /* §1 Light 테마 토큰 */
+    :root {
+      --bg:#FAFAF8; --bg-raise:#FFFFFF; --bg-card:#FFFFFF;
+      --bg-gradient:linear-gradient(135deg,#FDFDFB 0%,#F4F3EF 100%);
+      --surface:#FFFFFF; --surface-hover:#F5F4F0;
+      --line:#E7E5E0; --line-soft:#F0EEE9; --border:#EAE8E3; --border-accent:rgba(0,0,0,0.12);
+      --text-primary:#1A1A1A; --text-secondary:#4A4A48; --text-muted:#8A8A86;
+      --accent-1:#5b5bd6; --accent-2:#0a9d78; --accent-3:#d9772b; --hl:var(--accent-1);
+      --accent-gradient:linear-gradient(135deg,var(--accent-1),var(--accent-2));
+      --ok:#0a9d78; --bad:#d64545; --tag-bg:#EEEDFB; --tag-color:#5b5bd6;
+      --font-family:'NanumSquareNeo',-apple-system,BlinkMacSystemFont,sans-serif;
+      --mono:'SF Mono','JetBrains Mono','Fira Code',ui-monospace,Menlo,monospace;
+      color-scheme:light;
     }
 
-    .hero { text-align: center; }
-    .hero .eyebrow {
-      font-size: 14px;
-      color: #888;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 24px;
+    /* §3 core-css */
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { height:100%; }
+    body { background:var(--bg); color:var(--text-primary); font-family:var(--font-family); font-size:16px; line-height:1.65; letter-spacing:-0.01em; -webkit-font-smoothing:antialiased; overflow:hidden; }
+    .stagebg { position:fixed; inset:0; z-index:0; pointer-events:none; }
+    .stagebg::before { content:''; position:absolute; inset:0; background-image:linear-gradient(var(--line-soft) 1px,transparent 1px),linear-gradient(90deg,var(--line-soft) 1px,transparent 1px); background-size:64px 64px; -webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,rgba(0,0,0,.55),transparent 75%); mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,rgba(0,0,0,.55),transparent 75%); }
+    .deck { position:fixed; inset:0; z-index:1; }
+    .slide { position:absolute; inset:0; padding:7vh 5vw 9vh; display:flex; flex-direction:column; justify-content:center; opacity:0; visibility:hidden; transform:translateY(14px) scale(.992); transition:opacity .5s ease, transform .5s cubic-bezier(.22,1,.36,1), visibility 0s linear .5s; pointer-events:none; }
+    .slide.on { opacity:1; visibility:visible; transform:none; transition:opacity .5s ease, transform .5s cubic-bezier(.22,1,.36,1); pointer-events:auto; }
+    .slide__inner, .inner { width:min(1160px,100%); margin:0 auto; }
+    .slide--content .slide__inner, .slide--quote .slide__inner { max-width:820px; }
+    .slide--title, .slide--closing { background:var(--bg-gradient); }
+
+    /* §4 fluid-css */
+    .kicker, .label { font-family:var(--mono); font-size:clamp(10px,1.25vh,13px); font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:var(--hl); display:inline-flex; align-items:center; gap:12px; margin-bottom:1.6vh; }
+    .kicker::after { content:''; width:40px; border-top:1px solid var(--border-accent); }
+    h1, .deck-title { font-size:clamp(40px,min(11vh,8vw),104px); font-weight:900; line-height:1.08; letter-spacing:-0.035em; margin-bottom:2vh; }
+    h2, .sl-title { font-size:clamp(24px,5vh,46px); font-weight:800; line-height:1.16; letter-spacing:-0.03em; margin-bottom:1.4vh; }
+    h3 { font-size:clamp(16px,2.4vh,22px); font-weight:700; margin-bottom:1vh; }
+    .desc, .sl-desc { color:var(--text-secondary); font-size:clamp(14px,1.9vh,18px); line-height:1.75; max-width:900px; margin-bottom:3vh; }
+    .desc strong, .sl-desc strong { color:var(--text-primary); font-weight:700; }
+    .footnote { margin-top:2.4vh; font-size:clamp(11px,1.5vh,13.5px); color:var(--text-muted); }
+    .gradient-text { background:var(--accent-gradient); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+    h1 .em, h2 .em, .accent { color:var(--accent-1); }
+    .em2, .accent.c2 { color:var(--accent-2); }
+    .em3, .accent.c3 { color:var(--accent-3); }
+
+    /* §4 fluid-responsive */
+    @media (max-width:820px) {
+      body { overflow:auto; }
+      .deck { position:static; }
+      .slide { position:relative; inset:auto; opacity:1 !important; visibility:visible !important; transform:none !important; min-height:100dvh; height:auto; padding:6vh 6vw 10vh; justify-content:flex-start; overflow-y:visible; pointer-events:auto; border-top:1px solid var(--line-soft); }
+      .slide .rv, .slide .rvx { opacity:1 !important; transform:none !important; animation:none !important; }
+      .card-grid, .stat-row, .comparison, .workflow-grid, .flow-container, .code-cmp { grid-template-columns:1fr !important; flex-direction:column; }
+      .hud .nav { display:none; }
     }
-    .hero h1 {
-      font-size: clamp(2.25rem, 8vw, 3.5rem);
-      font-weight: 700;
-      line-height: 1.2;
-      margin-bottom: 20px;
-    }
-    .hero h1 .highlight {
-      background: linear-gradient(135deg, #6C5CE7, #00B894);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .hero .subtitle {
-      font-size: 18px;
-      color: #666;
-      line-height: 1.8;
-    }
-    .scroll-hint {
-      margin-top: 40px;
-      font-size: 13px;
-      color: #bbb;
-      animation: bounce 2s infinite;
-    }
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(8px); }
+    @media print {
+      body { overflow:visible; background:#fff; color:#111; }
+      .stagebg, .hud, .lightbox, .lb-close, .lb-hint, .notes-btn, .fs-btn { display:none !important; }
+      .deck { position:static; }
+      .slide { position:relative; inset:auto; height:auto; min-height:100vh; opacity:1 !important; visibility:visible !important; transform:none !important; page-break-after:always; pointer-events:auto; }
+      .rv, .rvx { opacity:1 !important; transform:none !important; animation:none !important; }
+      .fc .nd { opacity:1 !important; } .fc .eg { stroke-dashoffset:0 !important; opacity:1 !important; }
+      [data-step] { opacity:1 !important; transform:none !important; }
+      .md-plot .fill, .md-plot .ghost { animation:none !important; opacity:1 !important; width:var(--w) !important; }
+      aside.slide-notes { display:block !important; page-break-inside:avoid; }
     }
 
-    /* === Fullscreen Toggle Button === */
-    .fs-btn {
-      position: fixed;
-      bottom: 24px;
-      left: 24px;
-      z-index: 100;
-      width: 40px;
-      height: 40px;
-      border-radius: 99px;
-      background: rgba(255,255,255,0.75);
-      border: 1px solid #E5E4E2;
-      color: #666;
-      font-size: 18px;
-      line-height: 1;
-      cursor: pointer;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      transition: border-color 0.2s ease, color 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: inherit;
-      padding: 0;
-    }
-    .fs-btn:hover { border-color: #6C5CE7; color: #6C5CE7; }
-    @media print { .fs-btn { display: none; } }
+    /* §5 nav-hud-css */
+    .hud { position:fixed; inset:auto 0 0 0; z-index:30; pointer-events:none; }
+    .hud .bar { position:absolute; left:0; bottom:0; height:3px; width:0%; background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); transition:width .4s ease; }
+    .hud .meta { position:absolute; left:24px; bottom:14px; font-family:var(--mono); font-size:11.5px; letter-spacing:.12em; color:var(--text-muted); }
+    .hud .nav { position:absolute; right:20px; bottom:10px; display:flex; gap:6px; pointer-events:auto; }
+    .hud .nav button { width:38px; height:38px; border-radius:10px; border:1px solid var(--border-accent); background:var(--surface); color:var(--text-secondary); font-size:17px; line-height:1; cursor:pointer; -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); transition:color .2s,border-color .2s; display:flex; align-items:center; justify-content:center; }
+    .hud .nav button:hover { color:var(--text-primary); border-color:var(--accent-1); }
+    .fs-btn { position:fixed; bottom:14px; left:96px; z-index:31; width:34px; height:34px; border-radius:9px; background:var(--surface); border:1px solid var(--border-accent); color:var(--text-secondary); font-size:15px; line-height:1; cursor:pointer; -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; transition:color .2s,border-color .2s; }
+    .fs-btn:hover { color:var(--text-primary); border-color:var(--accent-1); }
 
-    .label {
-      font-size: 12px;
-      color: #6C5CE7;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      font-weight: 600;
-      margin-bottom: 12px;
-    }
-    h2 {
-      font-size: clamp(1.75rem, 5vw, 2.5rem);
-      font-weight: 700;
-      line-height: 1.3;
-      margin-bottom: 16px;
-    }
-    h2 .em { color: #6C5CE7; }
+    /* §6 reveal-css */
+    .rv { opacity:0; transform:translateY(16px); }
+    .rvx { opacity:0; transform:translateX(-14px); }
+    .slide.on .rv { animation:rise .5s cubic-bezier(.22,1,.36,1) forwards; animation-delay:var(--d,0s); }
+    .slide.on .rvx { animation:risex .45s cubic-bezier(.22,1,.36,1) forwards; animation-delay:var(--d,0s); }
+    @keyframes rise { to { opacity:1; transform:none; } }
+    @keyframes risex { to { opacity:1; transform:none; } }
 
-    .desc {
-      font-size: 16px;
-      color: #555;
-      line-height: 1.8;
-      margin-bottom: 32px;
-    }
+    /* §7 notes-css */
+    aside.slide-notes { display:none; }
+    body.notes-visible aside.slide-notes { display:block; margin-top:3vh; padding:18px 22px; background:var(--surface); border-left:3px solid var(--accent-1); border-radius:0 12px 12px 0; font-size:13px; line-height:1.6; color:var(--text-secondary); max-width:820px; }
+    aside.slide-notes h4 { font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:var(--accent-1); margin:12px 0 4px; font-weight:700; }
+    aside.slide-notes h4:first-child { margin-top:0; }
+    aside.slide-notes ul { padding-left:20px; }
+    .notes-btn { position:fixed; bottom:14px; left:136px; z-index:31; width:34px; height:34px; border-radius:9px; background:var(--surface); border:1px solid var(--border-accent); color:var(--text-secondary); font-size:12px; font-weight:700; cursor:pointer; -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; transition:color .2s,border-color .2s; }
+    .notes-btn[aria-pressed="true"] { color:var(--accent-1); border-color:var(--accent-1); }
 
-    .card-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-    .card {
-      background: #fff;
-      border: 1px solid #EEEDEB;
-      border-radius: 16px;
-      padding: 20px;
-    }
-    .card-icon { font-size: 2rem; margin-bottom: 10px; }
-    .card-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
-    .card-desc { font-size: 13px; color: #888; line-height: 1.6; }
+    /* §8 presenter-css */
+    .presenter-view { display:none; }
+    html.presenter .deck, html.presenter .hud, html.presenter .fs-btn, html.presenter .notes-btn, html.presenter .stagebg, html.presenter .lightbox { display:none !important; }
+    html.presenter { overflow:hidden; }
+    html.presenter .presenter-view { display:flex; flex-direction:column; position:fixed; inset:0; z-index:300; background:var(--bg); color:var(--text-primary); }
+    .pv-top { flex:none; display:flex; align-items:center; gap:16px; padding:12px 26px; border-bottom:1px solid var(--line); background:var(--bg-raise); }
+    .pv-brand { font-family:var(--mono); font-size:11.5px; font-weight:600; letter-spacing:.1em; color:var(--text-muted); display:flex; align-items:center; gap:9px; }
+    .pv-brand .dot { width:7px; height:7px; border-radius:50%; background:var(--accent-1); box-shadow:0 0 12px var(--accent-1); }
+    .pv-count { font-family:var(--mono); font-size:15px; font-weight:600; letter-spacing:.1em; }
+    .pv-spacer { flex:1 1 auto; }
+    .pv-timer { font-family:var(--mono); font-size:21px; font-weight:600; color:var(--accent-2); background:none; border:1px solid var(--line); border-radius:10px; padding:4px 15px; cursor:pointer; }
+    .pv-timer:hover { border-color:var(--accent-2); }
+    .pv-bar { flex:none; height:3px; background:var(--line-soft); }
+    .pv-bar i { display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); transition:width .3s ease; }
+    .pv-main { flex:1 1 auto; display:flex; flex-direction:column; min-height:0; width:min(1080px,100%); margin:0 auto; padding:20px 30px 0; }
+    .pv-kicker { font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:var(--accent-1); min-height:16px; }
+    .pv-title { font-size:clamp(19px,3.6vh,27px); font-weight:800; letter-spacing:-0.02em; margin:4px 0 12px; }
+    .pv-notes { flex:1 1 auto; min-height:0; overflow-y:auto; font-size:18px; line-height:1.8; padding-right:8px; }
+    .pv-notes h4 { font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--accent-1); margin:14px 0 5px; }
+    .pv-notes h4:first-child { margin-top:0; }
+    .pv-notes ul { padding-left:22px; }
+    .pv-notes b, .pv-notes strong { color:var(--accent-2); }
+    .pv-next { flex:none; margin:16px 0 18px; border:1px solid var(--line); border-radius:14px; background:var(--bg-card); padding:12px 18px; }
+    .pv-next-label { font-family:var(--mono); font-size:10px; font-weight:600; letter-spacing:.2em; color:var(--text-muted); text-transform:uppercase; }
+    .pv-next-title { font-size:15.5px; font-weight:700; margin-top:3px; }
+    .pv-foot { flex:none; display:flex; align-items:center; gap:14px; padding:9px 26px; border-top:1px solid var(--line-soft); font-family:var(--mono); font-size:10.5px; color:var(--text-muted); }
+    .pv-link.lost { color:var(--bad); }
+    .pv-keys { margin-left:auto; }
 
-    .stat-row { display: flex; gap: 12px; margin-bottom: 32px; }
-    .stat-box {
-      flex: 1;
-      background: #fff;
-      border: 1px solid #EEEDEB;
-      border-radius: 14px;
-      padding: 16px;
-      text-align: center;
-    }
-    .stat-num { font-size: 28px; font-weight: 700; color: #6C5CE7; }
-    .stat-label { font-size: 12px; color: #888; margin-top: 4px; }
+    /* §9 components-css */
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:clamp(16px,2.2vh,24px); }
+    .card-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .card-grid.cols-3 { grid-template-columns:repeat(3,1fr); }
+    .card-icon { font-size:1.9rem; margin-bottom:10px; }
+    .card-title { font-size:clamp(14px,1.9vh,16px); font-weight:700; margin-bottom:4px; }
+    .card-desc { font-size:clamp(12px,1.6vh,13px); color:var(--text-muted); line-height:1.6; }
+    .stat-row { display:flex; gap:14px; margin-bottom:3vh; }
+    .stat-box { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:clamp(14px,2vh,20px); text-align:center; }
+    .stat-num { font-size:clamp(1.8rem,6vh,2.8rem); font-weight:900; color:var(--accent-1); line-height:1.1; }
+    .stat-label { font-size:12px; color:var(--text-muted); margin-top:6px; }
+    .comparison { display:grid; grid-template-columns:1fr auto 1fr; gap:16px; align-items:center; }
+    .comparison-col { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:clamp(16px,2.4vh,24px); }
+    .comparison-col.bad { border-color:rgba(255,107,91,.3); }
+    .comparison-col.good { border-color:rgba(93,228,199,.3); }
+    .comparison-divider { font-size:24px; color:var(--text-muted); }
+    .tag { display:inline-block; background:var(--tag-bg); color:var(--tag-color); padding:4px 12px; border-radius:99px; font-size:12px; font-weight:600; margin:0 4px 8px 0; }
+    .hero-badge-row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:3vh; align-self:center; width:fit-content; }
+    .hero-badge { display:inline-flex; align-items:center; gap:7px; background:var(--surface); border:1px solid var(--border-accent); border-radius:99px; padding:6px 14px 6px 10px; font-size:13px; font-weight:500; color:var(--text-secondary); white-space:nowrap; }
+    .hero-badge::before { content:''; width:7px; height:7px; border-radius:50%; background:var(--accent-1); flex-shrink:0; }
+    .hero-badge.c2::before { background:var(--accent-2); }
+    .hero-badge.c3::before { background:var(--accent-3); }
+    pre { border-radius:12px; overflow:hidden; margin-bottom:2.4vh; }
+    pre code { font-size:clamp(12px,1.8vh,14px); line-height:1.6; padding:22px !important; }
 
-    pre { border-radius: 12px; overflow: hidden; margin-bottom: 24px; border: 1px solid #EEEDEB; }
-    pre code { font-size: 14px; line-height: 1.6; padding: 24px !important; }
+    /* §10 sequencer-css */
+    [data-seq] [data-step] { opacity:0; transform:translateY(10px); transition:opacity .4s ease, transform .4s cubic-bezier(.22,1,.36,1); }
+    [data-seq] [data-step].lit { opacity:1; transform:none; }
 
-    .cta-section { text-align: center; }
-    .cta-tag {
-      display: inline-block;
-      background: linear-gradient(135deg, #6C5CE7, #00B894);
-      color: #fff;
-      padding: 12px 32px;
-      border-radius: 99px;
-      font-size: 16px;
-      font-weight: 600;
-      margin-top: 20px;
-    }
+    /* §11 svg-drawing-css */
+    .fc { width:100%; height:auto; overflow:visible; max-width:760px; margin:0 auto; }
+    .fc text { font-family:var(--font-family); fill:var(--text-primary); font-size:15px; font-weight:700; }
+    .fc .nd rect { fill:var(--surface); stroke:var(--border-accent); stroke-width:1.5; }
+    .fc .nd.accent rect { fill:none; stroke:var(--accent-1); stroke-width:2; }
+    .fc .nd { opacity:0; transition:opacity .5s ease; transition-delay:calc(var(--i) * .1s); }
+    .slide.on .fc .nd { opacity:1; }
+    .fc .eg { stroke:var(--border-accent); stroke-width:1.6; fill:none; stroke-dasharray:100; stroke-dashoffset:100; opacity:0; transition:stroke-dashoffset .7s ease, opacity .25s ease; transition-delay:calc(var(--i) * .1s); }
+    .fc .eg.accent { stroke:var(--accent-1); }
+    .slide.on .fc .eg { stroke-dashoffset:0; opacity:1; }
+    .slide:not(.on) .fc .nd, .slide:not(.on) .fc .eg { transition:none; }
 
-    @media (max-width: 480px) {
-      section { padding: 48px 20px; }
-      .card-grid { grid-template-columns: 1fr; }
-      .stat-row { flex-direction: column; }
-    }
+    /* §12 lightbox-css */
+    .slide svg, .slide img { cursor:zoom-in; transition:outline-color .18s ease, filter .18s ease; }
+    .slide svg:hover, .slide img:hover { outline:1.5px solid var(--border-accent); outline-offset:3px; filter:brightness(1.05); }
+    .lightbox { position:fixed; inset:0; z-index:200; display:flex; align-items:center; justify-content:center; padding:3vh 3vw; background:rgba(6,10,18,.9); -webkit-backdrop-filter:blur(10px) saturate(1.05); backdrop-filter:blur(10px) saturate(1.05); cursor:zoom-out; visibility:hidden; opacity:0; pointer-events:none; transition:opacity .22s ease, visibility 0s linear .22s; }
+    .lightbox.open { visibility:visible; opacity:1; pointer-events:auto; transition:opacity .22s ease; }
+    .lb-stage { display:flex; align-items:center; justify-content:center; cursor:default; transform:scale(.97); transition:transform .24s cubic-bezier(.22,1,.36,1); filter:drop-shadow(0 30px 80px rgba(0,0,0,.6)); }
+    .lightbox.open .lb-stage { transform:scale(1); }
+    .lb-svgbox { box-sizing:border-box; background:var(--bg-card); border:1px solid var(--line); border-radius:18px; padding:clamp(18px,3vh,44px); }
+    .lb-svgbox svg { display:block; width:100%; height:100%; cursor:default; outline:none; filter:none; }
+    .lb-imgbox img { display:block; width:100%; height:100%; object-fit:contain; border-radius:12px; border:1px solid var(--line); outline:none; filter:none; cursor:default; }
+    .lb-close { position:fixed; top:20px; right:26px; z-index:201; width:46px; height:46px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; background:var(--surface); border:1px solid var(--line); color:var(--text-primary); font-size:19px; }
+    .lb-close:hover { transform:scale(1.06); }
+    .lb-hint { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:201; font-family:var(--mono); font-size:12px; letter-spacing:.1em; color:var(--text-muted); pointer-events:none; }
+
+    /* §14 dataviz-css */
+    .md-row { margin-bottom:1.6vh; }
+    .md-label { font-size:clamp(12px,1.6vh,14px); color:var(--text-secondary); margin-bottom:6px; display:flex; justify-content:space-between; }
+    .md-plot { position:relative; height:clamp(28px,4vh,40px); border-left:1px solid var(--line); background:linear-gradient(var(--line-soft),var(--line-soft)) no-repeat 50% 0 / 1px 100%; }
+    .md-plot .ghost, .md-plot .fill { position:absolute; left:0; top:50%; transform:translateY(-50%); width:0; }
+    .md-plot .ghost { height:clamp(16px,2.6vh,24px); border:1.5px dashed rgba(255,107,91,.6); border-left:none; background:rgba(255,107,91,.07); border-radius:0 6px 6px 0; }
+    .md-plot .fill { height:clamp(7px,1.2vh,11px); background:linear-gradient(90deg,color-mix(in srgb,var(--accent-2) 55%,transparent),var(--accent-2) 85%); border-radius:0 4px 4px 0; box-shadow:0 0 0 2px var(--bg); }
+    .slide.on .md-plot .ghost { animation:mdgrow .5s cubic-bezier(.22,1,.36,1) forwards; animation-delay:var(--g,0s); }
+    .slide.on .md-plot .fill { animation:mdgrow .55s cubic-bezier(.22,1,.36,1) forwards; animation-delay:var(--f,.15s); }
+    @keyframes mdgrow { from { opacity:1; width:0; } to { opacity:1; width:var(--w); } }
+    /* §14 dataviz-css — CSS-only 조직도 (정본에서 추가) */
+    .org-tier { display:flex; justify-content:center; gap:clamp(8px,1.1vw,16px); }
+    .org-tier.members { position:relative; padding-top:clamp(16px,2.4vh,26px); --stem:clamp(16px,2.4vh,26px); --hgap:clamp(8px,1.1vw,16px); }
+    .org-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:clamp(10px,1.5vh,16px); text-align:center; flex:1; min-width:0; }
+    .org-card.lead { flex:0 1 auto; border-color:var(--accent-1); }
+    .org-tier.members .org-card { position:relative; }
+    .org-tier.members .org-card::before { content:''; position:absolute; top:calc(var(--stem) * -1); left:50%; width:2px; height:var(--stem); background:var(--line); }
+    .org-tier.members .org-card::after { content:''; position:absolute; top:calc(var(--stem) * -1); left:calc(var(--hgap) * -0.5); right:calc(var(--hgap) * -0.5); height:2px; background:var(--line); }
+    .org-tier.members .org-card:first-child::after { left:50%; }
+    .org-tier.members .org-card:last-child::after { right:50%; }
   </style>
 </head>
 <body>
-
-  <section class="hero">
-    <div class="eyebrow">2025 Q2 Product Strategy</div>
-    <h1><span class="highlight">사용자 경험</span>을<br>재정의합니다</h1>
-    <p class="subtitle">
-      데이터 기반의 의사결정으로<br>
-      핵심 지표를 2배 성장시키는 전략
-    </p>
-    <div class="scroll-hint">&#8595; 스크롤해서 계속 읽기</div>
-  </section>
-
-  <section>
-    <div class="label">Current Status</div>
-    <h2>Q1 핵심 지표<br><span class="em">요약</span></h2>
-    <p class="desc">
-      1분기 동안 사용자 기반이 크게 성장했으며,
-      특히 리텐션 지표에서 유의미한 개선을 확인했습니다.
-    </p>
-    <div class="stat-row">
-      <div class="stat-box">
-        <div class="stat-num">2.4M</div>
-        <div class="stat-label">월간 활성 사용자</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num">68%</div>
-        <div class="stat-label">D7 리텐션</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num">+34%</div>
-        <div class="stat-label">전분기 대비 매출</div>
-      </div>
+  <!-- §5 nav-hud-markup -->
+  <div class="hud">
+    <div class="meta" id="hudMeta">01 / 01</div>
+    <div class="bar" id="hudBar"></div>
+    <div class="nav">
+      <button id="btnPrev" type="button" aria-label="이전 슬라이드">‹</button>
+      <button id="btnNext" type="button" aria-label="다음 슬라이드">›</button>
     </div>
-  </section>
-
-  <section>
-    <div class="label">Strategy</div>
-    <h2>Q2 <span class="em">핵심 전략</span><br>4가지</h2>
-    <p class="desc">
-      사용자 여정의 각 단계에서 마찰을 줄이고,
-      핵심 가치 전달 속도를 높이는 데 집중합니다.
-    </p>
-    <div class="card-grid">
-      <div class="card">
-        <div class="card-icon">&#9889;</div>
-        <div class="card-title">온보딩 개선</div>
-        <div class="card-desc">첫 경험까지의 시간을 50% 단축</div>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#127919;</div>
-        <div class="card-title">개인화 강화</div>
-        <div class="card-desc">AI 기반 맞춤 추천 시스템 도입</div>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#128172;</div>
-        <div class="card-title">커뮤니티 기능</div>
-        <div class="card-desc">사용자 간 연결과 공유 활성화</div>
-      </div>
-      <div class="card">
-        <div class="card-icon">&#128200;</div>
-        <div class="card-title">수익화 고도화</div>
-        <div class="card-desc">프리미엄 티어 재설계</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="cta-section">
-    <div class="label">Next Steps</div>
-    <h2>함께<br><span class="em">만들어 갑시다</span></h2>
-    <p class="desc">
-      Q2 전략의 성공은 팀 전체의 협업에 달려 있습니다.<br>
-      각 스쿼드별 상세 로드맵은 다음 주 공유됩니다.
-    </p>
-    <div class="cta-tag">Q2 킥오프 미팅 참여하기</div>
-  </section>
-
+  </div>
   <button class="fs-btn" id="fsBtn" type="button" aria-label="전체화면 전환" title="전체화면 (F)">⛶</button>
+  <button class="notes-btn" id="notesBtn" type="button" aria-label="발표자 노트 토글" title="노트 (Shift+N)" aria-pressed="false">N</button>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-  <script>hljs.highlightAll();</script>
+  <div class="stagebg"></div>
+
+  <div class="deck">
+
+    <!-- 1. TITLE -->
+    <section class="slide slide--title" data-name="title">
+      <div class="slide__inner">
+        <div class="hero-badge-row rv" style="--d:.05s">
+          <span class="hero-badge">온보딩 재설계</span>
+          <span class="hero-badge c2">Day3 리마인더</span>
+          <span class="hero-badge c3">세그먼트 알림</span>
+        </div>
+        <div class="kicker rv" style="--d:.1s">Growth · Q2 리텐션 제안</div>
+        <h1 class="rv" style="--d:.16s">신규 이탈률 12%→<span class="gradient-text">7%</span>,<br>온보딩 재설계로 되돌린다</h1>
+        <p class="desc rv" style="--d:.24s"><strong>D7 이탈 12%</strong> — 초기 설정 구간 마찰이 핵심 원인</p>
+      </div>
+      <aside class="slide-notes" hidden>
+        <h4>요지</h4><p>오늘 한 문장 — <strong>신규 이탈률 12%를 7%로 낮추는 온보딩 재설계</strong>를 제안한다.</p>
+        <h4>전환</h4><p>인사 후 바로 // "가입한 유저 중 며칠 안에 떠나는지 아시나요?"로 시작한다.</p>
+        <h4>핵심</h4><ul><li>이탈은 온보딩 초기 설정 구간에 집중</li><li>도구 교체가 아니라 <strong>온보딩 흐름 자체</strong>를 재설계하는 제안</li></ul>
+        <h4>상호작용</h4><p>손 들기 질문 (pause 3s)</p>
+        <h4>Q&amp;A 대비</h4><ul><li>목표 근거? — [INSERT: 벤치마크 소스]</li></ul>
+        <h4>소요 시간</h4><p>예상 1분 00초</p>
+      </aside>
+    </section>
+
+    <!-- 2. PROCESS (svg-drawing + sequencer) -->
+    <section class="slide slide--process" data-name="bottleneck">
+      <div class="slide__inner">
+        <div class="kicker rv">Situation · 이탈 발생 구간</div>
+        <h2 class="sl-title rv" style="--d:.06s">이탈은 <span class="accent">초기 설정</span> 구간에 몰려 있다</h2>
+        <svg class="fc rv" style="--d:.14s" viewBox="0 0 620 110" role="img" aria-label="가입에서 초기 설정, 가치 체감으로 이어지는 온보딩 퍼널">
+          <defs>
+            <marker id="ar-s2" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" style="fill:var(--border-accent)"/></marker>
+          </defs>
+          <line class="eg" style="--i:1" x1="150" y1="55" x2="238" y2="55" marker-end="url(#ar-s2)"/>
+          <line class="eg accent" style="--i:2" x1="392" y1="55" x2="480" y2="55" marker-end="url(#ar-s2)"/>
+          <g class="nd" style="--i:0"><rect x="30" y="33" width="120" height="44" rx="10"/><text x="90" y="60" text-anchor="middle">가입</text></g>
+          <g class="nd accent" style="--i:1"><rect x="250" y="33" width="130" height="44" rx="10"/><text x="315" y="60" text-anchor="middle">초기 설정</text></g>
+          <g class="nd" style="--i:2"><rect x="490" y="33" width="110" height="44" rx="10"/><text x="545" y="60" text-anchor="middle">가치 체감</text></g>
+        </svg>
+        <ul class="card-grid cols-3" data-seq data-interval="500" style="list-style:none; margin-top:2vh;">
+          <li class="card" data-step="1"><div class="card-title">가입</div><div class="card-desc">목적 불일치 — 첫 화면과 가입 동기 어긋남</div></li>
+          <li class="card" data-step="2"><div class="card-title">초기 설정</div><div class="card-desc">마찰 최대 — 완료율 최저 구간</div></li>
+          <li class="card" data-step="3"><div class="card-title">가치 체감</div><div class="card-desc">지연 발생 — 체감 전 이탈 다수</div></li>
+        </ul>
+      </div>
+      <aside class="slide-notes" hidden>
+        <h4>요지</h4><p>이탈은 흩어진 게 아니라 <strong>초기 설정 구간에 집중</strong>돼 있다.</p>
+        <h4>전환</h4><p>"먼저 어디서 유저가 떠나는지 퍼널을 봤습니다."</p>
+        <h4>핵심</h4><ul><li>다이어그램 가운데(초기 설정)가 최대 이탈 구간 — 강조 색</li><li>카드 3개가 순차로 뜨는 동안 각 구간을 설명</li></ul>
+        <h4>상호작용</h4><p>카드 등장에 맞춰 하나씩 짚기</p>
+        <h4>Q&amp;A 대비</h4><ul><li>측정 기준? — [INSERT: 코호트 정의] 기준 D1 이탈</li></ul>
+        <h4>소요 시간</h4><p>예상 1분 20초</p>
+      </aside>
+    </section>
+
+    <!-- 3. STAT -->
+    <section class="slide slide--stat-grid" data-name="numbers">
+      <div class="slide__inner">
+        <div class="kicker rv">Target · 목표 지표</div>
+        <h2 class="sl-title rv" style="--d:.06s">세 지표를 함께 움직인다</h2>
+        <div class="stat-row">
+          <div class="stat-box rv" style="--d:.12s"><div class="stat-num">12→7<span style="font-size:.5em">%</span></div><div class="stat-label">D7 신규 이탈률 (현재→목표)</div></div>
+          <div class="stat-box rv" style="--d:.2s"><div class="stat-num">[INSERT]<span style="font-size:.5em">%p</span></div><div class="stat-label">초기 설정 구간 이탈 비중</div></div>
+          <div class="stat-box rv" style="--d:.28s"><div class="stat-num">[INSERT]</div><div class="stat-label">Q2 예상 매출 임팩트</div></div>
+        </div>
+        <p class="footnote rv" style="--d:.34s">[INSERT: 측정 기간] 코호트 평균 · [INSERT: 데이터 소스] 기준</p>
+      </div>
+      <aside class="slide-notes" hidden>
+        <h4>요지</h4><p>목표는 <strong>이탈률 하나가 아니라 매출 임팩트</strong>까지 함께 본다.</p>
+        <h4>핵심</h4><ul><li>12%→7%는 D7 이탈률 기준</li><li>매출 임팩트가 의사결정 포인트</li></ul>
+        <h4>소요 시간</h4><p>예상 50초</p>
+      </aside>
+    </section>
+
+    <!-- 4. CHART (dataviz) -->
+    <section class="slide slide--chart" data-name="chart">
+      <div class="slide__inner">
+        <div class="kicker rv">Evidence · 단계별 이탈률</div>
+        <h2 class="sl-title rv" style="--d:.06s">점선은 현재, 채운 막대가 목표다</h2>
+        <div class="rv" style="--d:.14s; margin-top:1vh;">
+          <div class="md-row"><div class="md-label"><span>가입 → 첫 실행</span><span>[INSERT]% → [INSERT]%</span></div><div class="md-plot"><span class="ghost" style="--w:55%;--g:0s"></span><span class="fill" style="--w:30%;--f:.2s"></span></div></div>
+          <div class="md-row"><div class="md-label"><span>초기 설정</span><span>[INSERT]% → [INSERT]%</span></div><div class="md-plot"><span class="ghost" style="--w:92%;--g:.1s"></span><span class="fill" style="--w:45%;--f:.3s"></span></div></div>
+          <div class="md-row"><div class="md-label"><span>가치 체감 도달</span><span>[INSERT]% → [INSERT]%</span></div><div class="md-plot"><span class="ghost" style="--w:40%;--g:.2s"></span><span class="fill" style="--w:22%;--f:.4s"></span></div></div>
+        </div>
+        <p class="footnote rv" style="--d:.4s">막대는 최대 이탈 구간(초기 설정) 기준 상대 폭</p>
+      </div>
+      <aside class="slide-notes" hidden>
+        <h4>요지</h4><p><strong>초기 설정 구간</strong>에서 가장 큰 이탈이 나온다.</p>
+        <h4>핵심</h4><ul><li>점선 대비 채운 막대 — 목표 대비 현재 격차 강조</li><li>가입 단계는 이미 양호, 설정 단계가 핵심 타깃</li></ul>
+        <h4>소요 시간</h4><p>예상 1분</p>
+      </aside>
+    </section>
+
+    <!-- 5. ORG (dataviz 조직도) -->
+    <section class="slide slide--org" data-name="execution">
+      <div class="slide__inner">
+        <div class="kicker rv">Execution · 실행 조직</div>
+        <h2 class="sl-title rv" style="--d:.06s">3개 스쿼드가 <span class="accent">Q2 안에</span> 순차 실행한다</h2>
+        <div class="rv" style="--d:.14s">
+          <div class="org-tier"><div class="org-card lead"><div class="card-title">리텐션 TF 리드</div><div class="card-desc">주간 싱크 · 우선순위 조정</div></div></div>
+          <div class="org-tier members">
+            <div class="org-card"><div class="card-title">온보딩 스쿼드</div><div class="card-desc">Product · Eng</div></div>
+            <div class="org-card"><div class="card-title">CRM·알림 스쿼드</div><div class="card-desc">Growth</div></div>
+            <div class="org-card"><div class="card-title">데이터 분석</div><div class="card-desc">Data</div></div>
+            <div class="org-card"><div class="card-title">디자인 지원</div><div class="card-desc">Design</div></div>
+          </div>
+        </div>
+        <div class="hero-badge-row rv" style="--d:.24s">
+          <span class="hero-badge">W1 킥오프</span>
+          <span class="hero-badge c2">W4 1차 배포</span>
+          <span class="hero-badge c3">W8 효과 측정</span>
+        </div>
+        <p class="footnote rv" style="--d:.3s">[INSERT: 팀 구성 상세] — Product·Eng·Data 겸임 포함</p>
+      </div>
+      <aside class="slide-notes" hidden>
+        <h4>요지</h4><p>실행은 <strong>3개 스쿼드 + 리텐션 TF 리드</strong> 구조로 진행한다.</p>
+        <h4>핵심</h4><ul><li>온보딩·CRM·데이터 스쿼드가 병렬 실행</li><li>리드가 주간 싱크로 우선순위 조정</li></ul>
+        <h4>Q&amp;A 대비</h4><ul><li>추가 인력? — [INSERT: 리소스 계획]</li></ul>
+        <h4>소요 시간</h4><p>예상 50초</p>
+      </aside>
+    </section>
+
+    <!-- 6. COMPARISON -->
+    <section class="slide slide--comparison" data-name="before-after">
+      <div class="slide__inner">
+        <div class="kicker rv">Before / After</div>
+        <h2 class="sl-title rv" style="--d:.06s">획일적 온보딩을 <span class="accent">세그먼트별 맞춤</span>으로 바꾼다</h2>
+        <div class="comparison rv" style="--d:.14s">
+          <div class="comparison-col bad">
+            <div class="tag" style="background:rgba(214,69,69,.12); color:var(--bad)">BEFORE</div>
+            <h3>획일 온보딩 · 수동 대응</h3>
+            <ul style="padding-left:18px; color:var(--text-secondary); font-size:clamp(13px,1.7vh,15px); line-height:1.9;"><li>전체 유저 동일 튜토리얼</li><li>이탈 신호 감지 없음</li><li>재유입 캠페인 부재</li></ul>
+          </div>
+          <div class="comparison-divider">→</div>
+          <div class="comparison-col good">
+            <div class="tag">AFTER</div>
+            <h3>세그먼트 맞춤 · 자동화</h3>
+            <ul style="padding-left:18px; color:var(--text-secondary); font-size:clamp(13px,1.7vh,15px); line-height:1.9;"><li>세그먼트별 맞춤 온보딩</li><li>이탈 신호 실시간 감지</li><li>D3·D7 리마인더 자동화</li></ul>
+          </div>
+        </div>
+      </div>
+      <aside class="slide-notes" hidden>
+        <h4>요지</h4><p><strong>획일적 온보딩</strong>에서 <strong>세그먼트별 맞춤</strong>으로 바꾼다.</p>
+        <h4>핵심</h4><ul><li>왼쪽 세 줄이 앞 슬라이드의 이탈 원인과 1:1 대응</li></ul>
+        <h4>소요 시간</h4><p>예상 50초</p>
+      </aside>
+    </section>
+
+    <!-- 7. CLOSING -->
+    <section class="slide slide--closing" data-name="closing">
+      <div class="slide__inner">
+        <div class="kicker rv">Decision Needed</div>
+        <h2 class="sl-title rv" style="--d:.06s">이번 주 안에 <span class="gradient-text">온보딩 재설계 착수</span> 승인 요청</h2>
+        <p class="desc rv" style="--d:.16s">Q2 내 12%→7% 달성 목표 — 착수 지연 시 목표 이월 우려</p>
+        <div class="hero-badge-row rv" style="--d:.24s">
+          <span class="hero-badge">승인 요청: 예산 [INSERT]</span>
+          <span class="hero-badge c2">착수: W1</span>
+          <span class="hero-badge c3">문서: [INSERT: 링크]</span>
+        </div>
+      </div>
+      <aside class="slide-notes" hidden>
+        <h4>요지</h4><p>구체적 다음 행동 — <strong>이번 주 착수 승인</strong>으로 마무리.</p>
+        <h4>전환</h4><p>"오늘 본 12%를, 이번 분기 안에 7%로."</p>
+        <h4>핵심</h4><ul><li>이번 주 내 착수 승인 필요</li><li>예산·리소스는 별도 문서 공유</li></ul>
+        <h4>Q&amp;A 대비</h4><ul><li>실패 시 대안? — [INSERT: 롤백 기준]</li></ul>
+        <h4>소요 시간</h4><p>예상 40초</p>
+      </aside>
+    </section>
+
+  </div>
+
+  <!-- §8 presenter-markup -->
+  <div class="presenter-view" aria-hidden="true">
+    <div class="pv-top">
+      <span class="pv-brand"><span class="dot"></span>발표자 보기</span>
+      <span class="pv-count" id="pvCount">01 / 01</span>
+      <span class="pv-spacer"></span>
+      <button class="pv-timer" id="pvTimer" title="클릭/T: 타이머 리셋">00:00</button>
+    </div>
+    <div class="pv-bar"><i id="pvBar"></i></div>
+    <div class="pv-main">
+      <div class="pv-kicker" id="pvKicker"></div>
+      <div class="pv-title" id="pvTitle"></div>
+      <div class="pv-notes" id="pvNotes"></div>
+      <div class="pv-next">
+        <div class="pv-next-label">다음 슬라이드</div>
+        <div class="pv-next-title" id="pvNextTitle"></div>
+      </div>
+    </div>
+    <div class="pv-foot">
+      <span class="pv-link lost" id="pvLink">연결 대기…</span>
+      <span class="pv-keys">← → 이동 · T 타이머 · +/- 글자크기</span>
+    </div>
+  </div>
+
+  <!-- 스크립트: core → nav-hud → notes → presenter → feature -->
   <script>
+  /* §3 core-js */
   (function () {
-    var btn = document.getElementById('fsBtn');
-    if (!btn) return;
-    var root = document.documentElement;
-    if (!root.requestFullscreen) { btn.style.display = 'none'; return; }
-    function sync() { btn.textContent = document.fullscreenElement ? '\u2715' : '\u26F6'; }
-    btn.addEventListener('click', function () {
-      if (document.fullscreenElement) { document.exitFullscreen(); }
-      else { root.requestFullscreen(); }
-    });
-    document.addEventListener('fullscreenchange', sync);
+    'use strict';
+    if (document.documentElement.classList.contains('presenter')) return;
+    var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    var cur = -1, gen = 0, timers = [];
+    function later(fn, ms) { var t = setTimeout(fn, ms); timers.push(t); return t; }
+    function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+    window.__deckLater = later;
+    window.__deckGen = function () { return gen; };
+    var bar = document.getElementById('hudBar');
+    var meta = document.getElementById('hudMeta');
+    function go(i) {
+      if (i < 0 || i >= slides.length || i === cur) return;
+      gen++; clearTimers();
+      if (cur >= 0) slides[cur].classList.remove('on');
+      cur = i;
+      var sl = slides[cur];
+      sl.classList.add('on');
+      var myGen = gen;
+      if (window.__runStage) {
+        Array.prototype.forEach.call(sl.querySelectorAll('[data-seq]'), function (st) { window.__runStage(st, myGen); });
+      }
+      if (bar) bar.style.width = ((cur + 1) / slides.length * 100) + '%';
+      if (meta) meta.textContent = pad(cur + 1) + ' / ' + pad(slides.length);
+      if (history.replaceState) history.replaceState(null, '', '#' + (cur + 1));
+      if (window.__deckSync) window.__deckSync(cur);
+      document.dispatchEvent(new CustomEvent('deck:change', { detail: { index: cur } }));
+    }
+    function next() { go(Math.min(cur + 1, slides.length - 1)); }
+    function prev() { go(Math.max(cur - 1, 0)); }
+    window.__deckGo = go; window.__deckNext = next; window.__deckPrev = prev;
+    window.__deckSlides = slides; window.__deckCur = function () { return cur; };
+    var h = parseInt((location.hash || '').replace('#', ''), 10);
+    var start = isNaN(h) ? 0 : Math.min(Math.max(h - 1, 0), slides.length - 1);
+    requestAnimationFrame(function () { requestAnimationFrame(function () { go(start); }); });
+  })();
+  </script>
+  <script>
+  /* §5 nav-hud-js */
+  (function () {
+    if (document.documentElement.classList.contains('presenter')) return;
+    var next = window.__deckNext, prev = window.__deckPrev, go = window.__deckGo;
+    var slides = window.__deckSlides || [];
+    function editing(t) { return t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable); }
     document.addEventListener('keydown', function (e) {
-      if (e.key !== 'f' && e.key !== 'F') return;
+      if (window.__lightboxOpen && window.__lightboxOpen()) return;
+      if (editing(e.target) || e.isComposing) return;
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); next(); }
+      else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prev(); }
+      else if (e.key === 'Home') { e.preventDefault(); go(0); }
+      else if (e.key === 'End') { e.preventDefault(); go(slides.length - 1); }
+      else if (e.key === 'f' || e.key === 'F') { if (document.fullscreenElement) document.exitFullscreen(); else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); }
+      else if (e.key === 'p' || e.key === 'P') { if (window.__openPresenter) window.__openPresenter(); }
+    });
+    var bn = document.getElementById('btnNext'), bp = document.getElementById('btnPrev');
+    if (bn) bn.addEventListener('click', next);
+    if (bp) bp.addEventListener('click', prev);
+    var fs = document.getElementById('fsBtn');
+    if (fs) {
+      if (!document.documentElement.requestFullscreen) { fs.style.display = 'none'; }
+      else {
+        fs.addEventListener('click', function () { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); });
+        document.addEventListener('fullscreenchange', function () { fs.textContent = document.fullscreenElement ? '✕' : '⛶'; });
+      }
+    }
+    var tx = null;
+    document.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; }, { passive: true });
+    document.addEventListener('touchend', function (e) {
+      if (tx === null) return;
+      var dx = e.changedTouches[0].clientX - tx;
+      if (Math.abs(dx) > 56 && window.innerWidth > 820) { dx < 0 ? next() : prev(); }
+      tx = null;
+    }, { passive: true });
+  })();
+  </script>
+  <script>
+  /* §7 notes-js */
+  (function () {
+    var btn = document.getElementById('notesBtn');
+    if (!btn) return;
+    var body = document.body;
+    function sync() { btn.setAttribute('aria-pressed', body.classList.contains('notes-visible') ? 'true' : 'false'); }
+    btn.addEventListener('click', function () { body.classList.toggle('notes-visible'); sync(); });
+    document.addEventListener('keydown', function (e) {
+      if (!(e.shiftKey && (e.key === 'N' || e.key === 'n'))) return;
+      if (e.isComposing) return;
       var t = e.target;
       if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
       btn.click();
     });
+  })();
+  </script>
+  <script>
+  /* §8 presenter-js */
+  (function () {
+    var isPresenter = document.documentElement.classList.contains('presenter');
+    var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+    function titleOf(i) {
+      var t = slides[i].querySelector('h1, h2, .deck-title, .sl-title');
+      if (!t) return slides[i].dataset.name || ('슬라이드 ' + (i + 1));
+      var c = t.cloneNode(true);
+      Array.prototype.forEach.call(c.querySelectorAll('br'), function (b) { b.parentNode.replaceChild(document.createTextNode(' '), b); });
+      return c.textContent.replace(/\s+/g, ' ').trim();
+    }
+    function kickerOf(i) { var k = slides[i].querySelector('.kicker, .label'); return k ? k.textContent.replace(/\s+/g, ' ').trim() : ''; }
+    function notesOf(i) { var n = slides[i].querySelector('.slide-notes'); return n ? n.innerHTML : '<p style="color:var(--text-muted)">이 슬라이드의 노트 없음</p>'; }
+    if (!isPresenter) {
+      var win = null, kick = null;
+      window.__deckSync = function (idx) { if (!win || win.closed) return; try { win.postMessage({ type: 'yowu-deck-sync', index: idx }, '*'); } catch (e) {} };
+      window.__openPresenter = function () {
+        if (win && !win.closed) { try { win.focus(); } catch (e) {} window.__deckSync(window.__deckCur()); return; }
+        var base = location.href.split('#')[0];
+        win = window.open(base + (base.indexOf('?') > -1 ? '&' : '?') + 'presenter', 'yowu-presenter', 'width=1180,height=760');
+        if (!win) return;
+        var tries = 0;
+        kick = setInterval(function () { if (++tries > 40 || !win || win.closed) { clearInterval(kick); return; } window.__deckSync(window.__deckCur()); }, 250);
+      };
+      window.addEventListener('message', function (e) {
+        var d = e.data || {};
+        if (d.type === 'yowu-presenter-hello') { win = e.source; window.__deckSync(window.__deckCur()); }
+        else if (d.type === 'yowu-deck-nav') {
+          win = e.source || win;
+          if (d.action === 'next') window.__deckNext();
+          else if (d.action === 'prev') window.__deckPrev();
+          else if (d.action === 'home') window.__deckGo(0);
+          else if (d.action === 'end') window.__deckGo(slides.length - 1);
+        }
+      });
+      return;
+    }
+    document.title = '발표자 보기';
+    var elCount = document.getElementById('pvCount'), elBar = document.getElementById('pvBar'),
+        elKicker = document.getElementById('pvKicker'), elTitle = document.getElementById('pvTitle'),
+        elNotes = document.getElementById('pvNotes'), elNextTitle = document.getElementById('pvNextTitle'),
+        elTimer = document.getElementById('pvTimer'), elLink = document.getElementById('pvLink');
+    function render(i) {
+      if (typeof i !== 'number' || i < 0 || i >= slides.length) return;
+      elCount.textContent = pad(i + 1) + ' / ' + pad(slides.length);
+      elBar.style.width = ((i + 1) / slides.length * 100) + '%';
+      elKicker.textContent = kickerOf(i);
+      elTitle.textContent = titleOf(i);
+      elNotes.innerHTML = notesOf(i);
+      elNotes.scrollTop = 0;
+      elNextTitle.textContent = (i + 1 < slides.length) ? titleOf(i + 1) : '(마지막 슬라이드)';
+    }
+    var t0 = null;
+    function resetTimer() { t0 = Date.now(); elTimer.textContent = '00:00'; }
+    setInterval(function () { if (t0 === null) return; var s = Math.floor((Date.now() - t0) / 1000); elTimer.textContent = pad(Math.floor(s / 60)) + ':' + pad(s % 60); }, 1000);
+    elTimer.addEventListener('click', resetTimer);
+    var fs = 18; try { fs = +localStorage.getItem('yowu-deck-pv-fs') || 18; } catch (e) {}
+    function setFs(v) { fs = Math.min(32, Math.max(13, v)); elNotes.style.fontSize = fs + 'px'; try { localStorage.setItem('yowu-deck-pv-fs', String(fs)); } catch (e) {} }
+    setFs(fs);
+    var linked = false, deckWin = window.opener;
+    window.addEventListener('message', function (e) {
+      var d = e.data || {};
+      if (d.type !== 'yowu-deck-sync') return;
+      deckWin = e.source || deckWin;
+      if (!linked) { linked = true; elLink.classList.remove('lost'); elLink.textContent = '메인 덱과 연결됨'; if (t0 === null) resetTimer(); }
+      render(d.index);
+    });
+    function nav(action) { if (deckWin && !deckWin.closed) { try { deckWin.postMessage({ type: 'yowu-deck-nav', action: action }, '*'); } catch (e) {} } }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); nav('next'); }
+      else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); nav('prev'); }
+      else if (e.key === 'Home') nav('home');
+      else if (e.key === 'End') nav('end');
+      else if (e.key === 't' || e.key === 'T') resetTimer();
+      else if (e.key === '+' || e.key === '=') setFs(fs + 1);
+      else if (e.key === '-' || e.key === '_') setFs(fs - 1);
+    });
+    setInterval(function () { if (!deckWin || deckWin.closed) { elLink.textContent = '메인 덱 창이 닫혔습니다 — 덱에서 P 키로 다시 여세요'; elLink.classList.add('lost'); linked = false; } }, 1500);
+    if (window.opener) { try { window.opener.postMessage({ type: 'yowu-presenter-hello' }, '*'); } catch (e) {} }
+    else { elLink.textContent = '단독으로 열렸습니다 — 메인 덱에서 P 키로 여세요'; elLink.classList.add('lost'); }
+  })();
+  </script>
+  <script>
+  /* §10 sequencer-js */
+  (function () {
+    if (document.documentElement.classList.contains('presenter')) return;
+    window.__runStage = function (stage, myGen) {
+      var steps = Array.prototype.slice.call(stage.querySelectorAll('[data-step]')).sort(function (a, b) { return (+a.dataset.step) - (+b.dataset.step); });
+      var interval = +stage.dataset.interval || 700;
+      steps.forEach(function (s) { s.classList.remove('lit'); });
+      steps.forEach(function (s) { window.__deckLater(function () { if (myGen === window.__deckGen()) s.classList.add('lit'); }, 150 + (+s.dataset.step - 1) * interval); });
+    };
+    var on = document.querySelector('.slide.on');
+    if (on) Array.prototype.forEach.call(on.querySelectorAll('[data-seq]'), function (st) { window.__runStage(st, window.__deckGen()); });
+  })();
+  </script>
+  <script>
+  /* §12 lightbox-js */
+  (function () {
+    if (document.documentElement.classList.contains('presenter')) return;
+    var lb = document.createElement('div');
+    lb.className = 'lightbox'; lb.setAttribute('role', 'dialog'); lb.setAttribute('aria-modal', 'true');
+    lb.innerHTML = '<button class="lb-close" type="button" aria-label="닫기">✕</button><div class="lb-stage"></div><div class="lb-hint">클릭 · ESC 로 닫기</div>';
+    document.body.appendChild(lb);
+    var stage = lb.querySelector('.lb-stage'), closeBtn = lb.querySelector('.lb-close');
+    window.__lightboxOpen = function () { return lb.classList.contains('open'); };
+    function openWith(el) {
+      stage.innerHTML = '';
+      if (el.tagName.toLowerCase() === 'svg') {
+        var vb = el.viewBox && el.viewBox.baseVal;
+        var ar = (vb && vb.height) ? (vb.width / vb.height) : 1.6;
+        var box = document.createElement('div');
+        box.className = 'lb-svgbox'; box.style.aspectRatio = String(ar); box.style.width = 'min(94vw, calc(92vh * ' + ar + '))';
+        var ctx = document.createElement('div');
+        ctx.style.cssText = 'width:100%;height:100%;display:block;flex:none;opacity:1;transform:none';
+        var parent = el.parentElement;
+        if (parent && parent.className) ctx.className = parent.className;
+        var clone = el.cloneNode(true);
+        clone.removeAttribute('width'); clone.removeAttribute('height'); clone.style.width = '100%'; clone.style.height = '100%';
+        clone.querySelectorAll('[data-step]').forEach(function (s) { s.classList.add('lit'); });
+        clone.querySelectorAll('*').forEach(function (n) { if (n.style) { n.style.opacity = '1'; n.style.transform = 'none'; n.style.strokeDashoffset = '0'; } });
+        ctx.appendChild(clone); box.appendChild(ctx); stage.appendChild(box);
+      } else {
+        if (!el.naturalWidth) return;
+        var iar = el.naturalWidth / el.naturalHeight;
+        var ibox = document.createElement('div');
+        ibox.className = 'lb-imgbox'; ibox.style.aspectRatio = String(iar); ibox.style.width = 'min(94vw, calc(92vh * ' + iar + '))';
+        var img = document.createElement('img'); img.src = el.currentSrc || el.src; img.alt = el.alt || '';
+        ibox.appendChild(img); stage.appendChild(ibox);
+      }
+      lb.classList.add('open');
+    }
+    function close() { lb.classList.remove('open'); setTimeout(function () { if (!lb.classList.contains('open')) stage.innerHTML = ''; }, 240); }
+    document.addEventListener('click', function (e) {
+      if (lb.classList.contains('open')) return;
+      var t = e.target.closest('.slide svg, .slide img');
+      if (!t || t.closest('a')) return;
+      if (t.tagName.toLowerCase() === 'img' && !t.naturalWidth) return;
+      e.preventDefault(); openWith(t);
+    });
+    lb.addEventListener('click', function (e) { if (e.target === lb || e.target === stage || e.target === closeBtn) close(); });
+    document.addEventListener('keydown', function (e) { if (!lb.classList.contains('open')) return; if (e.key === 'Escape') close(); e.stopImmediatePropagation(); e.preventDefault(); }, true);
   })();
   </script>
 </body>
