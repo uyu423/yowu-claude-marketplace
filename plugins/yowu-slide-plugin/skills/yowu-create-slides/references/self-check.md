@@ -14,7 +14,7 @@
 | M2 | 마지막 슬라이드 타입 | `class` 속성에 `slide--closing` 포함 |
 | M3 | 마지막 슬라이드 제목 | `h1`/`h2` 텍스트가 `/^(감사합니다|Thank\s*you|Q\s*&\s*A|질문\s*있으신가요)$/` 패턴과 **일치하지 않음** |
 | M4 | 슬라이드 제목 결론형 | 모든 `h1`/`h2` 텍스트가 `/^(소개|개요|목차|결론|Overview|Agenda|Conclusion)$/` 패턴과 **일치하지 않음** |
-| M5 | 엔진 무결성 | 결과물에 `__deckGo` · 더블 rAF(`requestAnimationFrame` 중첩 호출) · `slides.length` · `?presenter` · `hudBar`가 모두 존재 (누락 시 정본 design-system.md 모듈 재삽입) |
+| M5 | 엔진 무결성 | 결과물에 `__deckGo` · 더블 rAF(`requestAnimationFrame` 중첩 호출) · `slides.length` · `[?&]presenter`(발표자 headscript 정규식; 리터럴 `?presenter` 아님 — 정본은 문자열 연결로 생성) · `hudBar`가 모두 존재 (누락 시 정본 design-system.md 모듈 재삽입) |
 
 ---
 

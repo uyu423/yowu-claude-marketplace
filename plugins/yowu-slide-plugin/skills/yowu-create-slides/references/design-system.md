@@ -502,11 +502,15 @@ HUD 마크업 — `<body>` 시작 직후 삽입:
 aside.slide-notes { display: none; }
 body.notes-visible aside.slide-notes {
   display: block;
-  margin-top: 3vh; padding: 18px 22px;
+  width: min(1160px, 100%); margin: 3vh auto 0;   /* .slide__inner와 동일 폭·중앙 정렬 — 좌측 쏠림 방지 */
+  padding: 18px 22px;
   background: var(--surface); border-left: 3px solid var(--accent-1);
   border-radius: 0 12px 12px 0;
-  font-size: 13px; line-height: 1.6; color: var(--text-secondary); max-width: 820px;
+  font-size: 13px; line-height: 1.6; color: var(--text-secondary);
 }
+/* 텍스트 위주 슬라이드는 본문 inner(820px)와 좌측 정렬을 맞춘다 */
+body.notes-visible .slide--content aside.slide-notes,
+body.notes-visible .slide--quote aside.slide-notes { width: min(820px, 100%); }
 aside.slide-notes h4 {
   font-size: 11px; text-transform: uppercase; letter-spacing: .1em;
   color: var(--accent-1); margin: 12px 0 4px; font-weight: 700;
@@ -528,7 +532,15 @@ aside.slide-notes ul { padding-left: 20px; }
 ```
 <!-- /MODULE -->
 
-마크업: HUD 마크업 옆에 `<button class="notes-btn" id="notesBtn" type="button" aria-label="발표자 노트 토글" title="노트 (Shift+N)" aria-pressed="false">N</button>` 추가. 노트 5요소 구조는 `references/note-protocol.md` 참조.
+마크업(§5 HUD 마크업 바로 옆에 그대로 복사):
+
+<!-- MODULE: notes-btn-markup (baseline) -->
+```html
+<button class="notes-btn" id="notesBtn" type="button" aria-label="발표자 노트 토글" title="노트 (Shift+N)" aria-pressed="false">N</button>
+```
+<!-- /MODULE -->
+
+노트 5요소 구조는 `references/note-protocol.md` 참조.
 
 <!-- MODULE: notes-js (baseline) -->
 ```html
@@ -924,7 +936,7 @@ pre code { font-size: clamp(12px, 1.8vh, 14px); line-height: 1.6; padding: 22px 
 
 플로우차트 선을 `stroke-dashoffset`으로 하나씩 그린다. **자동 적용 신호**: 프로세스/플로우/파이프라인/의존 관계.
 
-> **함정(주석 유지)**: ① `transition` shorthand 금지 — delay가 0으로 리셋됨. ② 화살촉(marker-end)은 dashoffset에 안 걸려 선보다 먼저 뜨므로 opacity를 함께 페이드. ③ `.slide:not(.on)`에서 transition을 끊어 재진입 잔상 차단.
+> **함정(주석 유지)**: ① `transition` shorthand 금지 — delay가 0으로 리셋됨. ② 화살촉(marker-end)은 dashoffset에 안 걸려 선보다 먼저 뜨므로 opacity를 함께 페이드. ③ `.slide:not(.on)`에서 transition을 끊어 재진입 잔상 차단. ④ **모든 `.eg` path에 `pathLength="100"` 필수** — 없으면 실제 path 길이가 100 user unit을 넘길 때 `stroke-dasharray:100`이 앞 100단위만 그리고 나머지(화살촉 도달부)를 dash 간격에 빠뜨려 "선이 중간에 끊긴" 것처럼 보인다.
 
 <!-- MODULE: svg-drawing-css (feature) -->
 ```css
@@ -937,7 +949,7 @@ pre code { font-size: clamp(12px, 1.8vh, 14px); line-height: 1.6; padding: 22px 
 /* 선: dashoffset 드로잉 + opacity 동시 페이드 (마커 조기 표시 방지) */
 .fc .eg {
   stroke: var(--border-accent); stroke-width: 1.6; fill: none;
-  stroke-dasharray: 100; stroke-dashoffset: 100; opacity: 0;
+  stroke-dasharray: 100; stroke-dashoffset: 100; opacity: 0;   /* path에 pathLength="100" 필수 — 실제 길이 무관하게 전체 선을 드로잉 */
   transition: stroke-dashoffset .7s ease, opacity .25s ease;   /* shorthand 금지 */
   transition-delay: calc(var(--i) * .1s);
 }
@@ -947,7 +959,7 @@ pre code { font-size: clamp(12px, 1.8vh, 14px); line-height: 1.6; padding: 22px 
 ```
 <!-- /MODULE -->
 
-마커 id는 슬라이드마다 고유값(`diag-arrow-s{N}`). `<defs><marker id="diag-arrow-s5" …>`. 선에 `style="--i:0"`, `--i:1`… 스태거.
+마커 id는 슬라이드마다 고유값(`diag-arrow-s{N}`). `<defs><marker id="diag-arrow-s5" …>`. 선(`<path class="eg">`)에는 **반드시 `pathLength="100"`**을 붙여 전체 길이를 100으로 정규화하고(→ dasharray 100 드로잉이 선 전체에 정확히 매핑), `style="--i:0"`, `--i:1`… 로 스태거한다. 예: `<path class="eg accent" style="--i:3" pathLength="100" d="…" marker-end="url(#diag-arrow-s5)"></path>`.
 
 ---
 
@@ -998,8 +1010,10 @@ pre code { font-size: clamp(12px, 1.8vh, 14px); line-height: 1.6; padding: 22px 
       if (parent && parent.className) ctx.className = parent.className;
       var clone = el.cloneNode(true);
       clone.removeAttribute('width'); clone.removeAttribute('height'); clone.style.width = '100%'; clone.style.height = '100%';
+      clone.style.opacity = '1'; clone.style.transform = 'none'; clone.classList.remove('rv');   /* 루트 svg의 등장 애니 상태만 해제 */
       clone.querySelectorAll('[data-step]').forEach(function (s) { s.classList.add('lit'); });
-      clone.querySelectorAll('*').forEach(function (n) { if (n.style) { n.style.opacity = '1'; n.style.transform = 'none'; n.style.strokeDashoffset = '0'; } });
+      /* 하위 노드는 opacity/dashoffset만 리셋 — transform은 건드리지 않는다(Mermaid 등 <g transform="translate()"> 구조 배치 보존) */
+      clone.querySelectorAll('*').forEach(function (n) { if (n.classList) n.classList.remove('rv'); if (n.style) { n.style.opacity = '1'; n.style.strokeDashoffset = '0'; } });
       ctx.appendChild(clone); box.appendChild(ctx); stage.appendChild(box);
     } else {
       if (!el.naturalWidth) return;
@@ -1129,6 +1143,12 @@ pre code { font-size: clamp(12px, 1.8vh, 14px); line-height: 1.6; padding: 22px 
 
 > **주의 (Mermaid deck 연동)**: Mermaid를 쓸 경우 반드시 `mermaid.initialize({startOnLoad:false})`로 두고, 첫 페인트 후 또는 활성 슬라이드 진입(`deck:change`) 시점에 `mermaid.run({nodes:...})`로 지연 렌더한다. 초기 hidden(`position:absolute`) 슬라이드에서 `startOnLoad:true` 자동 렌더는 크기가 0으로 잡혀 다이어그램이 깨진다. `SAMPLE_SLIDES.html`처럼 첫 title 슬라이드가 처음부터 보이는 경우는 동작하지만, 숨은 슬라이드에 Mermaid를 두면 이 함정이 발생한다. 단순 노드/플로우는 정본 SVG 드로잉(§11)·조직도(`.org-tier`)로 대체를 권장한다.
 
+> **주의 (Mermaid 컨테이너 여백)**: `pre.mermaid`에 큰 `min-height` 스테이지를 잡고 `align-items:center`로 다시 중앙 정렬하면, 짧은 LR 플로우가 스테이지 중앙에 떠서 제목↔다이어그램 사이에 과도한 **이중 여백**이 생긴다. `min-height`는 과하지 않게 두고 `align-items:flex-start`로 상단 정렬한다(남는 공간이 다이어그램 아래로 몰려 제목 바로 밑 리듬이 콘텐츠 슬라이드와 일치). `min-height`는 floor라 큰 다이어그램은 그대로 확장된다.
+> ```css
+> .mermaid { display:flex; justify-content:center; align-items:flex-start; min-height:clamp(160px,24vh,340px); }
+> .mermaid svg { max-width:100%; height:auto; }
+> ```
+
 ---
 
 ## 15. MODULE: lottie (feature) — Lottie 인트로
@@ -1182,6 +1202,8 @@ pre code { font-size: clamp(12px, 1.8vh, 14px); line-height: 1.6; padding: 22px 
 
 마크업: `<pre><code class="language-{lang}">…</code></pre>`. `language-` 접두사 필수.
 
+> **주의(common 번들 언어 한계)**: `highlight.min.js` 공용 번들에는 일부 언어가 빠져 있다(대표적으로 `http`). 번들에 없는 언어를 `language-…`로 지정하면 콘솔 WARN + no-highlight 폴백이 뜬다. 지원이 확실한 언어(`bash`·`json`·`javascript`·`typescript`·`kotlin`·`java`·`python`·`sql`·`yaml`·`xml`·`css` 등)로 지정하거나, 특수 언어가 꼭 필요하면 해당 언어 컴포넌트를 추가 로드한다.
+
 ---
 
 ## 17. 조립 가이드 (skeleton 삽입 순서)
@@ -1225,4 +1247,4 @@ pre code { font-size: clamp(12px, 1.8vh, 14px); line-height: 1.6; padding: 22px 
 </body></html>
 ```
 
-**엔진 무결성 체크(생성 후 self-check)**: `__deckGo` / `requestAnimationFrame(...requestAnimationFrame` / `slides.length` / `?presenter` / `hudBar` 가 결과물에 모두 존재해야 한다. (self-check.md M5와 동일 집합)
+**엔진 무결성 체크(생성 후 self-check)**: `__deckGo` / `requestAnimationFrame(...requestAnimationFrame` / `slides.length` / `[?&]presenter`(발표자 headscript 정규식 — 리터럴 `?presenter`는 정본이 문자열 연결로 생성하므로 검사 토큰으로 부적합) / `hudBar` 가 결과물에 모두 존재해야 한다. (self-check.md M5와 동일 집합)

@@ -381,7 +381,7 @@ Lite 모드: 요지, 핵심, 소요 시간 3요소만 필수.
 | M2 | 마지막 슬라이드 | `class`에 `slide--closing` 포함 |
 | M3 | 마지막 슬라이드 제목 | "감사합니다/Thank you/Q&A" 단독이 아님 |
 | M4 | 모든 슬라이드 제목 | "소개/개요/목차/결론" 단독이 아님 |
-| M5 | 엔진 무결성 | `__deckGo` · 더블 rAF(`requestAnimationFrame` 중첩 호출) · `slides.length` · `?presenter` · `hudBar` 가 결과물에 모두 존재 |
+| M5 | 엔진 무결성 | `__deckGo` · 더블 rAF(`requestAnimationFrame` 중첩 호출) · `slides.length` · `[?&]presenter`(발표자 headscript 정규식; 리터럴 `?presenter` 아님) · `hudBar` 가 결과물에 모두 존재 |
 
 **실패 시**: 해당 슬라이드만 Edit으로 수정 (1회 한정). 재시도 후에도 실패하면 통과 처리 + 메타 블록에 `[SELF-CHECK WARN]` 기록.
 
@@ -484,7 +484,7 @@ gemini CLI 미설치 시 자동으로 quiet pass되므로 별도 분기 처리�
 AI는 이 값을 **하한선**으로 사용하되, 콘텐츠 밀도와 슬라이드 구성에 따라 더 크게 조정할 수 있다.
 단, 이 값보다 **작게** 설정하지 않는다.
 
-> **v3 note**: deck 엔진의 레이아웃 치수(슬라이드 padding, `.slide__inner` 폭)와 유동 타이포는 **정본 §3/§4를 우선**한다. 정본은 `vh` 기반 `clamp()`로 아래 값들을 화면 높이에 맞게 유동시키므로, 아래 표는 폰트 크기의 상대적 하한선 참고용이다.
+> **v3 note**: 레이아웃 치수(슬라이드 padding, `.slide__inner`/다열 폭)는 **정본 §3/§4가 단일 소유**하므로 아래 표에 수치를 나열하지 않는다(정본은 `vh` 기반 `clamp()`로 화면 높이에 맞게 유동시킴). 아래 표는 **폰트 크기 하한선** 참고용이다.
 
 | 요소 | 베이스라인 | 비고 |
 |------|-----------|------|
@@ -501,10 +501,7 @@ AI는 이 값을 **하한선**으로 사용하되, 콘텐츠 밀도와 슬라이
 | pre code | `14px` | 코드 블럭 |
 | .tag | `13px` | 태그/칩 |
 | page number | `13px` | 슬라이드 번호 |
-| slide padding (desktop) | `60px 80px` | 기본 여백 |
-| slide padding (mobile) | `40px 24px` | 모바일 여백 |
-| .slide__inner max-width | `720px` | 텍스트 콘텐츠 폭 |
-| 다열 레이아웃 max-width | `960px` | 카드/비교/플로우 |
+| 레이아웃 치수 | 정본 §3/§4 | slide padding·`.slide__inner` 폭·다열 폭은 정본이 `vh`/`clamp()`로 소유(여기 수치 나열 안 함) |
 | card padding | `24px` | 카드 내부 여백 |
 | card border-radius | `16px` | 카드 라운딩 |
 | gap (기본) | `12px` | 그리드/플렉스 간격 |
