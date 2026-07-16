@@ -1,6 +1,6 @@
 {
     "name": "yowu-write-plugin",
-    "description": "글쓰기 스킬 모음. AI가 쓰는 장황한 문장을 사람이 읽기 쉬운 글로 바꾼다. 기술 문서(yowu-write-tech), 위키(yowu-write-wiki), 에세이/블로그(yowu-write-essay) 3종 스킬 제공. 전문 용어와 도메인 언어는 유지한 채 문장만 풀어 쓴다.",
+    "description": "글쓰기 스킬 모음. AI가 쓰는 장황한 문장을 사람이 읽기 쉬운 글로 바꾼다. 기술 문서(yowu-write-tech), 위키(yowu-write-wiki), 에세이/블로그(yowu-write-essay), 회의록(yowu-write-meeting) 4종 스킬 제공. 전문 용어와 도메인 언어는 유지한 채 문장만 풀어 쓴다.",
     "version": "1.0.1",
     "author": {
         "name": "yowu"
