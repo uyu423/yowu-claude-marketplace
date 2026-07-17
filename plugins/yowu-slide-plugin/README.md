@@ -7,7 +7,7 @@ HTML **deck(페이지 넘김) 엔진** 기반 인터랙티브 발표자료 생�
 - **deck 페이지 넘김 엔진**: `position:absolute + .on` 클래스 토글 전환. 키보드(←→ Space PageUp/Down Home/End)·클릭·터치 스와이프·진행바 HUD·딥링크(`#n`) 네비게이션
 - **해상도 독립 16:9**: `vh/vw + clamp()` 유동 타이포로 어떤 화면·프로젝터에서도 비율 유지, 모바일은 세로 스크롤 폴백(`100dvh`)
 - **발표자 보기(Presenter View)**: `P` 키로 같은 파일을 별창으로 열어 대본·경과 타이머·다음 슬라이드·진행바 표시. `postMessage`로 메인 덱과 양방향 동기화 (발표자 노트가 대본 데이터 소스)
-- **등장 애니메이션 + 시퀀서**: `.rv` 스태거 등장, `[data-seq]/[data-step]` 순차 점등, SVG `stroke-dashoffset` 순차 드로잉 (세대 토큰으로 경쟁 상태 차단)
+- **등장 애니메이션 + 시퀀서**: `.rv` 스태거 등장, `[data-seq]/[data-step]` 순차 점등, 길이 정규화된 SVG `stroke-dashoffset` 순차 드로잉 (긴 연결선 분절 방지)
 - **라이트박스**: 슬라이드의 SVG/이미지를 클릭하면 전체화면 확대 (SVG 색 컨텍스트 복원)
 - **비디오 거버넌스**: 활성 슬라이드의 `<video>`만 무음 자동재생, 이탈 시 정지 (에셋 있을 때 자동)
 - **CSS 수제 데이터비주얼**: 차트 라이브러리 없이 막대·워터폴·조직도를 순수 CSS로
@@ -18,6 +18,7 @@ HTML **deck(페이지 넘김) 엔진** 기반 인터랙티브 발표자료 생�
 - **콘텐츠 품질 가드**: 환각 금지, 결론형 제목, 키워드 본문, 금지 문구 필터, 자기 검증 루브릭(Strict 모드)
 - **발표자 노트**: 각 슬라이드 5요소 노트(요지/전환/핵심/상호작용/Q&A 대비/소요 시간). `Shift+N` 토글, 발표자 보기 대본으로 재사용
 - **Strict/Lite 모드**: 기본 Strict, "lite mode"·"빠른 초안" 입력으로 Lite 전환
+- **실브라우저 렌더 검증**: Chrome에서 모든 슬라이드를 16:9 두 해상도와 모바일로 순회하며 overflow·SVG·Mermaid·console 오류 검사
 
 ## 설치
 
@@ -61,8 +62,9 @@ HTML **deck(페이지 넘김) 엔진** 기반 인터랙티브 발표자료 생�
 3. **사용자 컨펌** — 테마/디자인/슬라이드 구성/컬러 + 자동 적용 기능 제안(AskUserQuestion)
 4. **서사 구조 + 아웃라인** — SCQA(기본)/PAS/BAB/Pyramid 등, 결론형 제목·훅·CTA 검증
 5. **HTML 생성** — 정본(design-system.md) 모듈을 조립: Skeleton(head+CSS+엔진 JS) → 슬라이드 Append
-6. **자기 검증** — M1~M5 체크(엔진 무결성 포함, Strict 모드)
-7. **Gemini 디자인 리뷰 + 메타 블록 출력**(선택)
+6. **브라우저 렌더 검증** — 16:9·모바일 전수 순회, overflow·SVG·Mermaid·console 확인(모든 모드)
+7. **자기 검증** — M1~M7 체크(엔진·SVG·Mermaid 무결성 포함, Strict 모드)
+8. **Gemini 디자인 리뷰 + 렌더 재검증 + 메타 블록 출력**(선택)
 
 ## 기술 스택
 
@@ -89,4 +91,19 @@ skills/
       example-dark.html           # 골든 참조 (기술, 다크)
       example-light.html          # 골든 참조 (비즈니스, 라이트)
   gemini-design-review/           # 선택적 Gemini CLI 시각 리뷰
+scripts/
+  validate-slides.mjs             # 의존성 없는 Chrome DevTools 기반 렌더 검증기
+  test-validate-slides.mjs        # 검증기 정상/실패 fixture 회귀 테스트
+  fixtures/                       # 긴 SVG·overflow 회귀 fixture
 ```
+
+## 렌더 검증
+
+Node.js 22+와 Chrome 또는 Chromium이 설치된 환경에서 실행한다. 별도 npm 설치는 필요 없다.
+
+```bash
+node plugins/yowu-slide-plugin/scripts/validate-slides.mjs path/to/deck.html
+node plugins/yowu-slide-plugin/scripts/test-validate-slides.mjs
+```
+
+검증기는 `1920×1080`, `1280×720`, `390×844`에서 모든 슬라이드를 열어 본 뒤 실패한 슬라이드와 요소를 출력한다. `SLIDE_CHROME=/path/to/chrome`으로 브라우저 경로를 지정할 수 있다.

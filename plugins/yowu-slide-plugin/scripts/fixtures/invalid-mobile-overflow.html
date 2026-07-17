@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>의도적으로 잘못된 모바일 overflow fixture</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; }
+    body { overflow: hidden; }
+    .deck { position: fixed; inset: 0; }
+    .slide { position: absolute; inset: 0; padding: 7vh 5vw 9vh; opacity: 0; visibility: hidden; }
+    .slide.on { opacity: 1; visibility: visible; }
+    .slide__inner { width: min(1160px, 100%); margin: 0 auto; }
+    .badge-row { display: flex; width: fit-content; white-space: nowrap; }
+    @media (max-width: 820px) {
+      body { overflow: auto; }
+      .deck { position: static; }
+      .slide { position: relative; min-height: 100dvh; opacity: 1; visibility: visible; padding: 6vh 6vw 10vh; }
+      .slide__inner { width: 100%; min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="deck">
+    <section class="slide">
+      <div class="slide__inner">
+        <h1>모바일에서 긴 배지가 화면을 밀어낸다</h1>
+        <div class="badge-row">release/very-long-unbreakable-branch-name@0123456789abcdef0123456789abcdef</div>
+      </div>
+    </section>
+  </div>
+  <script>
+  (function () {
+    var slides = Array.from(document.querySelectorAll('.slide'));
+    window.__deckSlides = slides;
+    window.__deckGo = function (index) {
+      slides.forEach(function (slide, slideIndex) { slide.classList.toggle('on', slideIndex === index); });
+      document.dispatchEvent(new CustomEvent('deck:change', { detail: { index: index } }));
+    };
+    requestAnimationFrame(function () { requestAnimationFrame(function () { window.__deckGo(0); }); });
+  })();
+  </script>
+</body>
+</html>

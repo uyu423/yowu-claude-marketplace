@@ -87,13 +87,13 @@ deck 골격(core) · 유동 캔버스/반응형/인쇄(fluid) · 네비게이션
 |---|---|
 | 코드 블럭 존재 | highlight.js (§16) |
 | 순차적 항목·빌드업·단계별 강조 | 등장 시퀀서 `sequencer` (§10) |
-| 프로세스·플로우·파이프라인·의존 관계 | SVG 순차 드로잉 `svg-drawing` (§11) |
+| 프로세스·플로우·파이프라인·의존 관계 | SVG 순차 드로잉 CSS+길이 정규화 JS `svg-drawing` (§11) |
 | 이미지·스크린샷·도표·복잡한 SVG 다이어그램 | 라이트박스 `lightbox` (§12) |
 | `.mp4`/데모 영상 에셋이 실제 존재 | 비디오 거버넌스 `video` (§13) |
 | 정량 데이터·비교·추이(막대) / 조직·계층·팀 | CSS 수제 차트·조직도 `dataviz` (§14) |
 | 인트로 애니메이션 에셋(`*.anim.js` 등) 실제 존재 | Lottie 인트로 `lottie` (§15) |
 | 슬라이드 10장 초과 | **결론형 제목**의 로드맵/여정 슬라이드(선택: `title` 타입 구간 디바이더). 제목에 "목차/Agenda/개요" 금지 — **M1·M4가 로드맵 지침보다 항상 우선**. 점프네비 신설 금지(딥링크 `#n`·Home/End로 충분) |
-| 복잡한 다이어그램(노드 4+/시퀀스/ER/간트) | Mermaid (Allowed CDN) |
+| 복잡한 다이어그램(노드 4+/시퀀스/ER/간트) | Mermaid + 활성 슬라이드 지연 렌더 모듈 (Allowed CDN, 정본 §14) |
 | 수학 수식 | KaTeX (Allowed CDN) |
 
 **판정 원칙**:
@@ -256,7 +256,7 @@ HTML Skeleton 생성 전에 아웃라인 자체를 점검한다. 아래 항목�
 
 **정본 조립 원칙 — 재발명 금지**: CSS/JS는 직접 타이핑하지 않고 `references/design-system.md`의 모듈을 **그대로 복사해 인라인 삽입**한다.
 - **baseline 모듈**(core / fluid / nav-hud / reveal / notes / presenter / components) — 항상 삽입
-- **feature 모듈**(sequencer / svg-drawing / lightbox / video / dataviz / lottie) — Step 0.5 판정 결과에 따라 삽입
+- **feature 모듈**(sequencer / svg-drawing CSS+JS / lightbox / video / dataviz / lottie / mermaid-deferred) — Step 0.5 판정 결과에 따라 삽입
 - 삽입 순서는 정본 **§17 조립 가이드**를 따른다
 
 **Skeleton 구조:**
@@ -292,7 +292,7 @@ HTML Skeleton 생성 전에 아웃라인 자체를 점검한다. 아래 항목�
     <script>{§5 nav-hud-js}</script>
     <script>{§7 notes-js}</script>
     <script>{§8 presenter-js}</script>
-    {feature JS — §10 sequencer / §13 video / §12 lightbox / §15 lottie 중 켠 것}
+    {feature JS — §10 sequencer / §11 svg-drawing / §13 video / §12 lightbox / §15 lottie / §14 mermaid-deferred 중 켠 것}
     {highlight.js — 코드 있을 때}
   </body>
 </html>
@@ -369,11 +369,29 @@ Lite 모드: 요지, 핵심, 소요 시간 3요소만 필수.
 2. 페이지 총수는 core-js가 `slides.length`로 자동 계산하므로 하드코딩 동기화가 불필요하다. 대신 `<div class="deck">` 안에만 `.slide`가 있고, HUD·발표자 마크업 등 비(非)슬라이드 요소에 `.slide` 클래스가 섞이지 않았는지 확인한다
 3. 임시 아웃라인 파일이 있으면 삭제한다
 
+### Step 6.4: 브라우저 렌더 검증 (모든 모드 필수)
+
+HTML을 파일로 완성한 뒤 플러그인 루트의 `scripts/validate-slides.mjs`를 실행한다. DOM 문자열 검사만으로는 실제 폰트·SVG·브라우저 레이아웃 파손을 찾을 수 없으므로, 이 검증은 Lite에서도 생략하지 않는다.
+
+```bash
+node {plugin-root}/scripts/validate-slides.mjs /absolute/path/to/deck.html
+```
+
+검증기는 실제 Chrome에서 다음을 전수 확인한다.
+
+- 16:9 데스크톱 `1920×1080`, `1280×720`: 모든 슬라이드를 순회하며 가로·세로 overflow, viewport 이탈, 활성 슬라이드 수 확인
+- 모바일 `390×844`: 세로 스크롤 폴백, 가로 overflow, 모든 슬라이드 가시성 확인
+- SVG 드로잉: 모든 `.fc .eg`의 `pathLength="1"`, 길이 정규화 모듈, 활성화 후 `stroke-dashoffset: 0` 확인
+- Mermaid: `startOnLoad:true` 금지, 활성화 뒤 SVG 생성 및 0이 아닌 크기 확인
+- 전 구간 JavaScript 예외와 `console.error` 확인
+
+실패하면 보고된 슬라이드·요소만 수정하고 같은 명령을 다시 실행한다. Chrome을 찾지 못하면 검증을 통과 처리하지 말고 `[RENDER-CHECK WARN]`으로 기록한다. 테스트 도구 자체 확인은 `node {plugin-root}/scripts/test-validate-slides.mjs`로 실행한다.
+
 ### Step 6.5: 자기 검증 (Strict 모드 전용)
 
 **Lite 모드에서는 이 Step을 건너뛴다.**
 
-`references/self-check.md`의 기계 판정 항목 M1-M4를 확인한다.
+`references/self-check.md`의 기계 판정 항목 M1-M7을 확인한다. 렌더링 항목은 Step 6.4의 브라우저 결과를 사용한다.
 
 | # | 항목 | 합격 기준 |
 |---|------|---------|
@@ -382,6 +400,8 @@ Lite 모드: 요지, 핵심, 소요 시간 3요소만 필수.
 | M3 | 마지막 슬라이드 제목 | "감사합니다/Thank you/Q&A" 단독이 아님 |
 | M4 | 모든 슬라이드 제목 | "소개/개요/목차/결론" 단독이 아님 |
 | M5 | 엔진 무결성 | `__deckGo` · 더블 rAF(`requestAnimationFrame` 중첩 호출) · `slides.length` · `[?&]presenter`(발표자 headscript 정규식; 리터럴 `?presenter` 아님) · `hudBar` 가 결과물에 모두 존재 |
+| M6 | SVG 드로잉 무결성 | `.fc .eg`가 있으면 모든 geometry에 `pathLength="1"` + `__normalizeSvgEdges` 존재 |
+| M7 | Mermaid 렌더 무결성 | `.mermaid`가 있으면 `startOnLoad:true` 없음 + `mermaid.run` + `deck:change` 존재 |
 
 **실패 시**: 해당 슬라이드만 Edit으로 수정 (1회 한정). 재시도 후에도 실패하면 통과 처리 + 메타 블록에 `[SELF-CHECK WARN]` 기록.
 
@@ -406,6 +426,8 @@ gemini CLI 미설치 시 자동으로 quiet pass되므로 별도 분기 처리�
   - `키 보호: 네비게이션` — 방향키/Space/PageUp·Down/Home/End, F(전체화면), Shift+N(노트), P(발표자 보기) 바인딩 변경 금지
 
 스킬이 지침을 적용하면 결과를 사용자에게 요약 보고하고, 스킵되면 아무 메시지 없이 다음 단계로 진행한다.
+
+Gemini가 HTML을 수정했다면 Step 6.4 브라우저 렌더 검증을 다시 실행한다. 시각 리뷰 이전 결과를 최종 검증으로 재사용하지 않는다.
 
 ### Step 8: 최종 안내
 
@@ -473,6 +495,7 @@ gemini CLI 미설치 시 자동으로 quiet pass되므로 별도 분기 처리�
 9. **페이지 번호**: HUD의 `#hudMeta`가 `01 / N`을 JS로 **자동** 표시(정본 §3/§5). `.slide::after` counter로 총수를 하드코딩하는 방식은 쓰지 않는다 — 슬라이드 추가/삭제가 자동 반영된다
 10. **접근성**: `<html lang="ko|en">` 설정. WCAG AA 이상의 색상 대비 유지. heading 레벨을 `h1` → `h2` → `h3` 순서로 사용
 11. **Flex 컨테이너 내 인라인 요소**: `.hero-badge-row`, badge, tag, pill 등 인라인 요소가 flex column 컨테이너의 직접 자식일 때 반드시 `align-self: center; width: fit-content;`을 추가한다. 누락 시 전체 너비로 늘어나는 버그 발생
+12. **SVG 드로잉 길이 정규화**: `.fc .eg`를 붙인 `<path>`·`<line>`·`<polyline>` 등 모든 SVG geometry에 `pathLength="1"`을 넣고 정본 §11의 `svg-drawing-js`를 함께 삽입한다. 고정 dash 길이를 실제 path 길이에 직접 적용하지 않는다
 
 ---
 
@@ -533,7 +556,7 @@ v3는 인터랙티브 deck이므로 바닐라 JS를 적극 사용한다. 단, **
 
 - **엔진 JS는 정본 모듈 복사**: 전환·네비·시퀀서·라이트박스·비디오·발표자보기·노트 JS는 `references/design-system.md`의 해당 MODULE 블록을 **그대로** 삽입한다. 직접 재작성 금지 — 세대 토큰·더블 rAF·transition shorthand 회피 같은 렌더링 함정을 재발명하지 않기 위함이다.
 - **baseline JS는 항상 포함**: core-js(전환 엔진) → nav-hud-js → notes-js → presenter-js 순. **core-js가 반드시 첫 스크립트**(다른 모듈이 `window.__deck*` 훅에 의존).
-- **feature JS는 Step 0.5 판정에 따라**: sequencer / video / lightbox / lottie.
+- **feature JS는 Step 0.5 판정에 따라**: sequencer / svg-drawing / video / lightbox / lottie / mermaid-deferred.
 - **외부 라이브러리는 화이트리스트만**: 아래 Allowed CDN Libraries 목록(highlight.js, Chart.js, Mermaid, KaTeX, Iconify, lottie-web)만 허용. 그 외 프레임워크/라이브러리 추가 금지.
 - **커스텀 JS가 꼭 필요하면**: 정본 훅(`window.__deckGo(i)`, `document`의 `deck:change` 이벤트)을 사용하고 `.on` 상태 모델을 존중한다. 전환 로직 자체를 직접 건드리지 않는다.
 
@@ -614,12 +637,10 @@ v3는 인터랙티브 deck이므로 바닐라 JS를 적극 사용한다. 단, **
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
-<script>
-  mermaid.initialize({ theme: 'dark', startOnLoad: true });
-</script>
+<!-- 이어서 정본 design-system.md §14의 MODULE: mermaid-deferred-js를 그대로 삽입 -->
 ```
 
-마크업: `<pre class="mermaid">graph LR; A-->B;</pre>`. 라이트 테마에서는 `theme: 'default'`로 변경.
+마크업: `<pre class="mermaid">graph LR; A-->B;</pre>`. `startOnLoad:false`와 `deck:change` 지연 렌더가 필수이며, 라이트 테마에서는 정본 모듈의 `theme`을 `'default'`로 변경한다.
 
 ### KaTeX — 수학 수식
 
@@ -682,6 +703,7 @@ v3는 인터랙티브 deck이므로 바닐라 JS를 적극 사용한다. 단, **
 - `references/forbidden-phrases.md`: 금지 문구 목록 + 교체 원칙 (§2.4)
 - `references/self-check.md`: 덱·슬라이드·노트 단위 자기 검증 루브릭 (§10)
 - `references/note-protocol.md`: 발표자 노트 5요소 마크업, CSS, 토글 JS (§6)
+- `../../scripts/validate-slides.mjs`: Chrome 기반 16:9·모바일·overflow·SVG·Mermaid·console 전수 검증기
 - 파일이 존재하지 않으면 본 skill에 명시된 CSS 규칙과 폰트 fallback만으로 진행한다. 에러를 사용자에게 알리고 계속 생성한다.
 
 Gemini 디자인 리뷰 (Step 7):

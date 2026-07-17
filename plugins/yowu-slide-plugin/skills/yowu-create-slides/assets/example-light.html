@@ -39,7 +39,8 @@
     .deck { position:fixed; inset:0; z-index:1; }
     .slide { position:absolute; inset:0; padding:7vh 5vw 9vh; display:flex; flex-direction:column; justify-content:center; opacity:0; visibility:hidden; transform:translateY(14px) scale(.992); transition:opacity .5s ease, transform .5s cubic-bezier(.22,1,.36,1), visibility 0s linear .5s; pointer-events:none; }
     .slide.on { opacity:1; visibility:visible; transform:none; transition:opacity .5s ease, transform .5s cubic-bezier(.22,1,.36,1); pointer-events:auto; }
-    .slide__inner, .inner { width:min(1160px,100%); margin:0 auto; }
+    .slide__inner, .inner { width:min(1160px,100%); min-width:0; margin:0 auto; }
+    .slide svg, .slide img, .slide video, .slide canvas { max-width:100%; }
     .slide--content .slide__inner, .slide--quote .slide__inner { max-width:820px; }
     .slide--title, .slide--closing { background:var(--bg-gradient); }
 
@@ -62,6 +63,8 @@
       body { overflow:auto; }
       .deck { position:static; }
       .slide { position:relative; inset:auto; opacity:1 !important; visibility:visible !important; transform:none !important; min-height:100dvh; height:auto; padding:6vh 6vw 10vh; justify-content:flex-start; overflow-y:visible; pointer-events:auto; border-top:1px solid var(--line-soft); }
+      .slide__inner, .inner { width:100%; min-width:0; overflow-wrap:anywhere; }
+      pre { max-width:100%; overflow-x:auto; }
       .slide .rv, .slide .rvx { opacity:1 !important; transform:none !important; animation:none !important; }
       .card-grid, .stat-row, .comparison, .workflow-grid, .flow-container, .code-cmp { grid-template-columns:1fr !important; flex-direction:column; }
       .hud .nav { display:none; }
@@ -171,7 +174,7 @@
     .fc .nd.accent rect { fill:none; stroke:var(--accent-1); stroke-width:2; }
     .fc .nd { opacity:0; transition:opacity .5s ease; transition-delay:calc(var(--i) * .1s); }
     .slide.on .fc .nd { opacity:1; }
-    .fc .eg { stroke:var(--border-accent); stroke-width:1.6; fill:none; stroke-dasharray:100; stroke-dashoffset:100; opacity:0; transition:stroke-dashoffset .7s ease, opacity .25s ease; transition-delay:calc(var(--i) * .1s); }
+    .fc .eg { stroke:var(--border-accent); stroke-width:1.6; fill:none; stroke-dasharray:1; stroke-dashoffset:1; opacity:0; transition:stroke-dashoffset .7s ease, opacity .25s ease; transition-delay:calc(var(--i) * .1s); }
     .fc .eg.accent { stroke:var(--accent-1); }
     .slide.on .fc .eg { stroke-dashoffset:0; opacity:1; }
     .slide:not(.on) .fc .nd, .slide:not(.on) .fc .eg { transition:none; }
@@ -260,8 +263,8 @@
           <defs>
             <marker id="ar-s2" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" style="fill:var(--border-accent)"/></marker>
           </defs>
-          <line class="eg" style="--i:1" x1="150" y1="55" x2="238" y2="55" marker-end="url(#ar-s2)"/>
-          <line class="eg accent" style="--i:2" x1="392" y1="55" x2="480" y2="55" marker-end="url(#ar-s2)"/>
+          <line class="eg" style="--i:1" pathLength="1" x1="150" y1="55" x2="238" y2="55" marker-end="url(#ar-s2)"/>
+          <line class="eg accent" style="--i:2" pathLength="1" x1="392" y1="55" x2="480" y2="55" marker-end="url(#ar-s2)"/>
           <g class="nd" style="--i:0"><rect x="30" y="33" width="120" height="44" rx="10"/><text x="90" y="60" text-anchor="middle">가입</text></g>
           <g class="nd accent" style="--i:1"><rect x="250" y="33" width="130" height="44" rx="10"/><text x="315" y="60" text-anchor="middle">초기 설정</text></g>
           <g class="nd" style="--i:2"><rect x="490" y="33" width="110" height="44" rx="10"/><text x="545" y="60" text-anchor="middle">가치 체감</text></g>
@@ -614,6 +617,19 @@
     };
     var on = document.querySelector('.slide.on');
     if (on) Array.prototype.forEach.call(on.querySelectorAll('[data-seq]'), function (st) { window.__runStage(st, window.__deckGen()); });
+  })();
+  </script>
+  <script>
+  /* §11 svg-drawing-js */
+  (function () {
+    if (document.documentElement.classList.contains('presenter')) return;
+    window.__normalizeSvgEdges = function (root) {
+      Array.prototype.forEach.call((root || document).querySelectorAll('.fc .eg'), function (edge) {
+        if (typeof edge.getTotalLength !== 'function') return;
+        edge.setAttribute('pathLength', '1');
+      });
+    };
+    window.__normalizeSvgEdges(document);
   })();
   </script>
   <script>

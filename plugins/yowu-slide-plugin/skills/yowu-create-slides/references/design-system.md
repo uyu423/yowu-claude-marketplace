@@ -18,6 +18,7 @@
 > 3. 시작은 **더블 rAF** 후 `go()` 호출 — 즉시 호출하면 드로잉 transition이 발화하지 않는다.
 > 4. 페이지 총수는 `slides.length`로 런타임 자동 계산 — 하드코딩 금지.
 > 5. `?presenter` 판정은 첫 페인트 전 `<head>` 최상단 스크립트로 — FOUC 방지.
+> 6. SVG 드로잉 선은 `pathLength="1"`로 정규화하고, Mermaid는 활성 슬라이드에서만 지연 렌더한다.
 
 ---
 
@@ -183,7 +184,8 @@ body {
   transition: opacity .5s ease, transform .5s cubic-bezier(.22,1,.36,1);
   pointer-events: auto;
 }
-.slide__inner, .inner { width: min(1160px, 100%); margin: 0 auto; }
+.slide__inner, .inner { width: min(1160px, 100%); min-width: 0; margin: 0 auto; }
+.slide svg, .slide img, .slide video, .slide canvas { max-width: 100%; }
 /* 텍스트 위주 슬라이드는 더 좁게 */
 .slide--content .slide__inner, .slide--quote .slide__inner { max-width: 820px; }
 
@@ -303,7 +305,7 @@ h1 .em, h2 .em, .accent { color: var(--accent-1); }
 /* ── 미디어 aspect-ratio 패턴: 확정 높이(vh) → aspect-ratio로 너비 결정 ── */
 .media-frame {
   height: clamp(240px, 46vh, 600px);
-  width: auto; align-self: center;
+  width: auto; max-width: 100%; align-self: center;
   border-radius: 16px; overflow: hidden;
   border: 1px solid var(--line); background: #000;
 }
@@ -328,6 +330,8 @@ h1 .em, h2 .em, .accent { color: var(--accent-1); }
     justify-content: flex-start; overflow-y: visible; pointer-events: auto;
     border-top: 1px solid var(--line-soft);
   }
+  .slide__inner, .inner { width: 100%; min-width: 0; overflow-wrap: anywhere; }
+  pre { max-width: 100%; overflow-x: auto; }
   .slide .rv, .slide .rvx { opacity: 1 !important; transform: none !important; animation: none !important; }
   .card-grid, .stat-row, .comparison, .workflow-grid, .flow-container, .code-cmp { grid-template-columns: 1fr !important; flex-direction: column; }
   .hud .nav { display: none; }              /* 모바일은 스크롤로 이동 */
@@ -936,7 +940,7 @@ pre code { font-size: clamp(12px, 1.8vh, 14px); line-height: 1.6; padding: 22px 
 
 플로우차트 선을 `stroke-dashoffset`으로 하나씩 그린다. **자동 적용 신호**: 프로세스/플로우/파이프라인/의존 관계.
 
-> **함정(주석 유지)**: ① `transition` shorthand 금지 — delay가 0으로 리셋됨. ② 화살촉(marker-end)은 dashoffset에 안 걸려 선보다 먼저 뜨므로 opacity를 함께 페이드. ③ `.slide:not(.on)`에서 transition을 끊어 재진입 잔상 차단. ④ **모든 `.eg` path에 `pathLength="100"` 필수** — 없으면 실제 path 길이가 100 user unit을 넘길 때 `stroke-dasharray:100`이 앞 100단위만 그리고 나머지(화살촉 도달부)를 dash 간격에 빠뜨려 "선이 중간에 끊긴" 것처럼 보인다.
+> **함정(주석 유지)**: ① `transition` shorthand 금지 — delay가 0으로 리셋됨. ② 화살촉(marker-end)은 dashoffset에 안 걸려 선보다 먼저 뜨므로 opacity를 함께 페이드. ③ `.slide:not(.on)`에서 transition을 끊어 재진입 잔상 차단. ④ 고정값 `stroke-dasharray`를 실제 길이가 더 긴 선에 적용하면 선과 공백이 반복되어 연결선이 여러 조각으로 끊긴다. 모든 `.eg` SVGGeometryElement에 `pathLength="1"`을 넣고, 아래 JS 안전망도 함께 삽입한다.
 
 <!-- MODULE: svg-drawing-css (feature) -->
 ```css
@@ -949,7 +953,7 @@ pre code { font-size: clamp(12px, 1.8vh, 14px); line-height: 1.6; padding: 22px 
 /* 선: dashoffset 드로잉 + opacity 동시 페이드 (마커 조기 표시 방지) */
 .fc .eg {
   stroke: var(--border-accent); stroke-width: 1.6; fill: none;
-  stroke-dasharray: 100; stroke-dashoffset: 100; opacity: 0;   /* path에 pathLength="100" 필수 — 실제 길이 무관하게 전체 선을 드로잉 */
+  stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0;       /* pathLength="1" 기준: 실제 길이와 무관하게 전체 선을 한 번에 드로잉 */
   transition: stroke-dashoffset .7s ease, opacity .25s ease;   /* shorthand 금지 */
   transition-delay: calc(var(--i) * .1s);
 }
@@ -959,7 +963,27 @@ pre code { font-size: clamp(12px, 1.8vh, 14px); line-height: 1.6; padding: 22px 
 ```
 <!-- /MODULE -->
 
-마커 id는 슬라이드마다 고유값(`diag-arrow-s{N}`). `<defs><marker id="diag-arrow-s5" …>`. 선(`<path class="eg">`)에는 **반드시 `pathLength="100"`**을 붙여 전체 길이를 100으로 정규화하고(→ dasharray 100 드로잉이 선 전체에 정확히 매핑), `style="--i:0"`, `--i:1`… 로 스태거한다. 예: `<path class="eg accent" style="--i:3" pathLength="100" d="…" marker-end="url(#diag-arrow-s5)"></path>`.
+마커 id는 슬라이드마다 고유값(`diag-arrow-s{N}`). `<defs><marker id="diag-arrow-s5" …>`. 선(`<path>`, `<line>`, `<polyline>` 등 `.eg` SVGGeometryElement)에는 **반드시 `pathLength="1"`**을 붙여 전체 길이를 1로 정규화하고, `style="--i:0"`, `--i:1`… 로 스태거한다. 예: `<path class="eg accent" style="--i:3" pathLength="1" d="…" marker-end="url(#diag-arrow-s5)"></path>`.
+
+마크업 누락이 다시 긴 선 파손으로 이어지지 않도록 CSS와 함께 아래 안전망을 삽입한다. 이 스크립트는 첫 슬라이드 활성화 전에 모든 `.eg` geometry를 같은 척도로 정규화한다. 작성된 HTML에도 `pathLength="1"`을 남겨야 하며, 스크립트는 방어 수단이지 마크업 생략 허가가 아니다.
+
+<!-- MODULE: svg-drawing-js (feature) -->
+```html
+<script>
+/* SVG 드로잉 길이 정규화 — 긴 path/line/polyline도 하나의 연속선으로 그린다. */
+(function () {
+  if (document.documentElement.classList.contains('presenter')) return;
+  window.__normalizeSvgEdges = function (root) {
+    Array.prototype.forEach.call((root || document).querySelectorAll('.fc .eg'), function (edge) {
+      if (typeof edge.getTotalLength !== 'function') return;
+      edge.setAttribute('pathLength', '1');
+    });
+  };
+  window.__normalizeSvgEdges(document);
+})();
+</script>
+```
+<!-- /MODULE -->
 
 ---
 
@@ -1141,13 +1165,66 @@ pre code { font-size: clamp(12px, 1.8vh, 14px); line-height: 1.6; padding: 22px 
 </div>
 ```
 
-> **주의 (Mermaid deck 연동)**: Mermaid를 쓸 경우 반드시 `mermaid.initialize({startOnLoad:false})`로 두고, 첫 페인트 후 또는 활성 슬라이드 진입(`deck:change`) 시점에 `mermaid.run({nodes:...})`로 지연 렌더한다. 초기 hidden(`position:absolute`) 슬라이드에서 `startOnLoad:true` 자동 렌더는 크기가 0으로 잡혀 다이어그램이 깨진다. `SAMPLE_SLIDES.html`처럼 첫 title 슬라이드가 처음부터 보이는 경우는 동작하지만, 숨은 슬라이드에 Mermaid를 두면 이 함정이 발생한다. 단순 노드/플로우는 정본 SVG 드로잉(§11)·조직도(`.org-tier`)로 대체를 권장한다.
+### Mermaid deck 연동 — 활성 슬라이드 지연 렌더
+
+초기 hidden(`position:absolute`) 슬라이드에서 `startOnLoad:true`로 자동 렌더하면 컨테이너 폭·높이가 0 또는 잘못된 값으로 계산될 수 있다. `startOnLoad:false`로 초기화하고, 활성 슬라이드 진입(`deck:change`) 후에만 렌더한다. 모바일에서는 모든 슬라이드가 세로로 보이므로 전체 Mermaid 노드를 렌더한다. 단순 노드/플로우는 정본 SVG 드로잉(§11)·조직도(`.org-tier`)로 대체를 권장한다.
 
 > **주의 (Mermaid 컨테이너 여백)**: `pre.mermaid`에 큰 `min-height` 스테이지를 잡고 `align-items:center`로 다시 중앙 정렬하면, 짧은 LR 플로우가 스테이지 중앙에 떠서 제목↔다이어그램 사이에 과도한 **이중 여백**이 생긴다. `min-height`는 과하지 않게 두고 `align-items:flex-start`로 상단 정렬한다(남는 공간이 다이어그램 아래로 몰려 제목 바로 밑 리듬이 콘텐츠 슬라이드와 일치). `min-height`는 floor라 큰 다이어그램은 그대로 확장된다.
 > ```css
 > .mermaid { display:flex; justify-content:center; align-items:flex-start; min-height:clamp(160px,24vh,340px); }
 > .mermaid svg { max-width:100%; height:auto; }
 > ```
+
+Mermaid CDN 뒤에 아래 모듈을 그대로 삽입한다. `data-mermaid-pending`은 빠른 전환·resize 중 같은 노드가 중복 렌더되는 것을 막는다.
+
+<!-- MODULE: mermaid-deferred-js (feature) -->
+```html
+<script>
+/* Mermaid — hidden 슬라이드의 0-size 렌더를 피하고 활성화 뒤에 그린다. */
+(function () {
+  if (!window.mermaid || document.documentElement.classList.contains('presenter')) return;
+  mermaid.initialize({
+    theme: 'dark', /* Light 테마는 'default' */
+    startOnLoad: false,
+    fontFamily: "'NanumSquareNeo','Noto Sans KR',sans-serif"
+  });
+
+  function pendingNodes(root) {
+    return Array.prototype.filter.call((root || document).querySelectorAll('pre.mermaid'), function (node) {
+      return !node.hasAttribute('data-processed') && !node.hasAttribute('data-mermaid-pending');
+    });
+  }
+  function render(root) {
+    var nodes = pendingNodes(root);
+    if (!nodes.length) return;
+    nodes.forEach(function (node) { node.setAttribute('data-mermaid-pending', ''); });
+    Promise.resolve(mermaid.run({ nodes: nodes })).catch(function (error) {
+      nodes.forEach(function (node) { node.removeAttribute('data-mermaid-pending'); });
+      console.error('[slides] Mermaid render failed', error);
+    });
+  }
+  function renderVisible() {
+    if (window.matchMedia('(max-width: 820px)').matches) render(document);
+    else {
+      var active = document.querySelector('.slide.on');
+      if (active) render(active);
+    }
+  }
+
+  document.addEventListener('deck:change', function (event) {
+    var slides = window.__deckSlides || [];
+    render(slides[event.detail.index]);
+  });
+  requestAnimationFrame(function () { requestAnimationFrame(renderVisible); });
+  var resizeTimer = 0;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(renderVisible, 120);
+  });
+})();
+</script>
+```
+<!-- /MODULE -->
 
 ---
 
@@ -1242,7 +1319,8 @@ pre code { font-size: clamp(12px, 1.8vh, 14px); line-height: 1.6; padding: 22px 
   [MODULE nav-hud-js]
   [MODULE notes-js]
   [MODULE presenter-js]
-  [MODULE sequencer-js / video-js / lightbox-js / lottie-js] ← feature (신호 있을 때)
+  [MODULE sequencer-js / svg-drawing-js / video-js / lightbox-js / lottie-js] ← feature (신호 있을 때)
+  [Mermaid CDN + MODULE mermaid-deferred-js] ← 복잡한 다이어그램이 있을 때
   [highlight.js — 코드 있을 때]
 </body></html>
 ```

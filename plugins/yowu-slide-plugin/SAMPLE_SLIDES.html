@@ -41,7 +41,8 @@
     .deck { position:fixed; inset:0; z-index:1; }
     .slide { position:absolute; inset:0; padding:7vh 5vw 9vh; display:flex; flex-direction:column; justify-content:center; opacity:0; visibility:hidden; transform:translateY(14px) scale(.992); transition:opacity .5s ease, transform .5s cubic-bezier(.22,1,.36,1), visibility 0s linear .5s; pointer-events:none; }
     .slide.on { opacity:1; visibility:visible; transform:none; transition:opacity .5s ease, transform .5s cubic-bezier(.22,1,.36,1); pointer-events:auto; }
-    .slide__inner, .inner { width:min(1160px,100%); margin:0 auto; }
+    .slide__inner, .inner { width:min(1160px,100%); min-width:0; margin:0 auto; }
+    .slide svg, .slide img, .slide video, .slide canvas { max-width:100%; }
     .slide--content .slide__inner, .slide--quote .slide__inner { max-width:820px; }
     .slide--title, .slide--closing { background:var(--bg-gradient); }
 
@@ -64,6 +65,8 @@
       body { overflow:auto; }
       .deck { position:static; }
       .slide { position:relative; inset:auto; opacity:1 !important; visibility:visible !important; transform:none !important; min-height:100dvh; height:auto; padding:6vh 6vw 10vh; justify-content:flex-start; overflow-y:visible; pointer-events:auto; border-top:1px solid var(--line-soft); }
+      .slide__inner, .inner { width:100%; min-width:0; overflow-wrap:anywhere; }
+      pre { max-width:100%; overflow-x:auto; }
       .slide .rv, .slide .rvx { opacity:1 !important; transform:none !important; animation:none !important; }
       .card-grid, .stat-row, .comparison, .workflow-grid, .flow-container, .code-cmp { grid-template-columns:1fr !important; flex-direction:column; }
       .hud .nav { display:none; }
@@ -173,7 +176,7 @@
     .fc .nd.accent rect { fill:none; stroke:var(--accent-1); stroke-width:2; }
     .fc .nd { opacity:0; transition:opacity .5s ease; transition-delay:calc(var(--i) * .1s); }
     .slide.on .fc .nd { opacity:1; }
-    .fc .eg { stroke:var(--border-accent); stroke-width:1.6; fill:none; stroke-dasharray:100; stroke-dashoffset:100; opacity:0; transition:stroke-dashoffset .7s ease, opacity .25s ease; transition-delay:calc(var(--i) * .1s); }
+    .fc .eg { stroke:var(--border-accent); stroke-width:1.6; fill:none; stroke-dasharray:1; stroke-dashoffset:1; opacity:0; transition:stroke-dashoffset .7s ease, opacity .25s ease; transition-delay:calc(var(--i) * .1s); }
     .fc .eg.accent { stroke:var(--accent-1); }
     .slide.on .fc .eg { stroke-dashoffset:0; opacity:1; }
     .slide:not(.on) .fc .nd, .slide:not(.on) .fc .eg { transition:none; }
@@ -328,7 +331,7 @@ window.__deckSlides.length;  // 전체 슬라이드 수 — 하드코딩 금지,
     <section class="slide slide--diagram" data-name="diagram">
       <div class="slide__inner">
         <div class="kicker rv">Mermaid · 다이어그램 자동 배치</div>
-        <h2 class="sl-title rv" style="--d:.06s">라이브러리 초기화는 <span class="accent">엔진 스크립트 뒤</span>에 둔다</h2>
+        <h2 class="sl-title rv" style="--d:.06s">숨은 다이어그램은 <span class="accent">슬라이드가 열린 뒤</span> 그린다</h2>
         <div class="card rv" style="--d:.14s; max-width:760px; margin:0 auto;">
           <pre class="mermaid">
 flowchart LR
@@ -338,11 +341,11 @@ flowchart LR
     D --> E[렌더 완료]
           </pre>
         </div>
-        <p class="footnote rv" style="--d:.22s">순서가 바뀌면 deck 엔진의 첫 더블 rAF 타이밍과 경쟁해 레이아웃이 흔들릴 수 있다.</p>
+        <p class="footnote rv" style="--d:.22s"><code>startOnLoad:false</code> + <code>deck:change</code>로 폭 0 상태의 선렌더를 막는다.</p>
       </div>
       <aside class="slide-notes" hidden>
         <h4>요지</h4><p>초기화 순서 하나가 <strong>레이아웃 안정성</strong>을 좌우한다.</p>
-        <h4>핵심</h4><ul><li>core-js가 먼저 슬라이드를 배치하고, 라이브러리는 그 뒤에 얹는다</li><li>mermaid.initialize는 startOnLoad:true로 DOM의 pre.mermaid를 자동 스캔한다</li></ul>
+        <h4>핵심</h4><ul><li>숨은 슬라이드는 아직 신뢰할 수 있는 컨테이너 크기가 없다</li><li>활성화 이벤트에서 해당 슬라이드의 Mermaid만 지연 렌더한다</li></ul>
         <h4>상호작용</h4><p>없음</p>
         <h4>Q&amp;A 대비</h4><ul><li>다크/라이트 전환 시 테마는? — mermaid.initialize의 theme 옵션을 토큰에 맞춰 바꿔주면 된다</li></ul>
         <h4>소요 시간</h4><p>예상 40초</p>
@@ -643,6 +646,19 @@ flowchart LR
   })();
   </script>
   <script>
+  /* §11 svg-drawing-js */
+  (function () {
+    if (document.documentElement.classList.contains('presenter')) return;
+    window.__normalizeSvgEdges = function (root) {
+      Array.prototype.forEach.call((root || document).querySelectorAll('.fc .eg'), function (edge) {
+        if (typeof edge.getTotalLength !== 'function') return;
+        edge.setAttribute('pathLength', '1');
+      });
+    };
+    window.__normalizeSvgEdges(document);
+  })();
+  </script>
+  <script>
   /* §12 lightbox-js */
   (function () {
     if (document.documentElement.classList.contains('presenter')) return;
@@ -702,12 +718,45 @@ flowchart LR
   <script src="https://cdnjs.cloudflare.com/ajax/libs/iconify/2.0.0/iconify.min.js"></script>
 
   <script>
-  /* Mermaid — 단순 초기화. startOnLoad:true가 DOM의 pre.mermaid를 자동 스캔한다. */
-  mermaid.initialize({
-    theme: 'dark',
-    startOnLoad: true,
-    fontFamily: "'NanumSquareNeo','Noto Sans KR',sans-serif"
-  });
+  /* Mermaid — hidden 슬라이드의 0-size 렌더를 피하고 활성화 뒤에 그린다. */
+  (function () {
+    mermaid.initialize({
+      theme: 'dark',
+      startOnLoad: false,
+      fontFamily: "'NanumSquareNeo','Noto Sans KR',sans-serif"
+    });
+    function pendingNodes(root) {
+      return Array.prototype.filter.call((root || document).querySelectorAll('pre.mermaid'), function (node) {
+        return !node.hasAttribute('data-processed') && !node.hasAttribute('data-mermaid-pending');
+      });
+    }
+    function render(root) {
+      var nodes = pendingNodes(root);
+      if (!nodes.length) return;
+      nodes.forEach(function (node) { node.setAttribute('data-mermaid-pending', ''); });
+      Promise.resolve(mermaid.run({ nodes: nodes })).catch(function (error) {
+        nodes.forEach(function (node) { node.removeAttribute('data-mermaid-pending'); });
+        console.error('[slides] Mermaid render failed', error);
+      });
+    }
+    function renderVisible() {
+      if (window.matchMedia('(max-width: 820px)').matches) render(document);
+      else {
+        var active = document.querySelector('.slide.on');
+        if (active) render(active);
+      }
+    }
+    document.addEventListener('deck:change', function (event) {
+      var slides = window.__deckSlides || [];
+      render(slides[event.detail.index]);
+    });
+    requestAnimationFrame(function () { requestAnimationFrame(renderVisible); });
+    var resizeTimer = 0;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(renderVisible, 120);
+    });
+  })();
   </script>
   <script>
   /* Chart.js — 독립 IIFE. animation:false로 deck 전환 트랜지션과 겹치지 않게 한다. */
