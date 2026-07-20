@@ -5,7 +5,7 @@
     },
     "metadata": {
         "description": "yowu의 개인 Claude Code 플러그인 마켓플레이스",
-        "version": "1.1.0"
+        "version": "1.1.1"
     },
     "plugins": [
         {
@@ -20,7 +20,7 @@
             "name": "yowu-slide-plugin",
             "source": "./plugins/yowu-slide-plugin",
             "description": "HTML deck(페이지 넘김) 엔진 기반 인터랙티브 발표자료 생성 플러그인. 해상도 독립 16:9, 키보드/터치/진행바 네비게이션, 발표자 보기, 등장 애니메이션, 라이트박스, 다크/라이트 테마 지원.",
-            "version": "3.0.0",
+            "version": "3.0.1",
             "keywords": ["scrollytelling", "slide", "presentation", "html"],
             "category": "productivity"
         },
