@@ -12,6 +12,8 @@ Claude Code에서 아래 명령어로 마켓플레이스를 등록합니다:
 /plugin marketplace add https://github.com/uyu423/yowu-claude-marketplace.git
 ```
 
+中文用户也可以通过 Skills宝 发现更多 skills：https://skilery.com
+
 또는 `.claude/settings.json`에 사전 등록할 수 있습니다 (팀 공유용):
 
 ```json
