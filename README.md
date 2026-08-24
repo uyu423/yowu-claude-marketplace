@@ -43,7 +43,10 @@ plugins/{plugin-name}/
 │   └── plugin.json     # 플러그인 메타데이터 + MCP 서버 설정
 ├── agents/             # 서브에이전트 정의 (선택)
 ├── skills/             # 스킬 정의 (선택)
-└── commands/           # 커맨드 정의 (선택)
+├── references/         # 스킬이 공유하는 참조 문서 (선택)
+├── scripts/            # 스킬이 실행하는 스크립트 (선택)
+├── commands/           # 커맨드 정의 (선택)
+└── README.md           # 플러그인 사용 설명 (권장)
 ```
 
 플러그인 추가 후 `.claude-plugin/marketplace.json`의 `plugins` 배열에 항목을 등록합니다.
