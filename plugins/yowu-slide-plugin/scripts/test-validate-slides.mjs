@@ -11,6 +11,9 @@ const invalidFixture = join(scriptDir, 'fixtures/invalid-long-svg.html');
 const invalidMobileFixture = join(scriptDir, 'fixtures/invalid-mobile-overflow.html');
 const presenterFixture = join(scriptDir, 'fixtures/presenter.html');
 const invalidPresenterFixture = join(scriptDir, 'fixtures/invalid-presenter.html');
+const componentsFixture = join(scriptDir, 'fixtures/components.html');
+const componentsLightFixture = join(scriptDir, 'fixtures/components-light.html');
+const invalidNotesFixture = join(scriptDir, 'fixtures/invalid-notes.html');
 
 function run(args) {
   return new Promise((resolveRun, rejectRun) => {
@@ -60,4 +63,18 @@ if (invalidPresenter.code !== 1 || missed.length) {
   throw new Error(`발표자 창 결함 fixture를 잡지 못했습니다 (exit=${invalidPresenter.code}, 놓친 검사: ${missed.join(', ') || '없음'})`);
 }
 
-console.log('PASS validator self-test: valid deck accepted, broken long SVG / mobile overflow / presenter bridge rejected');
+const components = await run([componentsFixture, componentsLightFixture]);
+if (components.code !== 0) {
+  console.error(components.output);
+  throw new Error(`components-ext fixture가 실패했습니다 (exit=${components.code})`);
+}
+
+const invalidNotes = await run(['--static-only', invalidNotesFixture]);
+const noteChecks = ['M9 노트 커버리지', "M10 노트 1에 '소요 시간' 항목 없음", 'M11 구간 라벨'];
+const missedNotes = noteChecks.filter((needle) => !invalidNotes.output.includes(needle));
+if (invalidNotes.code !== 1 || missedNotes.length) {
+  console.error(invalidNotes.output);
+  throw new Error(`노트·구간 라벨 결함을 잡지 못했습니다 (exit=${invalidNotes.code}, 놓친 검사: ${missedNotes.join(', ') || '없음'})`);
+}
+
+console.log('PASS validator self-test: valid deck + components-ext accepted; long SVG / mobile overflow / presenter bridge / notes rejected');

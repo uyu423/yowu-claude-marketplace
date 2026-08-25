@@ -78,7 +78,7 @@ description: 깔끔하고 전문적인 HTML 기반 발표자료를 단일 파일
 **v3의 핵심 단계.** deck 엔진의 인터랙션 기능은 **사용자의 별도 지시 없이도 AI가 콘텐츠·목적·에셋을 스캔해 스스로 on/off를 결정**한다. 아래 매트릭스를 따라 각 기능을 판정하고, 결정 근거를 1줄씩 기록하여 Step 1 컨펌 블록의 "자동 적용" 항목에 노출한다(자동이되 투명하게 — 사용자가 원하면 끌 수 있다).
 
 **A. Always-On Baseline** (콘텐츠와 무관하게 항상 포함, 판단 불필요):
-deck 골격(core) · 유동 캔버스/반응형/인쇄(fluid) · 네비게이션 HUD(nav-hud) · 등장 애니메이션(reveal) · 발표자 노트(notes) · 발표자 보기(presenter) · 기본 컴포넌트(components).
+deck 골격(core) · 유동 캔버스/반응형/인쇄(fluid) · 네비게이션 HUD(nav-hud) · 등장 애니메이션(reveal) · 발표자 노트(notes) · 발표자 보기(presenter) · 기본 컴포넌트(components) · 본문 컴포넌트(components-ext).
 notes와 presenter는 **한 쌍**이다 — 노트 버튼(`N`·`Shift+N`)이 `__openPresenter`를 호출해 별창을 열고, 팝업이 막힐 때만 슬라이드 아래 인라인으로 폴백한다.
 → 정본 `references/design-system.md`의 baseline 모듈을 모두 삽입한다.
 
@@ -256,7 +256,7 @@ HTML Skeleton 생성 전에 아웃라인 자체를 점검한다. 아래 항목�
 이 단계에서는 `<div class="deck">`를 비워둔다(슬라이드 콘텐츠는 Step 5에서 append).
 
 **정본 조립 원칙 — 재발명 금지**: CSS/JS는 직접 타이핑하지 않고 `references/design-system.md`의 모듈을 **그대로 복사해 인라인 삽입**한다.
-- **baseline 모듈**(core / fluid / nav-hud / reveal / notes / presenter / components) — 항상 삽입
+- **baseline 모듈**(core / fluid / nav-hud / reveal / notes / presenter / components / components-ext) — 항상 삽입
 - **feature 모듈**(sequencer / svg-drawing CSS+JS / lightbox / video / dataviz / lottie / mermaid-deferred) — Step 0.5 판정 결과에 따라 삽입
 - 삽입 순서는 정본 **§17 조립 가이드**를 따른다
 
@@ -276,7 +276,7 @@ HTML Skeleton 생성 전에 아웃라인 자체를 점검한다. 아래 항목�
       {§2 나눔스퀘어 네오 @font-face}
       {§1 테마 토큰 :root — Dark 또는 Light}
       {§3 core-css}{§4 fluid-css + fluid-responsive}{§5 nav-hud-css}
-      {§6 reveal-css}{§7 notes-css}{§8 presenter-css}{§9 components-css — 사용분만}
+      {§6 reveal-css}{§7 notes-css}{§8 presenter-css}{§9 components-css — 사용분만}{§9.1 components-ext-css — 사용분만}
       {feature CSS — §10~§14 중 Step 0.5에서 켠 것만}
     </style>
   </head>
@@ -337,7 +337,7 @@ Edit:
 **각 `<section>` 블록 구성** (가이드 §2.2, §6.1):
 
 ```html
-<section class="slide slide--{type}" data-name="{slug}">
+<section class="slide slide--{type}" data-name="{slug}" data-part="{N부 구간명}">
   <div class="slide__inner">
     <!-- 슬라이드 콘텐츠 — label/heading/desc/visual. 주요 요소에 .rv + style="--d:.08s" 스태거 등장 -->
     <!-- 시퀀서(§10) 신호가 있으면 <div data-seq data-interval="600"> 안에 [data-step] 배치 -->
@@ -394,7 +394,7 @@ node {plugin-root}/scripts/validate-slides.mjs /absolute/path/to/deck.html
 
 **Lite 모드에서는 이 Step을 건너뛴다.**
 
-`references/self-check.md`의 기계 판정 항목 M1-M8을 확인한다. 렌더링 항목은 Step 6.4의 브라우저 결과를 사용한다.
+`references/self-check.md`의 기계 판정 항목 M1-M11을 확인한다. 렌더링 항목은 Step 6.4의 브라우저 결과를 사용한다.
 
 | # | 항목 | 합격 기준 |
 |---|------|---------|
@@ -474,6 +474,7 @@ Gemini가 HTML을 수정했다면 Step 6.4 브라우저 렌더 검증을 다시 
 | `comparison` | 비교          | 2열 비교 (before/after, A/B)                  | "기존 vs 신규", "A vs B" 대비 구조   |
 | `naming`     | 이름/공식     | naming-box (chip + 결과 + 설명)               | 브랜딩, 합성어 설명, 공식/수식       |
 | `code-comparison` | 코드 비교 | 2열 `.code-cmp` 코드 블럭 (`.cmp-head`+`<pre>`, 정본 §9) | "JS vs TS", "before/after", 문법 비교 |
+| `part`       | 구간 표지     | `.slide--part` + `.part-num`/`.part-title`/`.part-when` (정본 §9.1) | 10장 넘는 덱의 부 나눔. `data-part`와 한 세트 |
 | `closing`    | 마무리        | CTA 버튼, 감사 메시지, 연락처                 | 마지막 슬라이드, Q&A                 |
 | `diagram`    | SVG 아키텍처 다이어그램 | Inline SVG (`<rect>` + `<path>` + `<marker>` + CSS 변수 참조) | 컴포넌트 관계, 데이터 흐름 — JS 없이 테마 연동 다이어그램이 필요할 때 |
 | `media`      | 비디오/이미지 데모 | `.media-frame`(확정높이→aspect-ratio) + `<video>`/`<img>` | .mp4 데모, 앱 시연, 스크린샷 (video 모듈 자동 재생, 클릭 시 라이트박스 확대) |
@@ -492,7 +493,7 @@ Gemini가 HTML을 수정했다면 Step 6.4 브라우저 렌더 검증을 다시 
 3. **섹션 구조**: `<section class="slide slide--{type}" data-name="{slug}">`를 `<div class="deck">` 안에 배치. 테마 차이는 CSS 변수로만 처리
 4. **deck 페이지 넘김**: `.slide { position:absolute; inset:0 }` + `.slide.on` 토글 전환(정본 §3). scroll-snap 미사용. `body { overflow:hidden }` (모바일은 정본 §4가 자동 해제)
 5. **콘텐츠 오버플로우**: `.slide`는 세로 중앙 정렬(`justify-content:center`). 콘텐츠가 넘치면 슬라이드를 분할하거나 밀도를 낮춘다 — 페이지 넘김에서는 스크롤로 도망갈 수 없다
-6. **콘텐츠 폭**: `.slide__inner`는 `min(1160px, 100%)`. 텍스트 위주 슬라이드는 `max-width: 820px`
+6. **콘텐츠 폭**: `.slide__inner`는 `min(1160px, 100%)`. 텍스트 위주 슬라이드는 `max-width: 820px`. **2열(`.split`)·다이어그램처럼 폭이 필요하면 `<section class="slide slide--content wide">`로 제한을 푼다**(정본 §3)
 7. **나눔스퀘어 네오 폰트**: 정본 §2 `@font-face` 블럭을 그대로 삽입한다. 로드 실패 시 `'Noto Sans KR', -apple-system, sans-serif` fallback(정본 변수에 포함). 모노 폰트(kicker/HUD/타이머)는 시스템 스택이라 CDN 불필요
 8. **유동 캔버스**: 폰트·간격은 `clamp()` 중심(정본 §4). 타이틀은 세로/가로 동시 대응 `clamp(.., min(..vh, ..vw), ..)`. 모바일은 `@media (max-width:820px)`에서 세로 스크롤 폴백 + `100dvh`(iOS 주소창 대응)
 9. **페이지 번호**: HUD의 `#hudMeta`가 `01 / N`을 JS로 **자동** 표시(정본 §3/§5). `.slide::after` counter로 총수를 하드코딩하는 방식은 쓰지 않는다 — 슬라이드 추가/삭제가 자동 반영된다
@@ -545,6 +546,7 @@ AI는 이 값을 **하한선**으로 사용하되, 콘텐츠 밀도와 슬라이
 - tag/chip — 인라인 태그 표시
 
 **컬러 제한**: 악센트 최대 3색. 테마별 권장 팔레트는 design-system.md 참조.
+**색에 의미를 배정한다** (정본 §1): `--accent-1` 실측·수치 / `--accent-2` 인용·성과 / `--accent-3` 위험·예외. 한 덱 안에서 끝까지 일관되게 쓴다. 바꾸려면 Step 1 컨펌 블록에 노출한다.
 
 **폰트**:
 

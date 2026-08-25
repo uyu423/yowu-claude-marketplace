@@ -197,6 +197,26 @@ function staticAudit(source, file) {
         failures.push(`${basename(file)}: 발표자 브리지 토큰 ${token} 누락 — 정본 §8 presenter-js 재삽입 필요`);
       }
     });
+
+    // 노트·구간 라벨 (self-check M9~M11). 발표자 창을 갖춘 덱 = 발표용 덱이므로 대본이 있어야 한다.
+    const slideTags = source.match(/<section[^>]*class=["'][^"']*\bslide\b[^"']*["'][^>]*>/gi) || [];
+    const notes = source.match(/<aside[^>]*class=["'][^"']*\bslide-notes\b[^"']*["'][^>]*>[\s\S]*?<\/aside>/gi) || [];
+    if (slideTags.length && notes.length < slideTags.length) {
+      failures.push(`${basename(file)}: M9 노트 커버리지 — 슬라이드 ${slideTags.length}개 중 노트 ${notes.length}개 (발표자 창 대본이 빈다)`);
+    }
+    notes.forEach((note, index) => {
+      const headings = (note.match(/<h4[^>]*>([\s\S]*?)<\/h4>/gi) || []).join(' ');
+      ['요지', '핵심', '소요 시간'].forEach((required) => {
+        if (!headings.includes(required)) {
+          failures.push(`${basename(file)}: M10 노트 ${index + 1}에 '${required}' 항목 없음`
+            + (required === '소요 시간' ? ' (발표자 창 페이싱 입력)' : ''));
+        }
+      });
+    });
+    if (slideTags.length > 10) {
+      const missing = slideTags.filter((tag) => !/\bdata-part=/.test(tag)).length;
+      if (missing) failures.push(`${basename(file)}: M11 구간 라벨 — data-part 없는 슬라이드 ${missing}개 (HUD가 구간명을 못 읽는다)`);
+    }
   }
 
   const hasMermaid = /class=["'][^"']*\bmermaid\b/i.test(source);

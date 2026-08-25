@@ -8,7 +8,7 @@
 > `assets/example-{dark,light}.html`은 이 정본으로부터 생성된 골든 참조 산출물이다(정본 아님).
 >
 > **모듈 경계**: 각 모듈은 `<!-- MODULE: name (baseline|feature) -->` ~ `<!-- /MODULE -->`로 구획된다.
-> - **baseline** = 모든 덱에 항상 삽입 (core, fluid, nav-hud, reveal, notes, presenter, components)
+> - **baseline** = 모든 덱에 항상 삽입 (core, fluid, nav-hud, reveal, notes, presenter, components, components-ext)
 > - **feature** = SKILL.md Capability Planning 판단에 따라 조건부 삽입 (sequencer, svg-drawing, lightbox, video, dataviz, lottie)
 > - feature 모듈은 해당 콘텐츠 신호가 없으면 삽입하지 않는다(파일 크기 최적화).
 >
@@ -35,6 +35,16 @@
 ## 1. 테마 토큰 (CSS 변수)
 
 deck 엔진은 기존 v2 토큰에 더해 `--bg-raise/--bg-card/--line/--line-soft/--mono/--hl`을 요구한다.
+
+**악센트 3색에 의미를 배정한다.** "최대 3색"만 정하고 용도를 비워 두면 색이 장식으로 쓰인다. 색을 의미에 묶으면 청중이 색만 보고 정보의 종류를 안다.
+
+| 토큰 | 배정 | 주로 쓰는 곳 |
+|------|------|-------------|
+| `--accent-1` | **실측·수치·분석** | 목록 점, `.stat-num`, `.why`, `.src` 라벨, HUD |
+| `--accent-2` | **인용·문서·성과** | `q`, `.keep`, `.part-when`, 발표자 창 강조 |
+| `--accent-3` | **위험·문제·예외** | `.risk`, `.chk.miss`, `.src.unverified`, `.tl-h .hot` |
+
+주제에 따라 배정을 바꿔도 되지만, **한 덱 안에서는 끝까지 일관되게** 쓴다. 바꿀 때는 Step 1 컨펌 블록에 노출해 사용자가 알게 한다.
 
 ### 1.1 Dark Theme (기술 발표, 개발 주제)
 
@@ -188,6 +198,8 @@ body {
 .slide svg, .slide img, .slide video, .slide canvas { max-width: 100%; }
 /* 텍스트 위주 슬라이드는 더 좁게 */
 .slide--content .slide__inner, .slide--quote .slide__inner { max-width: 820px; }
+/* 2열(.split)·다이어그램처럼 폭이 필요한 본문 슬라이드는 .wide로 820px 제한을 푼다 */
+.slide--content.wide .slide__inner, .slide--quote.wide .slide__inner { max-width: min(1160px, 100%); }
 
 /* 슬라이드별 배경 변형 (선택) */
 .slide--title   { background: var(--bg-gradient); }
@@ -333,7 +345,13 @@ h1 .em, h2 .em, .accent { color: var(--accent-1); }
   .slide__inner, .inner { width: 100%; min-width: 0; overflow-wrap: anywhere; }
   pre { max-width: 100%; overflow-x: auto; }
   .slide .rv, .slide .rvx { opacity: 1 !important; transform: none !important; animation: none !important; }
-  .card-grid, .stat-row, .comparison, .workflow-grid, .flow-container, .code-cmp { grid-template-columns: 1fr !important; flex-direction: column; }
+  .card-grid, .stat-row, .comparison, .workflow-grid, .flow-container, .code-cmp,
+  .split, .split-2, .tri, .shot-row, .part { grid-template-columns: 1fr !important; flex-direction: column; }
+  /* 수평 타임라인은 grid-auto-flow라 위 규칙으로 안 접힌다 — 세로 목록으로 폴백하고 선·점을 숨긴다 */
+  .tl-h { grid-auto-flow: row !important; padding-top: 0; gap: 14px; }
+  .tl-h::before, .tl-h .n::before { display: none; }
+  .tl-h .d { margin-bottom: 4px; }
+  .part-num { font-size: clamp(48px, 12vh, 88px); }
   .hud .nav { display: none; }              /* 모바일은 스크롤로 이동 */
 }
 
@@ -1016,6 +1034,278 @@ pre code { font-size: clamp(12px, 1.8vh, 14px); line-height: 1.6; padding: 22px 
 
 ---
 
+## 9.1 MODULE: components-ext (baseline) — 본문·구간·강조 컴포넌트
+
+§9가 카드·통계·플로우 같은 **블록**을 준다면, 여기는 본문 슬라이드를 실제로 채우는 **문장·목록·구간** 컴포넌트다.
+실전 44면 덱에서 뽑아 토큰으로 일반화했다. 필요한 것만 골라 삽입한다.
+
+색은 §1의 **악센트 의미 배정**을 따른다 — `--accent-1` 실측·수치, `--accent-2` 인용·성과, `--accent-3` 위험·예외.
+
+<!-- MODULE: components-ext-css (baseline) -->
+```css
+/* ── 본문 목록 ── */
+.blist { list-style: none; display: flex; flex-direction: column; gap: clamp(6px, 1.15vh, 13px); }
+.blist > li { position: relative; padding-left: 20px; font-size: clamp(13px, 1.92vh, 18px); line-height: 1.62; color: var(--text-secondary); }
+.blist > li::before { content: ''; position: absolute; left: 2px; top: .72em; width: 6px; height: 6px; border-radius: 2px; background: var(--accent-1); opacity: .85; }
+.blist > li strong { color: var(--text-primary); font-weight: 800; }
+.blist > li em { font-style: normal; color: var(--accent-2); }   /* 한국어에서 이탤릭은 읽기 나쁘다 — 색으로만 강조 */
+.blist.num { counter-reset: bl; }
+.blist.num > li { padding-left: 30px; }
+.blist.num > li::before {
+  counter-increment: bl; content: counter(bl, decimal-leading-zero);
+  width: auto; height: auto; background: none; border-radius: 0; top: 0;
+  font-family: var(--mono); font-size: .74em; font-weight: 700; color: var(--accent-1); opacity: 1;
+}
+.blist .sub { list-style: none; margin-top: 5px; display: flex; flex-direction: column; gap: 4px; }
+.blist .sub > li { position: relative; padding-left: 14px; font-size: .86em; color: var(--text-muted); }
+.blist .sub > li::before { content: '·'; position: absolute; left: 2px; color: var(--accent-1); }
+
+/* ── 강조 블록: .risk 기본형 + .keep/.why 색 변형 ── */
+.risk {
+  border-left: 3px solid var(--accent-3);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent-3) 14%, transparent), transparent 72%);
+  border-radius: 0 12px 12px 0;
+  padding: clamp(10px, 1.6vh, 18px) clamp(12px, 1.8vh, 20px);
+}
+.risk > .rl {
+  font-family: var(--mono); font-size: clamp(9.5px, 1.25vh, 11.5px); font-weight: 700;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--accent-3);
+  display: block; margin-bottom: 7px;
+}
+.risk .blist > li::before { background: var(--accent-3); }
+.keep { border-left-color: var(--accent-2); background: linear-gradient(90deg, color-mix(in srgb, var(--accent-2) 14%, transparent), transparent 72%); }
+.keep > .rl { color: var(--accent-2); }
+.keep .blist > li::before { background: var(--accent-2); }
+.why { border-left-color: var(--accent-1); background: linear-gradient(90deg, color-mix(in srgb, var(--accent-1) 14%, transparent), transparent 72%); }
+.why > .rl { color: var(--accent-1); }
+.why .blist > li::before { background: var(--accent-1); }
+
+/* ── 인용 문장 ── */
+q, .q { color: var(--accent-2); font-style: normal; }
+q::before { content: '\201C'; } q::after { content: '\201D'; }
+
+/* ── 결론 한 문장 ── */
+.punch {
+  font-size: clamp(20px, 3.9vh, 38px); font-weight: 900; line-height: 1.32; letter-spacing: -.03em;
+  padding: clamp(16px, 2.6vh, 30px) clamp(18px, 2.8vh, 34px);
+  border: 1px solid var(--border-accent); border-radius: 20px;
+  background: linear-gradient(150deg, color-mix(in srgb, var(--accent-1) 14%, transparent), color-mix(in srgb, var(--accent-2) 5%, transparent) 70%, transparent);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+.punch .em { color: var(--accent-1); }   /* §9의 .em은 h1/h2 스코프라 여기 따로 둔다 */
+
+/* ── 키-값 나열 (dl/dt/dd) ── */
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 6px clamp(12px, 1.6vw, 20px); font-size: clamp(12px, 1.7vh, 15px); align-items: baseline; }
+.kv dt { font-family: var(--mono); font-size: .84em; letter-spacing: .06em; color: var(--accent-1); white-space: nowrap; }
+.kv dd { color: var(--text-secondary); margin: 0; }
+.kv dd strong { color: var(--text-primary); font-weight: 800; }
+
+/* ── 2·3열 분할 ── */
+.split { display: grid; grid-template-columns: 1.02fr .98fr; gap: clamp(14px, 2.2vw, 30px); align-items: start; }
+.split.img-l { grid-template-columns: .92fr 1.08fr; }
+.split-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(12px, 1.6vw, 20px); }
+.tri { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(10px, 1.4vw, 16px); }
+.split > *, .split-2 > *, .tri > * { min-width: 0; }   /* grid 자식 overflow 방어 — 빠뜨리면 코드/표가 슬라이드를 넘긴다 */
+
+/* ── 스크린샷 프레임 ── */
+.shot { border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: var(--bg-card); box-shadow: 0 14px 40px rgba(0,0,0,.18); display: flex; align-items: center; justify-content: center; }
+.shot img { display: block; width: 100%; height: auto; max-width: 100%; }
+.shot.tall img { width: auto; height: auto; max-height: var(--sh, 44vh); }   /* 세로형 캡처는 높이로 잡는다 — 폭 기준이면 슬라이드를 넘긴다 */
+.shot-row { display: flex; gap: 12px; align-items: stretch; }
+.shot-row .shot { flex: 1; min-width: 0; }
+.shot-cap { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; color: var(--text-muted); margin-top: 7px; }
+
+/* ── 구간 표지 (10장 넘는 덱의 부 나눔) ── */
+.slide--part { background: var(--bg-gradient); }
+.slide--part .slide__inner { max-width: min(1160px, 100%); }
+.part { display: grid; grid-template-columns: minmax(0, 26%) 1fr; gap: clamp(18px, 3vw, 48px); align-items: center; }
+.part-num {
+  font-family: var(--mono); font-weight: 700;
+  font-size: clamp(72px, 17vh, 200px); line-height: .82; letter-spacing: -.05em;
+  color: transparent; -webkit-text-stroke: 1.5px color-mix(in srgb, var(--accent-1) 42%, transparent);
+  user-select: none;
+}
+@supports not (-webkit-text-stroke: 1px black) {   /* stroke 미지원이면 숫자가 통째로 사라진다 */
+  .part-num { color: color-mix(in srgb, var(--accent-1) 30%, transparent); }
+}
+.part-title { font-size: clamp(28px, 6.4vh, 62px); margin-bottom: 2vh; }
+.part-when { font-family: var(--mono); font-size: clamp(10.5px, 1.5vh, 13.5px); letter-spacing: .1em; color: var(--text-muted); padding-left: 13px; border-left: 2px solid var(--accent-2); }
+.part-when b { color: var(--accent-2); font-weight: 700; }
+
+/* ── 수평 타임라인 ──
+   --tl-pad: 컨테이너 위 여백 · --tl-dot: 컨테이너 기준 점 위 좌표 · --tl-dot-size: 점 지름.
+   가로선과 점을 같은 변수로 묶는다 — 따로 두면 다시 어긋난다. */
+.tl-h { --tl-pad: 26px; --tl-dot: 52px; --tl-dot-size: 9px;
+  position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0; padding-top: var(--tl-pad); }
+.tl-h::before { content: ''; position: absolute; left: 0; right: 0; height: 1px; background: var(--line); top: calc(var(--tl-dot) + var(--tl-dot-size) / 2); }
+.tl-h .n { position: relative; padding: 0 8px 0 0; }
+.tl-h .n::before {
+  content: ''; position: absolute; top: calc(var(--tl-dot) - var(--tl-pad)); left: 0;
+  width: var(--tl-dot-size); height: var(--tl-dot-size); border-radius: 50%;
+  background: var(--bg); border: 2px solid var(--accent-1); z-index: 1;
+}
+.tl-h .n.hot::before { background: var(--accent-3); border-color: var(--accent-3); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-3) 18%, transparent); }
+.tl-h .d { font-family: var(--mono); font-size: clamp(10px, 1.4vh, 12.5px); color: var(--accent-1); letter-spacing: .06em; margin-bottom: 22px; display: block; line-height: 1.35; }
+.tl-h .n.hot .d { color: var(--accent-3); }
+.tl-h .t { font-size: clamp(11.5px, 1.6vh, 14px); color: var(--text-secondary); line-height: 1.5; padding-right: 10px; word-break: keep-all; }
+.tl-h .n.hot .t { color: var(--text-primary); font-weight: 700; }
+
+/* ── 전환 행 (A → B) ──
+   행끼리 열 폭을 공유해야 화살표가 한 줄로 맞는다. 그래서 컨테이너가 grid, 각 행은 display:contents.
+   (행 요소가 접근성 트리에서 사라지는 대가를 치른다 — 표 형태 데이터에는 쓰지 않는다) */
+.arrow-rows { display: grid; grid-template-columns: auto 22px minmax(0, 1fr); align-items: center; gap: clamp(5px, .95vh, 11px) 10px; font-size: clamp(12px, 1.72vh, 15.5px); }
+.arrow-rows .ar { display: contents; }
+.arrow-rows .ar > .k { grid-column: 1 / -1; font-family: var(--mono); font-size: clamp(9.5px, 1.25vh, 11.5px); letter-spacing: .14em; text-transform: uppercase; color: var(--text-muted); margin-top: 4px; }
+.arrow-rows .from { color: var(--text-muted); text-align: right; }
+.arrow-rows .mid { text-align: center; color: var(--accent-1); font-family: var(--mono); }
+.arrow-rows .to { color: var(--text-primary); font-weight: 800; }
+
+/* ── 체크 격자 (통과·실패) ── */
+.checks { display: flex; gap: 10px; flex-wrap: wrap; }
+.chk { flex: 1; min-width: 84px; border: 1px solid var(--border); border-radius: 12px; padding: clamp(9px, 1.5vh, 16px) 10px; text-align: center; background: var(--surface); }
+.chk .m { font-size: clamp(18px, 3.2vh, 28px); line-height: 1; font-weight: 900; font-family: var(--mono); color: var(--text-muted); }
+.chk .l { font-size: clamp(10.5px, 1.4vh, 12.5px); color: var(--text-muted); margin-top: 7px; line-height: 1.4; }
+.chk.hit { border-color: color-mix(in srgb, var(--ok) 40%, transparent); background: color-mix(in srgb, var(--ok) 6%, transparent); }
+.chk.hit .m { color: var(--ok); }
+.chk.miss { border-color: color-mix(in srgb, var(--accent-3) 45%, transparent); background: color-mix(in srgb, var(--accent-3) 7%, transparent); }
+.chk.miss .m { color: var(--accent-3); }
+
+/* ── 표 가로 스크롤 안전망 (모바일 overflow의 단골) ── */
+.table-scroll { width: 100%; overflow-x: auto; }
+.table-scroll > table { min-width: max-content; }
+
+/* ── 근거 스탬프 ──
+   수치·인용이 있는 슬라이드는 자기 출처를 화면에 달고 있는다. 출처가 없으면 .unverified로 밝힌다. */
+.src {
+  margin-top: auto; padding-top: 1.8vh;
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  font-family: var(--mono); font-size: clamp(9.5px, 1.25vh, 12px);
+  letter-spacing: .04em; color: var(--text-muted);
+}
+.src::before {
+  content: '근거'; flex: none;
+  padding: 2px 7px; border-radius: 4px;
+  background: color-mix(in srgb, var(--accent-1) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent-1) 28%, transparent);
+  color: var(--accent-1); font-weight: 700; letter-spacing: .16em;
+}
+.src code { color: var(--accent-2); }
+.src.unverified::before {
+  content: '미확인';
+  background: color-mix(in srgb, var(--accent-3) 10%, transparent);
+  border-color: color-mix(in srgb, var(--accent-3) 30%, transparent);
+  color: var(--accent-3);
+}
+html[lang="en"] .src::before { content: 'SOURCE'; }
+html[lang="en"] .src.unverified::before { content: 'UNVERIFIED'; }
+
+/* ── 장 전환 한 줄 ──
+   본문이 다 뜬 뒤 마지막에 등장해, 지금 장의 결론을 다음 장의 질문으로 바꾼다. */
+.bridge {
+  margin-top: auto; padding-top: 1.6vh;
+  display: flex; align-items: baseline; gap: 9px;
+  font-size: clamp(11.5px, 1.58vh, 14.5px); line-height: 1.55;
+  color: var(--text-muted);
+}
+.bridge::before { content: '\2193'; flex: none; font-family: var(--mono); font-weight: 700; color: var(--accent-1); opacity: .8; }
+.bridge strong { color: var(--text-secondary); font-weight: 700; }
+.bridge + .src { margin-top: 0; padding-top: 1.1vh; }
+
+/* .src/.bridge를 바닥에 붙이려면 inner가 flex column이어야 한다.
+   §3의 .slide__inner를 전역으로 바꾸면 기존 덱이 영향을 받으므로 :has()로 옵트인한다.
+   :has() 미지원 환경에서는 바닥 정렬만 사라진다(내용은 그대로). */
+.slide__inner:has(> .src), .slide__inner:has(> .bridge) { display: flex; flex-direction: column; }
+
+/* ── SVG 아키텍처 다이어그램 클래스 규약 ──
+   inline <svg class="arch">에 붙인다. 색을 토큰으로 묶어 두면 테마를 따라간다. */
+.arch { width: 100%; height: auto; display: block; }
+.arch .box { fill: var(--bg-card); stroke: var(--line); stroke-width: 1.2; }
+.arch .box.mine { fill: color-mix(in srgb, var(--accent-1) 10%, transparent); stroke: color-mix(in srgb, var(--accent-1) 55%, transparent); stroke-width: 1.8; }
+.arch .box.ext { fill: color-mix(in srgb, var(--accent-2) 14%, transparent); stroke: color-mix(in srgb, var(--accent-2) 45%, transparent); }
+.arch .nm { fill: var(--text-primary); font-size: 15px; font-weight: 800; }
+.arch .sub { fill: var(--text-muted); font-size: 12px; }
+.arch .org { fill: var(--accent-1); font-size: 10.5px; font-family: var(--mono); letter-spacing: .06em; }
+.arch .wire { stroke: color-mix(in srgb, var(--text-primary) 24%, transparent); stroke-width: 1.4; fill: none; }
+.arch .wire.hot { stroke: color-mix(in srgb, var(--accent-2) 70%, transparent); stroke-width: 1.8; }
+.arch .cap { fill: var(--text-secondary); font-size: 11.5px; }
+.arch .cap.hot { fill: var(--accent-2); }
+```
+<!-- /MODULE -->
+
+마크업 (필요한 것만 골라 쓴다):
+
+<!-- MODULE: components-ext-markup (baseline) -->
+```html
+<!-- 본문 목록: strong=핵심, em=인용 뉘앙스, .sub=하위 -->
+<ul class="blist">
+  <li><strong>결론 문구</strong> — 근거 한 조각
+    <ul class="sub"><li>보조 설명</li></ul>
+  </li>
+</ul>
+<ol class="blist num"><li>번호가 필요한 순서</li></ol>
+
+<!-- 강조 블록: risk=위험 · keep=유지·성과 · why=원인·분석 -->
+<div class="risk"><span class="rl">여기서 무너졌습니다</span>
+  <p class="desc" style="margin:0">한 문장 진술</p>
+</div>
+<div class="risk keep"><span class="rl">이건 남깁니다</span><p class="desc" style="margin:0">…</p></div>
+<div class="risk why"><span class="rl">왜 그렇게 됐나</span><p class="desc" style="margin:0">…</p></div>
+
+<!-- 결론 한 문장 · 키-값 -->
+<div class="punch">핵심은 <span class="em">한 문장</span>입니다.</div>
+<dl class="kv"><dt>범위</dt><dd><strong>44면</strong> · 22분</dd></dl>
+
+<!-- 2열 분할 + 스크린샷 -->
+<div class="split">
+  <div>
+    <div class="shot-row">
+      <figure class="shot tall" style="--sh:40vh"><img src="assets/shot-1.png" alt="화면 1"></figure>
+    </div>
+    <div class="shot-cap">실제 화면 · 클릭하면 확대됩니다</div>
+  </div>
+  <ul class="blist"><li>오른쪽 설명</li></ul>
+</div>
+
+<!-- 구간 표지: slide--part + data-part -->
+<section class="slide slide--title slide--part" data-name="part-1" data-part="1부 무엇을 만들었나">
+  <div class="slide__inner">
+    <div class="part">
+      <div class="part-num" aria-hidden="true">01</div>
+      <div>
+        <div class="label rv">1부 · 무엇을 만들었나</div>
+        <h2 class="part-title rv" style="--d:.06s">결론형 구간 제목</h2>
+        <div class="part-when rv" style="--d:.14s">시점 · <b>2026-07-23</b> · 3장</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 수평 타임라인: .hot = 이 발표가 가리키는 지점 -->
+<div class="tl-h">
+  <div class="n"><span class="d">07-23</span><span class="t">기획 리뷰</span></div>
+  <div class="n hot"><span class="d">08-19</span><span class="t">최초 제공<br><strong>하루 넘겼습니다</strong></span></div>
+</div>
+
+<!-- 전환 행 · 체크 격자 -->
+<div class="arrow-rows">
+  <div class="ar"><span class="from">기존</span><span class="mid">→</span><span class="to">바뀐 것</span></div>
+</div>
+<div class="checks">
+  <div class="chk hit"><div class="m">PASS</div><div class="l">조건 A</div></div>
+  <div class="chk miss"><div class="m">FAIL</div><div class="l">조건 B</div></div>
+</div>
+
+<!-- 근거 스탬프 · 장 전환 (.slide__inner 직계 자식으로 둔다) -->
+<div class="bridge rv" style="--d:.44s">여기까지가 <strong>무엇</strong>입니다. 그럼 <strong>얼마나 걸렸을까요.</strong></div>
+<div class="src"><code>retro.md</code> · 실측 200건</div>
+<div class="src unverified">추정 — 실측 전</div>
+```
+<!-- /MODULE -->
+
+> **`.src` / `.bridge` 사용 규칙**은 `references/content-rules.md`를 따른다. 수치·인용이 있으면 출처를 달고, 없으면 `.unverified`로 밝힌다.
+
+---
+
 ## 10. MODULE: sequencer (feature) — 등장 시퀀서
 
 `[data-seq]` 스테이지 안의 `[data-step]`을 순번대로 누적 점등. **자동 적용 신호**: 순차적 항목·빌드업·단계별 강조.
@@ -1421,6 +1711,7 @@ Mermaid CDN 뒤에 아래 모듈을 그대로 삽입한다. `data-mermaid-pendin
     [MODULE notes-css]                 ← baseline
     [MODULE presenter-css]             ← baseline
     [MODULE components-css]            ← baseline (사용분만)
+    [MODULE components-ext-css]        ← baseline (사용분만 — 목록·강조·구간·근거 스탬프)
     [MODULE sequencer/svg-drawing/lightbox/dataviz-css] ← feature (신호 있을 때)
   </style>
 </head>
@@ -1428,7 +1719,7 @@ Mermaid CDN 뒤에 아래 모듈을 그대로 삽입한다. `data-mermaid-pendin
   [MODULE nav-hud-markup]              ← HUD + fs-btn + notesBtn
   <div class="stagebg"></div>          ← 선택적 배경
   <div class="deck">
-    <section class="slide slide--title" data-name="...">…<aside class="slide-notes" hidden>…</aside></section>
+    <section class="slide slide--title" data-name="..." data-part="0부 여는 장">…<aside class="slide-notes" hidden>…</aside></section>
     … 슬라이드 N개 …
   </div>
   [MODULE presenter-markup]            ← 발표자 창 UI (baseline)

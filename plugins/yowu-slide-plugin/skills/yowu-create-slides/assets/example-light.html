@@ -42,6 +42,7 @@
     .slide__inner, .inner { width:min(1160px,100%); min-width:0; margin:0 auto; }
     .slide svg, .slide img, .slide video, .slide canvas { max-width:100%; }
     .slide--content .slide__inner, .slide--quote .slide__inner { max-width:820px; }
+    .slide--content.wide .slide__inner, .slide--quote.wide .slide__inner { max-width:min(1160px,100%); }
     .slide--title, .slide--closing { background:var(--bg-gradient); }
 
     /* §4 fluid-css */
@@ -225,6 +226,193 @@
     .org-tier.members .org-card::after { content:''; position:absolute; top:calc(var(--stem) * -1); left:calc(var(--hgap) * -0.5); right:calc(var(--hgap) * -0.5); height:2px; background:var(--line); }
     .org-tier.members .org-card:first-child::after { left:50%; }
     .org-tier.members .org-card:last-child::after { right:50%; }
+      /* §9.1 components-ext-css */
+    /* ── 본문 목록 ── */
+    .blist { list-style: none; display: flex; flex-direction: column; gap: clamp(6px, 1.15vh, 13px); }
+    .blist > li { position: relative; padding-left: 20px; font-size: clamp(13px, 1.92vh, 18px); line-height: 1.62; color: var(--text-secondary); }
+    .blist > li::before { content: ''; position: absolute; left: 2px; top: .72em; width: 6px; height: 6px; border-radius: 2px; background: var(--accent-1); opacity: .85; }
+    .blist > li strong { color: var(--text-primary); font-weight: 800; }
+    .blist > li em { font-style: normal; color: var(--accent-2); }   /* 한국어에서 이탤릭은 읽기 나쁘다 — 색으로만 강조 */
+    .blist.num { counter-reset: bl; }
+    .blist.num > li { padding-left: 30px; }
+    .blist.num > li::before {
+      counter-increment: bl; content: counter(bl, decimal-leading-zero);
+      width: auto; height: auto; background: none; border-radius: 0; top: 0;
+      font-family: var(--mono); font-size: .74em; font-weight: 700; color: var(--accent-1); opacity: 1;
+    }
+    .blist .sub { list-style: none; margin-top: 5px; display: flex; flex-direction: column; gap: 4px; }
+    .blist .sub > li { position: relative; padding-left: 14px; font-size: .86em; color: var(--text-muted); }
+    .blist .sub > li::before { content: '·'; position: absolute; left: 2px; color: var(--accent-1); }
+
+    /* ── 강조 블록: .risk 기본형 + .keep/.why 색 변형 ── */
+    .risk {
+      border-left: 3px solid var(--accent-3);
+      background: linear-gradient(90deg, color-mix(in srgb, var(--accent-3) 14%, transparent), transparent 72%);
+      border-radius: 0 12px 12px 0;
+      padding: clamp(10px, 1.6vh, 18px) clamp(12px, 1.8vh, 20px);
+    }
+    .risk > .rl {
+      font-family: var(--mono); font-size: clamp(9.5px, 1.25vh, 11.5px); font-weight: 700;
+      letter-spacing: .2em; text-transform: uppercase; color: var(--accent-3);
+      display: block; margin-bottom: 7px;
+    }
+    .risk .blist > li::before { background: var(--accent-3); }
+    .keep { border-left-color: var(--accent-2); background: linear-gradient(90deg, color-mix(in srgb, var(--accent-2) 14%, transparent), transparent 72%); }
+    .keep > .rl { color: var(--accent-2); }
+    .keep .blist > li::before { background: var(--accent-2); }
+    .why { border-left-color: var(--accent-1); background: linear-gradient(90deg, color-mix(in srgb, var(--accent-1) 14%, transparent), transparent 72%); }
+    .why > .rl { color: var(--accent-1); }
+    .why .blist > li::before { background: var(--accent-1); }
+
+    /* ── 인용 문장 ── */
+    q, .q { color: var(--accent-2); font-style: normal; }
+    q::before { content: '\201C'; } q::after { content: '\201D'; }
+
+    /* ── 결론 한 문장 ── */
+    .punch {
+      font-size: clamp(20px, 3.9vh, 38px); font-weight: 900; line-height: 1.32; letter-spacing: -.03em;
+      padding: clamp(16px, 2.6vh, 30px) clamp(18px, 2.8vh, 34px);
+      border: 1px solid var(--border-accent); border-radius: 20px;
+      background: linear-gradient(150deg, color-mix(in srgb, var(--accent-1) 14%, transparent), color-mix(in srgb, var(--accent-2) 5%, transparent) 70%, transparent);
+      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    }
+    .punch .em { color: var(--accent-1); }   /* §9의 .em은 h1/h2 스코프라 여기 따로 둔다 */
+
+    /* ── 키-값 나열 (dl/dt/dd) ── */
+    .kv { display: grid; grid-template-columns: auto 1fr; gap: 6px clamp(12px, 1.6vw, 20px); font-size: clamp(12px, 1.7vh, 15px); align-items: baseline; }
+    .kv dt { font-family: var(--mono); font-size: .84em; letter-spacing: .06em; color: var(--accent-1); white-space: nowrap; }
+    .kv dd { color: var(--text-secondary); margin: 0; }
+    .kv dd strong { color: var(--text-primary); font-weight: 800; }
+
+    /* ── 2·3열 분할 ── */
+    .split { display: grid; grid-template-columns: 1.02fr .98fr; gap: clamp(14px, 2.2vw, 30px); align-items: start; }
+    .split.img-l { grid-template-columns: .92fr 1.08fr; }
+    .split-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(12px, 1.6vw, 20px); }
+    .tri { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(10px, 1.4vw, 16px); }
+    .split > *, .split-2 > *, .tri > * { min-width: 0; }   /* grid 자식 overflow 방어 — 빠뜨리면 코드/표가 슬라이드를 넘긴다 */
+
+    /* ── 스크린샷 프레임 ── */
+    .shot { border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: var(--bg-card); box-shadow: 0 14px 40px rgba(0,0,0,.18); display: flex; align-items: center; justify-content: center; }
+    .shot img { display: block; width: 100%; height: auto; max-width: 100%; }
+    .shot.tall img { width: auto; height: auto; max-height: var(--sh, 44vh); }   /* 세로형 캡처는 높이로 잡는다 — 폭 기준이면 슬라이드를 넘긴다 */
+    .shot-row { display: flex; gap: 12px; align-items: stretch; }
+    .shot-row .shot { flex: 1; min-width: 0; }
+    .shot-cap { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; color: var(--text-muted); margin-top: 7px; }
+
+    /* ── 구간 표지 (10장 넘는 덱의 부 나눔) ── */
+    .slide--part { background: var(--bg-gradient); }
+    .slide--part .slide__inner { max-width: min(1160px, 100%); }
+    .part { display: grid; grid-template-columns: minmax(0, 26%) 1fr; gap: clamp(18px, 3vw, 48px); align-items: center; }
+    .part-num {
+      font-family: var(--mono); font-weight: 700;
+      font-size: clamp(72px, 17vh, 200px); line-height: .82; letter-spacing: -.05em;
+      color: transparent; -webkit-text-stroke: 1.5px color-mix(in srgb, var(--accent-1) 42%, transparent);
+      user-select: none;
+    }
+    @supports not (-webkit-text-stroke: 1px black) {   /* stroke 미지원이면 숫자가 통째로 사라진다 */
+      .part-num { color: color-mix(in srgb, var(--accent-1) 30%, transparent); }
+    }
+    .part-title { font-size: clamp(28px, 6.4vh, 62px); margin-bottom: 2vh; }
+    .part-when { font-family: var(--mono); font-size: clamp(10.5px, 1.5vh, 13.5px); letter-spacing: .1em; color: var(--text-muted); padding-left: 13px; border-left: 2px solid var(--accent-2); }
+    .part-when b { color: var(--accent-2); font-weight: 700; }
+
+    /* ── 수평 타임라인 ──
+       --tl-pad: 컨테이너 위 여백 · --tl-dot: 컨테이너 기준 점 위 좌표 · --tl-dot-size: 점 지름.
+       가로선과 점을 같은 변수로 묶는다 — 따로 두면 다시 어긋난다. */
+    .tl-h { --tl-pad: 26px; --tl-dot: 52px; --tl-dot-size: 9px;
+      position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0; padding-top: var(--tl-pad); }
+    .tl-h::before { content: ''; position: absolute; left: 0; right: 0; height: 1px; background: var(--line); top: calc(var(--tl-dot) + var(--tl-dot-size) / 2); }
+    .tl-h .n { position: relative; padding: 0 8px 0 0; }
+    .tl-h .n::before {
+      content: ''; position: absolute; top: calc(var(--tl-dot) - var(--tl-pad)); left: 0;
+      width: var(--tl-dot-size); height: var(--tl-dot-size); border-radius: 50%;
+      background: var(--bg); border: 2px solid var(--accent-1); z-index: 1;
+    }
+    .tl-h .n.hot::before { background: var(--accent-3); border-color: var(--accent-3); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-3) 18%, transparent); }
+    .tl-h .d { font-family: var(--mono); font-size: clamp(10px, 1.4vh, 12.5px); color: var(--accent-1); letter-spacing: .06em; margin-bottom: 22px; display: block; line-height: 1.35; }
+    .tl-h .n.hot .d { color: var(--accent-3); }
+    .tl-h .t { font-size: clamp(11.5px, 1.6vh, 14px); color: var(--text-secondary); line-height: 1.5; padding-right: 10px; word-break: keep-all; }
+    .tl-h .n.hot .t { color: var(--text-primary); font-weight: 700; }
+
+    /* ── 전환 행 (A → B) ──
+       행끼리 열 폭을 공유해야 화살표가 한 줄로 맞는다. 그래서 컨테이너가 grid, 각 행은 display:contents.
+       (행 요소가 접근성 트리에서 사라지는 대가를 치른다 — 표 형태 데이터에는 쓰지 않는다) */
+    .arrow-rows { display: grid; grid-template-columns: auto 22px minmax(0, 1fr); align-items: center; gap: clamp(5px, .95vh, 11px) 10px; font-size: clamp(12px, 1.72vh, 15.5px); }
+    .arrow-rows .ar { display: contents; }
+    .arrow-rows .ar > .k { grid-column: 1 / -1; font-family: var(--mono); font-size: clamp(9.5px, 1.25vh, 11.5px); letter-spacing: .14em; text-transform: uppercase; color: var(--text-muted); margin-top: 4px; }
+    .arrow-rows .from { color: var(--text-muted); text-align: right; }
+    .arrow-rows .mid { text-align: center; color: var(--accent-1); font-family: var(--mono); }
+    .arrow-rows .to { color: var(--text-primary); font-weight: 800; }
+
+    /* ── 체크 격자 (통과·실패) ── */
+    .checks { display: flex; gap: 10px; flex-wrap: wrap; }
+    .chk { flex: 1; min-width: 84px; border: 1px solid var(--border); border-radius: 12px; padding: clamp(9px, 1.5vh, 16px) 10px; text-align: center; background: var(--surface); }
+    .chk .m { font-size: clamp(18px, 3.2vh, 28px); line-height: 1; font-weight: 900; font-family: var(--mono); color: var(--text-muted); }
+    .chk .l { font-size: clamp(10.5px, 1.4vh, 12.5px); color: var(--text-muted); margin-top: 7px; line-height: 1.4; }
+    .chk.hit { border-color: color-mix(in srgb, var(--ok) 40%, transparent); background: color-mix(in srgb, var(--ok) 6%, transparent); }
+    .chk.hit .m { color: var(--ok); }
+    .chk.miss { border-color: color-mix(in srgb, var(--accent-3) 45%, transparent); background: color-mix(in srgb, var(--accent-3) 7%, transparent); }
+    .chk.miss .m { color: var(--accent-3); }
+
+    /* ── 표 가로 스크롤 안전망 (모바일 overflow의 단골) ── */
+    .table-scroll { width: 100%; overflow-x: auto; }
+    .table-scroll > table { min-width: max-content; }
+
+    /* ── 근거 스탬프 ──
+       수치·인용이 있는 슬라이드는 자기 출처를 화면에 달고 있는다. 출처가 없으면 .unverified로 밝힌다. */
+    .src {
+      margin-top: auto; padding-top: 1.8vh;
+      display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+      font-family: var(--mono); font-size: clamp(9.5px, 1.25vh, 12px);
+      letter-spacing: .04em; color: var(--text-muted);
+    }
+    .src::before {
+      content: '근거'; flex: none;
+      padding: 2px 7px; border-radius: 4px;
+      background: color-mix(in srgb, var(--accent-1) 10%, transparent);
+      border: 1px solid color-mix(in srgb, var(--accent-1) 28%, transparent);
+      color: var(--accent-1); font-weight: 700; letter-spacing: .16em;
+    }
+    .src code { color: var(--accent-2); }
+    .src.unverified::before {
+      content: '미확인';
+      background: color-mix(in srgb, var(--accent-3) 10%, transparent);
+      border-color: color-mix(in srgb, var(--accent-3) 30%, transparent);
+      color: var(--accent-3);
+    }
+    html[lang="en"] .src::before { content: 'SOURCE'; }
+    html[lang="en"] .src.unverified::before { content: 'UNVERIFIED'; }
+
+    /* ── 장 전환 한 줄 ──
+       본문이 다 뜬 뒤 마지막에 등장해, 지금 장의 결론을 다음 장의 질문으로 바꾼다. */
+    .bridge {
+      margin-top: auto; padding-top: 1.6vh;
+      display: flex; align-items: baseline; gap: 9px;
+      font-size: clamp(11.5px, 1.58vh, 14.5px); line-height: 1.55;
+      color: var(--text-muted);
+    }
+    .bridge::before { content: '\2193'; flex: none; font-family: var(--mono); font-weight: 700; color: var(--accent-1); opacity: .8; }
+    .bridge strong { color: var(--text-secondary); font-weight: 700; }
+    .bridge + .src { margin-top: 0; padding-top: 1.1vh; }
+
+    /* .src/.bridge를 바닥에 붙이려면 inner가 flex column이어야 한다.
+       §3의 .slide__inner를 전역으로 바꾸면 기존 덱이 영향을 받으므로 :has()로 옵트인한다.
+       :has() 미지원 환경에서는 바닥 정렬만 사라진다(내용은 그대로). */
+    .slide__inner:has(> .src), .slide__inner:has(> .bridge) { display: flex; flex-direction: column; }
+
+    /* ── SVG 아키텍처 다이어그램 클래스 규약 ──
+       inline <svg class="arch">에 붙인다. 색을 토큰으로 묶어 두면 테마를 따라간다. */
+    .arch { width: 100%; height: auto; display: block; }
+    .arch .box { fill: var(--bg-card); stroke: var(--line); stroke-width: 1.2; }
+    .arch .box.mine { fill: color-mix(in srgb, var(--accent-1) 10%, transparent); stroke: color-mix(in srgb, var(--accent-1) 55%, transparent); stroke-width: 1.8; }
+    .arch .box.ext { fill: color-mix(in srgb, var(--accent-2) 14%, transparent); stroke: color-mix(in srgb, var(--accent-2) 45%, transparent); }
+    .arch .nm { fill: var(--text-primary); font-size: 15px; font-weight: 800; }
+    .arch .sub { fill: var(--text-muted); font-size: 12px; }
+    .arch .org { fill: var(--accent-1); font-size: 10.5px; font-family: var(--mono); letter-spacing: .06em; }
+    .arch .wire { stroke: color-mix(in srgb, var(--text-primary) 24%, transparent); stroke-width: 1.4; fill: none; }
+    .arch .wire.hot { stroke: color-mix(in srgb, var(--accent-2) 70%, transparent); stroke-width: 1.8; }
+    .arch .cap { fill: var(--text-secondary); font-size: 11.5px; }
+    .arch .cap.hot { fill: var(--accent-2); }
   </style>
 </head>
 <body>
@@ -286,6 +474,8 @@
           <li class="card" data-step="2"><div class="card-title">초기 설정</div><div class="card-desc">마찰 최대 — 완료율 최저 구간</div></li>
           <li class="card" data-step="3"><div class="card-title">가치 체감</div><div class="card-desc">지연 발생 — 체감 전 이탈 다수</div></li>
         </ul>
+        <div class="bridge rv" style="--d:.6s">구조는 알았습니다. 그럼 <strong>실제로 얼마나 줄었을까요.</strong></div>
+        <div class="src"><code>ci-metrics.json</code> · 최근 30일 빌드 412회</div>
       </div>
       <aside class="slide-notes" hidden>
         <h4>요지</h4><p>이탈은 흩어진 게 아니라 <strong>초기 설정 구간에 집중</strong>돼 있다.</p>
@@ -308,6 +498,7 @@
           <div class="stat-box rv" style="--d:.28s"><div class="stat-num">[INSERT]</div><div class="stat-label">Q2 예상 매출 임팩트</div></div>
         </div>
         <p class="footnote rv" style="--d:.34s">[INSERT: 측정 기간] 코호트 평균 · [INSERT: 데이터 소스] 기준</p>
+        <div class="src unverified">개발자 체감 시간은 아직 측정 전</div>
       </div>
       <aside class="slide-notes" hidden>
         <h4>요지</h4><p>목표는 <strong>이탈률 하나가 아니라 매출 임팩트</strong>까지 함께 본다.</p>
@@ -373,13 +564,13 @@
           <div class="comparison-col bad">
             <div class="tag" style="background:rgba(214,69,69,.12); color:var(--bad)">BEFORE</div>
             <h3>획일 온보딩 · 수동 대응</h3>
-            <ul style="padding-left:18px; color:var(--text-secondary); font-size:clamp(13px,1.7vh,15px); line-height:1.9;"><li>전체 유저 동일 튜토리얼</li><li>이탈 신호 감지 없음</li><li>재유입 캠페인 부재</li></ul>
+            <ul class="blist" style="gap:7px"><li>전체 유저 동일 튜토리얼</li><li>이탈 신호 감지 없음</li><li>재유입 캠페인 부재</li></ul>
           </div>
           <div class="comparison-divider">→</div>
           <div class="comparison-col good">
             <div class="tag">AFTER</div>
             <h3>세그먼트 맞춤 · 자동화</h3>
-            <ul style="padding-left:18px; color:var(--text-secondary); font-size:clamp(13px,1.7vh,15px); line-height:1.9;"><li>세그먼트별 맞춤 온보딩</li><li>이탈 신호 실시간 감지</li><li>D3·D7 리마인더 자동화</li></ul>
+            <ul class="blist" style="gap:7px"><li>세그먼트별 맞춤 온보딩</li><li>이탈 신호 실시간 감지</li><li>D3·D7 리마인더 자동화</li></ul>
           </div>
         </div>
       </div>
