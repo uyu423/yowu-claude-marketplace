@@ -79,6 +79,7 @@ description: 깔끔하고 전문적인 HTML 기반 발표자료를 단일 파일
 
 **A. Always-On Baseline** (콘텐츠와 무관하게 항상 포함, 판단 불필요):
 deck 골격(core) · 유동 캔버스/반응형/인쇄(fluid) · 네비게이션 HUD(nav-hud) · 등장 애니메이션(reveal) · 발표자 노트(notes) · 발표자 보기(presenter) · 기본 컴포넌트(components).
+notes와 presenter는 **한 쌍**이다 — 노트 버튼(`N`·`Shift+N`)이 `__openPresenter`를 호출해 별창을 열고, 팝업이 막힐 때만 슬라이드 아래 인라인으로 폴백한다.
 → 정본 `references/design-system.md`의 baseline 모듈을 모두 삽입한다.
 
 **B. Content-Triggered Auto-Apply** (신호 감지 시 자동 활성 — 해당 feature 모듈 삽입):
@@ -99,7 +100,7 @@ deck 골격(core) · 유동 캔버스/반응형/인쇄(fluid) · 네비게이션
 **판정 원칙**:
 - feature 모듈은 신호가 **있을 때만** 삽입한다(파일 크기 최적화). 신호가 없으면 코드를 넣지 않는다.
 - 에셋 의존 기능(video/lottie)은 **에셋이 실제 존재할 때만** 활성화. 없으면 CSS 대체(정적 히어로/스크린샷 placeholder)로 폴백.
-- 발표자 보기는 baseline이지만, "순수 열람용 문서 배포"가 목적이면 생략 가능.
+- 발표자 보기는 baseline이지만, "순수 열람용 문서 배포"가 목적이면 생략 가능. 단, 생략하면 노트 버튼도 죽으므로 인라인 토글판 `notes-js`로 되돌려야 한다.
 - 확신이 낮으면 켠다(그레이스풀 폴백이 있으므로 켜서 손해가 적다). 단, 근거를 로그에 남긴다.
 
 **결정 로그 형식** (Step 1 컨펌 블록 + Step 8 메타 블록에 기록):
@@ -300,11 +301,13 @@ HTML Skeleton 생성 전에 아웃라인 자체를 점검한다. 아래 항목�
 
 **핵심**:
 - `<head>` 최상단 presenter-headscript는 **필수**(FOUC 방지) — 발표자 보기가 baseline이므로 항상 넣는다
+- `notes-js`는 `presenter-js`보다 먼저 실행되지만 훅을 **호출 시점**에 찾으므로 순서 문제가 없다. 조립 순서(정본 §17)를 그대로 지킨다
 - **core-js가 반드시 첫 스크립트** — 다른 모듈이 `window.__deck*` 훅에 의존한다
 - 페이지 총수는 core-js가 `slides.length`로 **자동 계산** — CSS/마크업에 하드코딩하지 않는다
 - CSS는 아웃라인의 **모든 슬라이드 타입 스타일을 한 번에** 포함해 이후 append 시 CSS 수정이 없도록 한다
 
 **Speaker Notes**: 각 `<section class="slide">` 끝에 `<aside class="slide-notes" hidden>` 포함. 이 노트는 **발표자 보기(presenter)의 대본 데이터 소스**이기도 하다(정본 §8). 5요소 마크업은 `references/note-protocol.md` 참조. Mermaid/Chart.js를 aside 내부에 넣지 않는다.
+`소요 시간`은 **모든 슬라이드에 채운다** — 발표자 창의 페이싱(계획 누적 대비 경과)이 이 값을 읽는다. 한 장이라도 비면 그 뒤 계산이 어긋난다.
 
 ### Step 5: 슬라이드 Append
 
@@ -353,7 +356,7 @@ Edit:
     <ul>
       <li>{예상 질문 + 답변 요점}</li>
     </ul>
-    <h4>소요 시간</h4><p>{분·초}</p>
+    <h4>소요 시간</h4><p>{분·초 — 전 슬라이드 필수, 발표자 창 페이싱 입력}</p>
   </aside>
 </section>
 ```
@@ -391,7 +394,7 @@ node {plugin-root}/scripts/validate-slides.mjs /absolute/path/to/deck.html
 
 **Lite 모드에서는 이 Step을 건너뛴다.**
 
-`references/self-check.md`의 기계 판정 항목 M1-M7을 확인한다. 렌더링 항목은 Step 6.4의 브라우저 결과를 사용한다.
+`references/self-check.md`의 기계 판정 항목 M1-M8을 확인한다. 렌더링 항목은 Step 6.4의 브라우저 결과를 사용한다.
 
 | # | 항목 | 합격 기준 |
 |---|------|---------|
@@ -423,7 +426,7 @@ gemini CLI 미설치 시 자동으로 quiet pass되므로 별도 분기 처리�
   - `콘텐츠 보호: 텍스트 원문` — 제목·본문·노트 문구 수정 금지 (Gemini는 시각만 리뷰)
   - `구조 보호: 슬라이드 타입 클래스` — `slide--{type}` 클래스명 및 `<aside class="slide-notes">` 구조 변경 금지
   - `위계 보호: label/heading/desc 3단 구조` — label 제거·병합 지침 무시
-  - `키 보호: 네비게이션` — 방향키/Space/PageUp·Down/Home/End, F(전체화면), Shift+N(노트), P(발표자 보기) 바인딩 변경 금지
+  - `키 보호: 네비게이션` — 방향키/Space/PageUp·Down/Home/End, F(전체화면), Shift+N(노트=발표자 창), P(발표자 보기) 바인딩 변경 금지. 발표자 창 전용 키(↑↓ 노트 스크롤, T 리셋, S 정지·재개, +/- 글자크기)도 그대로 둔다
 
 스킬이 지침을 적용하면 결과를 사용자에게 요약 보고하고, 스킵되면 아무 메시지 없이 다음 단계로 진행한다.
 

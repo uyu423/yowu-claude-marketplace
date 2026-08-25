@@ -440,7 +440,10 @@ HUD 마크업 — `<body>` 시작 직후 삽입:
       if (document.fullscreenElement) document.exitFullscreen();
       else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
     }
-    else if (e.key === 'p' || e.key === 'P') { if (window.__openPresenter) window.__openPresenter(); }
+    else if (e.key === 'p' || e.key === 'P') {
+      /* 팝업이 막히면 노트 버튼과 같은 인라인 폴백을 탄다 — P가 무반응으로 끝나지 않게 */
+      if (window.__openPresenter && window.__openPresenter() === false && window.__notesInline) window.__notesInline();
+    }
   });
 
   var bn = document.getElementById('btnNext'), bp = document.getElementById('btnPrev');
@@ -497,9 +500,11 @@ HUD 마크업 — `<body>` 시작 직후 삽입:
 
 ---
 
-## 7. MODULE: notes (baseline) — 발표자 노트 + 토글
+## 7. MODULE: notes (baseline) — 발표자 노트 + 별창 진입
 
-각 슬라이드 끝에 `<aside class="slide-notes" hidden>` 5요소 노트. Shift+N 토글. **발표자 보기(§8)의 대본 데이터 소스이기도 하다.**
+각 슬라이드 끝에 `<aside class="slide-notes" hidden>` 5요소 노트. **발표자 보기(§8)의 대본 데이터 소스다.**
+
+노트 버튼(`N`)과 `Shift+N`은 **별창(발표자 보기)을 연다** — 슬라이드 아래에 노트를 펼치는 것은 팝업이 차단됐을 때의 폴백이다. `P` 키와 목적지가 같다. 인라인 노트 CSS(`body.notes-visible`)는 그 폴백과 인쇄를 위해 남는다.
 
 <!-- MODULE: notes-css (baseline) -->
 ```css
@@ -549,23 +554,39 @@ aside.slide-notes ul { padding-left: 20px; }
 <!-- MODULE: notes-js (baseline) -->
 ```html
 <script>
-/* 발표자 노트 토글 (Shift+N) */
+/* 발표자 노트 버튼 — 슬라이드 아래가 아니라 별창(발표자 보기)을 연다.
+   별창은 __deckSync로 덱을 따라 넘어간다. 팝업이 막히면 그때만 슬라이드 아래로 되돌린다.
+   presenter-js보다 먼저 로드돼도 안전하다 — 훅을 호출 시점에 찾는다. */
 (function () {
+  if (document.documentElement.classList.contains('presenter')) return; /* 별창 자신은 이 버튼을 쓰지 않는다 */
   var btn = document.getElementById('notesBtn');
   if (!btn) return;
   var body = document.body;
   function sync() {
-    var active = body.classList.contains('notes-visible');
-    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    var open = !!(window.__presenterOpen && window.__presenterOpen());
+    btn.setAttribute('aria-pressed', (open || body.classList.contains('notes-visible')) ? 'true' : 'false');
   }
-  btn.addEventListener('click', function () { body.classList.toggle('notes-visible'); sync(); });
+  function inlineFallback() {                 /* 팝업 차단 시의 폴백. P 키(nav-hud-js)도 이 경로를 쓴다 */
+    body.classList.add('notes-visible');
+    btn.title = '팝업이 차단되어 슬라이드 아래에 표시합니다 (노트 · Shift+N)';
+    sync();
+  }
+  window.__notesInline = inlineFallback;
+  function toggle() {
+    if (body.classList.contains('notes-visible')) { body.classList.remove('notes-visible'); sync(); return; }
+    if (window.__presenterOpen && window.__presenterOpen()) { window.__closePresenter(); sync(); return; }
+    if (window.__openPresenter && window.__openPresenter() === false) inlineFallback();
+    sync();
+  }
+  btn.addEventListener('click', toggle);
   document.addEventListener('keydown', function (e) {
     if (!(e.shiftKey && (e.key === 'N' || e.key === 'n'))) return;
     if (e.isComposing) return;
     var t = e.target;
     if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
-    btn.click();
+    toggle();
   });
+  setInterval(sync, 900);                     /* 별창을 사용자가 닫아도 버튼 상태가 따라온다 */
 })();
 </script>
 ```
@@ -575,8 +596,14 @@ aside.slide-notes ul { padding-left: 20px; }
 
 ## 8. MODULE: presenter (baseline) — 발표자 보기 (postMessage 팝업 동기화)
 
-`P` 키로 같은 파일을 `?presenter` 별창으로 열어 대본·타이머·다음 슬라이드·진행바를 표시하고 양방향 동기화한다.
+`P` 키 또는 노트 버튼(`N`·`Shift+N`)으로 같은 파일을 `?presenter` 별창으로 열어 대본·타이머·페이싱·다음 슬라이드·진행바를 표시하고 양방향 동기화한다.
 **대본은 별도 객체가 아니라 각 슬라이드의 `aside.slide-notes`에서 직접 읽는다.**
+
+**연결 유지**: 별창이 2초마다 `hello`를 쏘고 덱이 `sync`로 답한다. 덱을 새로고침하면 덱은 별창 참조를 잃으므로, 복구를 시작할 수 있는 쪽은 별창뿐이다. 이 ping-pong이 없으면 새로고침 후 조용히 끊긴 채 "연결됨"만 표시된다.
+
+**페이싱**: 노트의 `<h4>소요 시간</h4>`을 초로 환산해 계획 누적과 경과를 비교한다. 값은 `cumPlan(i)` 기준, 색은 구간 `[cumPlan(i-1), cumPlan(i)+30초]` 판정이다 — 계획한 만큼 머무는 것은 늦은 게 아니다. 노트에 소요 시간이 하나도 없으면 계획·페이싱 칸을 감춘다.
+
+**타이머**: `T`·클릭 리셋, `S` 정지·재개. 누적(`acc`) + 마지막 재개 시각(`t0`) 모델이라 정지를 지원한다. 상태가 바뀔 때만 `localStorage`(`yowu-deck-pv-timer-<deckId>`)에 저장하고, 6시간 지난 기록은 폐기한다. 글자 크기(`yowu-deck-pv-fs`)는 덱 공통이고 타이머는 덱별이다 — 시력은 덱마다 바뀌지 않지만 경과는 바뀐다.
 
 **두 조각으로 구성**: (A) `<head>` 최상단 first-paint 스크립트, (B) `<body>` 끝 브리지+부트.
 
@@ -604,8 +631,15 @@ html.presenter .presenter-view {
 .pv-brand .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-1); box-shadow: 0 0 12px var(--accent-1); }
 .pv-count { font-family: var(--mono); font-size: 15px; font-weight: 600; letter-spacing: .1em; }
 .pv-spacer { flex: 1 1 auto; }
+.pv-plan { font-family: var(--mono); font-size: 11.5px; letter-spacing: .08em; color: var(--text-muted); white-space: nowrap; }
 .pv-timer { font-family: var(--mono); font-size: 21px; font-weight: 600; color: var(--accent-2); background: none; border: 1px solid var(--line); border-radius: 10px; padding: 4px 15px; cursor: pointer; }
 .pv-timer:hover { border-color: var(--accent-2); }
+.pv-timer.paused { opacity: .55; border-style: dashed; }
+/* 페이싱: 노트의 '소요 시간' 누적 대비 경과. 값은 cumPlan(i) 기준, 색은 구간 판정 */
+.pv-pace { font-family: var(--mono); font-size: 13.5px; font-weight: 700; min-width: 64px; text-align: right; color: var(--text-secondary); }
+.pv-pace.ahead { color: var(--ok); }
+.pv-pace.late { color: var(--bad); }
+.pv-plan.off, .pv-pace.off { display: none; }   /* 노트에 소요 시간이 하나도 없으면 감춘다 */
 .pv-bar { flex: none; height: 3px; background: var(--line-soft); }
 .pv-bar i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-1), var(--accent-2)); transition: width .3s ease; }
 .pv-main { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; width: min(1080px, 100%); margin: 0 auto; padding: 20px 30px 0; }
@@ -622,6 +656,7 @@ html.presenter .presenter-view {
 .pv-foot { flex: none; display: flex; align-items: center; gap: 14px; padding: 9px 26px; border-top: 1px solid var(--line-soft); font-family: var(--mono); font-size: 10.5px; color: var(--text-muted); }
 .pv-link.lost { color: var(--bad); }
 .pv-keys { margin-left: auto; }
+@media (max-width: 620px) { .pv-brand { display: none; } }   /* 좁은 별창에서 상단 줄바꿈 방지 */
 ```
 <!-- /MODULE -->
 
@@ -634,7 +669,9 @@ html.presenter .presenter-view {
     <span class="pv-brand"><span class="dot"></span>발표자 보기</span>
     <span class="pv-count" id="pvCount">01 / 01</span>
     <span class="pv-spacer"></span>
-    <button class="pv-timer" id="pvTimer" title="클릭/T: 타이머 리셋">00:00</button>
+    <span class="pv-plan" id="pvPlan"></span>
+    <button class="pv-timer" id="pvTimer" title="클릭 또는 T: 리셋 · S: 정지·재개">00:00</button>
+    <span class="pv-pace" id="pvPace"></span>
   </div>
   <div class="pv-bar"><i id="pvBar"></i></div>
   <div class="pv-main">
@@ -648,7 +685,7 @@ html.presenter .presenter-view {
   </div>
   <div class="pv-foot">
     <span class="pv-link lost" id="pvLink">연결 대기…</span>
-    <span class="pv-keys">← → 이동 · T 타이머 · +/- 글자크기</span>
+    <span class="pv-keys">← → 이동 · ↑ ↓ 노트 · T 리셋 · S 정지 · +/- 글자크기</span>
   </div>
 </div>
 ```
@@ -658,13 +695,18 @@ html.presenter .presenter-view {
 ```html
 <script>
 /* ═══ 발표자 보기 ═══
-   메인 덱: P 키로 ?presenter 별창 오픈, postMessage로 현재 인덱스 push.
-   발표자 창: aside.slide-notes를 대본으로 렌더 + 타이머 + 다음 슬라이드. 방향키는 opener로 되돌림.
+   메인 덱: P 키 또는 노트 버튼(N)으로 ?presenter 별창을 열고 postMessage로 현재 인덱스를 push.
+   발표자 창: aside.slide-notes를 대본으로 렌더 + 타이머·페이싱 + 다음 슬라이드. 방향키는 opener로 되돌림.
+   연결 유지: 별창이 2초마다 hello를 쏘고 덱이 sync로 답한다 — 덱을 새로고침해도 스스로 다시 붙는다.
+                (덱은 새로고침되면 별창 참조를 잃는다. 복구를 시작할 수 있는 쪽은 별창뿐이다.)
    file:// origin 불투명 → targetOrigin '*' 고정. */
 (function () {
   var isPresenter = document.documentElement.classList.contains('presenter');
   var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  /* 덱 파일명으로 창 이름·저장 키를 분리 — 덱 두 개를 열어도 서로의 발표자 창을 뺏지 않는다 */
+  var deckId = (location.pathname.split('/').pop() || 'deck').replace(/[^\w.-]/g, '') || 'deck';
   function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function clock(sec) { var s = Math.max(0, Math.round(sec)); return pad(Math.floor(s / 60)) + ':' + pad(s % 60); }
   function titleOf(i) {
     var t = slides[i].querySelector('h1, h2, .deck-title, .sl-title');
     if (!t) return slides[i].dataset.name || ('슬라이드 ' + (i + 1));
@@ -682,16 +724,23 @@ html.presenter .presenter-view {
       if (!win || win.closed) return;
       try { win.postMessage({ type: 'yowu-deck-sync', index: idx }, '*'); } catch (e) {}
     };
-    window.__openPresenter = function () {
-      if (win && !win.closed) { try { win.focus(); } catch (e) {} window.__deckSync(window.__deckCur()); return; }
+    window.__presenterOpen = function () { return !!(win && !win.closed); };
+    window.__closePresenter = function () { if (win && !win.closed) { try { win.close(); } catch (e) {} } win = null; };
+    window.__openPresenter = function () {   /* 성공 true · 팝업 차단 false — 호출자(notes-js)가 폴백을 정한다 */
+      if (win && !win.closed) { try { win.focus(); } catch (e) {} window.__deckSync(window.__deckCur()); return true; }
       var base = location.href.split('#')[0];
-      win = window.open(base + (base.indexOf('?') > -1 ? '&' : '?') + 'presenter', 'yowu-presenter', 'width=1180,height=760');
-      if (!win) return;
+      var w = Math.min(1180, Math.round((screen.availWidth || 1440) * .62));
+      var h = Math.min(820, Math.round((screen.availHeight || 900) * .82));
+      var x = Math.max(0, (screen.availWidth || 1440) - w - 40);
+      var feat = 'width=' + w + ',height=' + h + ',left=' + x + ',top=60,menubar=no,toolbar=no,location=no,status=no';
+      win = window.open(base + (base.indexOf('?') > -1 ? '&' : '?') + 'presenter', 'yowu-presenter-' + deckId, feat);
+      if (!win) return false;
       var tries = 0;
-      kick = setInterval(function () {
+      kick = setInterval(function () {        /* 별창이 뜨는 동안의 초기 응답성. 이후는 별창의 hello가 맡는다 */
         if (++tries > 40 || !win || win.closed) { clearInterval(kick); return; }
         window.__deckSync(window.__deckCur());
       }, 250);
+      return true;
     };
     window.addEventListener('message', function (e) {
       var d = e.data || {};
@@ -709,13 +758,70 @@ html.presenter .presenter-view {
 
   /* ── 발표자 창 부트 ── */
   document.title = '발표자 보기';
+  var pvRoot = document.querySelector('.presenter-view');
+  if (pvRoot) pvRoot.removeAttribute('aria-hidden');   /* 마크업의 aria-hidden은 메인 덱에서 숨길 때만 유효 */
   var elCount = document.getElementById('pvCount'), elBar = document.getElementById('pvBar'),
       elKicker = document.getElementById('pvKicker'), elTitle = document.getElementById('pvTitle'),
       elNotes = document.getElementById('pvNotes'), elNextTitle = document.getElementById('pvNextTitle'),
-      elTimer = document.getElementById('pvTimer'), elLink = document.getElementById('pvLink');
+      elTimer = document.getElementById('pvTimer'), elLink = document.getElementById('pvLink'),
+      elPlan = document.getElementById('pvPlan'), elPace = document.getElementById('pvPace');
+
+  /* 계획 시간: 노트의 '소요 시간' 항목을 초로 환산. "예상 1분 20초 + Q&A" 같은 꼬리표는 무시한다 */
+  function planOf(i) {
+    var n = slides[i].querySelector('.slide-notes'); if (!n) return 0;
+    var hs = n.querySelectorAll('h4');
+    for (var k = 0; k < hs.length; k++) {
+      if (!/소요\s*시간|duration/i.test(hs[k].textContent)) continue;
+      var p = hs[k].nextElementSibling; if (!p) return 0;
+      var t = p.textContent;
+      var m = /(\d+)\s*분/.exec(t), s = /(\d+)\s*초/.exec(t);
+      if (!m && !s) { var only = /(\d+)/.exec(t); return only ? +only[1] * 60 : 0; }   /* 단위 없는 숫자는 분으로 읽는다 */
+      return (m ? +m[1] * 60 : 0) + (s ? +s[1] : 0);
+    }
+    return 0;
+  }
+  var CUM = [], TOTAL = 0;
+  for (var pi = 0; pi < slides.length; pi++) { TOTAL += planOf(pi); CUM[pi] = TOTAL; }
+  function cumPlan(i) { return i < 0 ? 0 : (CUM[i] || 0); }
+  if (TOTAL > 0) { elPlan.textContent = '총 ' + clock(TOTAL); }
+  else { elPlan.classList.add('off'); elPace.classList.add('off'); }
+
+  /* 타이머: 누적(acc) + 마지막 재개 시각(t0). 정지·재개를 지원하려면 시작 시각 하나로는 부족하다 */
+  var TKEY = 'yowu-deck-pv-timer-' + deckId;
+  var tm = { acc: 0, t0: null, paused: true };
+  try {
+    var st = JSON.parse(localStorage.getItem(TKEY) || 'null');
+    if (st && Date.now() - (st.savedAt || 0) < 216e5) {   /* 6시간 지난 기록은 폐기 — 어제 발표가 되살아나지 않게 */
+      tm.acc = +st.acc || 0; tm.t0 = st.t0 || null; tm.paused = !!st.paused;
+      if (!tm.paused && !tm.t0) tm.paused = true;
+    }
+  } catch (e) {}
+  function saveTimer() {
+    try { localStorage.setItem(TKEY, JSON.stringify({ acc: tm.acc, t0: tm.t0, paused: tm.paused, savedAt: Date.now() })); } catch (e) {}
+  }
+  function elapsed() { return tm.paused ? tm.acc : tm.acc + (Date.now() - tm.t0) / 1000; }
+  function startTimer() { if (tm.paused) { tm.t0 = Date.now(); tm.paused = false; saveTimer(); } }
+  function pauseTimer() { if (!tm.paused) { tm.acc = elapsed(); tm.paused = true; saveTimer(); } }
+  function resetTimer() { tm.acc = 0; tm.t0 = Date.now(); tm.paused = false; saveTimer(); tick(); }
+
+  var curIdx = -1;
+  function paceTick() {
+    if (TOTAL <= 0) return;
+    var e = elapsed(), hi = cumPlan(curIdx), lo = cumPlan(curIdx - 1), d = e - hi;
+    elPace.textContent = (d < 0 ? '−' : '+') + clock(Math.abs(d));
+    /* 정상 구간은 [cumPlan(i-1), cumPlan(i)+30] — 계획만큼 머무는 것은 늦은 게 아니다 */
+    elPace.className = 'pv-pace' + (e < lo ? ' ahead' : (e > hi + 30 ? ' late' : ''));
+  }
+  function tick() {
+    elTimer.textContent = clock(elapsed());
+    elTimer.classList.toggle('paused', tm.paused);
+    paceTick();
+  }
 
   function render(i) {
     if (typeof i !== 'number' || i < 0 || i >= slides.length) return;
+    if (i === curIdx) { paceTick(); return; }   /* 같은 슬라이드 재수신 — 다시 그리지 않는다(노트 스크롤 위치 보존) */
+    curIdx = i;
     elCount.textContent = pad(i + 1) + ' / ' + pad(slides.length);
     elBar.style.width = ((i + 1) / slides.length * 100) + '%';
     elKicker.textContent = kickerOf(i);
@@ -723,51 +829,64 @@ html.presenter .presenter-view {
     elNotes.innerHTML = notesOf(i);
     elNotes.scrollTop = 0;
     elNextTitle.textContent = (i + 1 < slides.length) ? titleOf(i + 1) : '(마지막 슬라이드)';
+    paceTick();
   }
 
-  var t0 = null;
-  function resetTimer() { t0 = Date.now(); elTimer.textContent = '00:00'; }
-  setInterval(function () {
-    if (t0 === null) return;
-    var s = Math.floor((Date.now() - t0) / 1000);
-    elTimer.textContent = pad(Math.floor(s / 60)) + ':' + pad(s % 60);
-  }, 1000);
-  elTimer.addEventListener('click', resetTimer);
-
-  var fs = 18; try { fs = +localStorage.getItem('yowu-deck-pv-fs') || 18; } catch (e) {}
+  var fs = 18; try { fs = +localStorage.getItem('yowu-deck-pv-fs') || 18; } catch (e) {}   /* 글자크기는 덱 공통 */
   function setFs(v) { fs = Math.min(32, Math.max(13, v)); elNotes.style.fontSize = fs + 'px'; try { localStorage.setItem('yowu-deck-pv-fs', String(fs)); } catch (e) {} }
   setFs(fs);
 
-  var linked = false, deckWin = window.opener;
+  var lastSync = 0, deckWin = window.opener;
+  function link(text, lost) { elLink.textContent = text; elLink.classList.toggle('lost', !!lost); }
+  function hello() { if (deckWin && !deckWin.closed) { try { deckWin.postMessage({ type: 'yowu-presenter-hello' }, '*'); } catch (e) {} } }
+  function nav(action) { if (deckWin && !deckWin.closed) { try { deckWin.postMessage({ type: 'yowu-deck-nav', action: action }, '*'); } catch (e) {} } }
+
   window.addEventListener('message', function (e) {
     var d = e.data || {};
     if (d.type !== 'yowu-deck-sync') return;
     deckWin = e.source || deckWin;
-    if (!linked) { linked = true; elLink.classList.remove('lost'); elLink.textContent = '메인 덱과 연결됨'; if (t0 === null) resetTimer(); }
+    lastSync = Date.now();
+    if (tm.paused && tm.acc === 0 && tm.t0 === null) startTimer();   /* 첫 연결에 타이머 시작 (복원된 기록은 건드리지 않는다) */
+    link('메인 덱과 연결됨', false);
     render(d.index);
   });
-  function nav(action) { if (deckWin && !deckWin.closed) { try { deckWin.postMessage({ type: 'yowu-deck-nav', action: action }, '*'); } catch (e) {} } }
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); nav('next'); }
-    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); nav('prev'); }
-    else if (e.key === 'Home') nav('home');
-    else if (e.key === 'End') nav('end');
-    else if (e.key === 't' || e.key === 'T') resetTimer();
-    else if (e.key === '+' || e.key === '=') setFs(fs + 1);
-    else if (e.key === '-' || e.key === '_') setFs(fs - 1);
-  });
-  setInterval(function () {
-    if (!deckWin || deckWin.closed) { elLink.textContent = '메인 덱 창이 닫혔습니다 — 덱에서 P 키로 다시 여세요'; elLink.classList.add('lost'); linked = false; }
-  }, 1500);
 
-  if (window.opener) { try { window.opener.postMessage({ type: 'yowu-presenter-hello' }, '*'); } catch (e) {} }
-  else { elLink.textContent = '단독으로 열렸습니다 — 메인 덱에서 P 키로 여세요'; elLink.classList.add('lost'); }
+  document.addEventListener('keydown', function (e) {
+    if (e.isComposing) return;
+    var k = e.key;
+    if (k === 'ArrowRight' || k === ' ' || k === 'PageDown') { e.preventDefault(); nav('next'); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); nav('prev'); }
+    else if (k === 'Home') { e.preventDefault(); nav('home'); }
+    else if (k === 'End') { e.preventDefault(); nav('end'); }
+    else if (k === 'ArrowDown') { e.preventDefault(); elNotes.scrollTop += 80; }
+    else if (k === 'ArrowUp') { e.preventDefault(); elNotes.scrollTop -= 80; }
+    else if (k === 't' || k === 'T') resetTimer();
+    else if (k === 's' || k === 'S') { if (tm.paused) startTimer(); else pauseTimer(); tick(); }
+    else if (k === '+' || k === '=') setFs(fs + 1);
+    else if (k === '-' || k === '_') setFs(fs - 1);
+  });
+  elTimer.addEventListener('click', resetTimer);
+
+  setInterval(tick, 1000);
+  setInterval(function () {                    /* 하트비트 — 덱이 살아 있으면 2초마다 다시 붙는다 */
+    if (!deckWin) { link('단독으로 열렸습니다 — 메인 덱에서 P 키로 여세요', true); return; }
+    if (deckWin.closed) { link('메인 덱 창이 닫혔습니다 — 덱에서 P 키로 다시 여세요', true); return; }
+    hello();
+    if (lastSync === 0) { link('연결 대기…', true); return; }   /* 첫 연결 전과 끊긴 뒤는 다른 상태다 */
+    if (Date.now() - lastSync > 5000) link('재연결 중…', true);
+  }, 2000);
+
+  render(0);                                   /* 첫 sync 전에도 자기 슬라이드를 안다 */
+  tick();
+  if (!deckWin) link('단독으로 열렸습니다 — 메인 덱에서 P 키로 여세요', true);
+  else hello();
 })();
 </script>
 ```
 <!-- /MODULE -->
 
 > **자동 적용**: 발표/피칭/보고 목적이면 baseline으로 항상 포함. 순수 열람용(문서 배포) 목적이 명확하면 생략 가능.
+> **생략하면 노트 버튼도 죽는다** — `notes-js`가 `__openPresenter`를 호출하므로, presenter 모듈을 뺄 때는 인라인 토글판 `notes-js`로 되돌려야 한다.
 
 ---
 
@@ -1326,3 +1445,5 @@ Mermaid CDN 뒤에 아래 모듈을 그대로 삽입한다. `data-mermaid-pendin
 ```
 
 **엔진 무결성 체크(생성 후 self-check)**: `__deckGo` / `requestAnimationFrame(...requestAnimationFrame` / `slides.length` / `[?&]presenter`(발표자 headscript 정규식 — 리터럴 `?presenter`는 정본이 문자열 연결로 생성하므로 검사 토큰으로 부적합) / `hudBar` 가 결과물에 모두 존재해야 한다. (self-check.md M5와 동일 집합)
+
+**발표자 브리지 무결성**: `__openPresenter` / `__presenterOpen` / `yowu-presenter-hello` / `yowu-deck-sync` 가 모두 존재해야 한다. 위 M5 집합은 headscript만 보므로 별창을 여는 코드가 통째로 빠져도 통과한다. (self-check.md M8과 동일 집합)

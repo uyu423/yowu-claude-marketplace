@@ -9,6 +9,8 @@ const validator = join(scriptDir, 'validate-slides.mjs');
 const validFixture = join(scriptDir, 'fixtures/long-svg.html');
 const invalidFixture = join(scriptDir, 'fixtures/invalid-long-svg.html');
 const invalidMobileFixture = join(scriptDir, 'fixtures/invalid-mobile-overflow.html');
+const presenterFixture = join(scriptDir, 'fixtures/presenter.html');
+const invalidPresenterFixture = join(scriptDir, 'fixtures/invalid-presenter.html');
 
 function run(args) {
   return new Promise((resolveRun, rejectRun) => {
@@ -40,4 +42,22 @@ if (invalidMobile.code !== 1 || !invalidMobile.output.includes('mobile-390x844')
   throw new Error(`모바일 overflow fixture를 잡지 못했습니다 (exit=${invalidMobile.code})`);
 }
 
-console.log('PASS validator self-test: valid deck accepted, broken long SVG and mobile overflow rejected');
+const presenter = await run([presenterFixture]);
+if (presenter.code !== 0) {
+  console.error(presenter.output);
+  throw new Error(`발표자 창 정상 fixture가 실패했습니다 (exit=${presenter.code})`);
+}
+
+const invalidPresenter = await run([invalidPresenterFixture]);
+const presenterChecks = [
+  '발표자 브리지 토큰 __presenterOpen 누락',
+  'aria-hidden 잔존',
+  '#pvCount 동기화 실패',
+];
+const missed = presenterChecks.filter((needle) => !invalidPresenter.output.includes(needle));
+if (invalidPresenter.code !== 1 || missed.length) {
+  console.error(invalidPresenter.output);
+  throw new Error(`발표자 창 결함 fixture를 잡지 못했습니다 (exit=${invalidPresenter.code}, 놓친 검사: ${missed.join(', ') || '없음'})`);
+}
+
+console.log('PASS validator self-test: valid deck accepted, broken long SVG / mobile overflow / presenter bridge rejected');

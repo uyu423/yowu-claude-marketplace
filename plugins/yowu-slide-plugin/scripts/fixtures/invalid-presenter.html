@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>발표자 창 결함 fixture — presenter-js 누락</title>
+<!-- <head> 최상단 (FOUC 방지: 첫 페인트 전 발표자 모드 판정) -->
+<script>
+if (/[?&]presenter(?:[=&]|$)/.test(location.search)) document.documentElement.className += ' presenter';
+</script>
+  <style>
+    :root {
+      --bg:#0a0f1a; --bg-raise:#0f1523; --bg-card:#131a2b; --surface:rgba(255,255,255,.04);
+      --line:#1e2a3c; --line-soft:#16202f; --border:#22304a; --border-accent:rgba(87,201,216,.3);
+      --text-primary:#eaf0f9; --text-secondary:rgba(234,240,249,.72); --text-muted:rgba(234,240,249,.42);
+      --accent-1:#57c9d8; --accent-2:#e9b872; --ok:#5de4c7; --bad:#ff6b5b;
+      --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { width:100%; height:100%; margin:0; }
+    body { overflow:hidden; background:var(--bg); color:var(--text-primary); font-family:sans-serif; }
+    .deck { position:fixed; inset:0; }
+    .slide { position:absolute; inset:0; display:flex; align-items:center; padding:7vh 5vw 9vh; opacity:0; visibility:hidden; }
+    .slide.on { opacity:1; visibility:visible; }
+    .slide__inner { width:min(1160px,100%); min-width:0; margin:0 auto; }
+    aside.slide-notes { display:none; }
+    .hud .bar { position:fixed; left:0; bottom:0; height:3px; width:0%; background:var(--accent-1); }
+    @media (max-width:820px) { body { overflow:auto; } .deck { position:static; } .slide { position:relative; opacity:1; visibility:visible; } }
+.presenter-view { display: none; }
+html.presenter .deck, html.presenter .hud, html.presenter .fs-btn,
+html.presenter .notes-btn, html.presenter .stagebg, html.presenter .lightbox { display: none !important; }
+html.presenter { overflow: hidden; }
+html.presenter .presenter-view {
+  display: flex; flex-direction: column; position: fixed; inset: 0; z-index: 300;
+  background: var(--bg); color: var(--text-primary);
+}
+.pv-top { flex: none; display: flex; align-items: center; gap: 16px; padding: 12px 26px; border-bottom: 1px solid var(--line); background: var(--bg-raise); }
+.pv-brand { font-family: var(--mono); font-size: 11.5px; font-weight: 600; letter-spacing: .1em; color: var(--text-muted); display: flex; align-items: center; gap: 9px; }
+.pv-brand .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-1); box-shadow: 0 0 12px var(--accent-1); }
+.pv-count { font-family: var(--mono); font-size: 15px; font-weight: 600; letter-spacing: .1em; }
+.pv-spacer { flex: 1 1 auto; }
+.pv-plan { font-family: var(--mono); font-size: 11.5px; letter-spacing: .08em; color: var(--text-muted); white-space: nowrap; }
+.pv-timer { font-family: var(--mono); font-size: 21px; font-weight: 600; color: var(--accent-2); background: none; border: 1px solid var(--line); border-radius: 10px; padding: 4px 15px; cursor: pointer; }
+.pv-timer:hover { border-color: var(--accent-2); }
+.pv-timer.paused { opacity: .55; border-style: dashed; }
+/* 페이싱: 노트의 '소요 시간' 누적 대비 경과. 값은 cumPlan(i) 기준, 색은 구간 판정 */
+.pv-pace { font-family: var(--mono); font-size: 13.5px; font-weight: 700; min-width: 64px; text-align: right; color: var(--text-secondary); }
+.pv-pace.ahead { color: var(--ok); }
+.pv-pace.late { color: var(--bad); }
+.pv-plan.off, .pv-pace.off { display: none; }   /* 노트에 소요 시간이 하나도 없으면 감춘다 */
+.pv-bar { flex: none; height: 3px; background: var(--line-soft); }
+.pv-bar i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-1), var(--accent-2)); transition: width .3s ease; }
+.pv-main { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; width: min(1080px, 100%); margin: 0 auto; padding: 20px 30px 0; }
+.pv-kicker { font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--accent-1); min-height: 16px; }
+.pv-title { font-size: clamp(19px, 3.6vh, 27px); font-weight: 800; letter-spacing: -0.02em; margin: 4px 0 12px; }
+.pv-notes { flex: 1 1 auto; min-height: 0; overflow-y: auto; font-size: 18px; line-height: 1.8; padding-right: 8px; }
+.pv-notes h4 { font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--accent-1); margin: 14px 0 5px; }
+.pv-notes h4:first-child { margin-top: 0; }
+.pv-notes ul { padding-left: 22px; }
+.pv-notes b, .pv-notes strong { color: var(--accent-2); }
+.pv-next { flex: none; margin: 16px 0 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg-card); padding: 12px 18px; }
+.pv-next-label { font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: .2em; color: var(--text-muted); text-transform: uppercase; }
+.pv-next-title { font-size: 15.5px; font-weight: 700; margin-top: 3px; }
+.pv-foot { flex: none; display: flex; align-items: center; gap: 14px; padding: 9px 26px; border-top: 1px solid var(--line-soft); font-family: var(--mono); font-size: 10.5px; color: var(--text-muted); }
+.pv-link.lost { color: var(--bad); }
+.pv-keys { margin-left: auto; }
+@media (max-width: 620px) { .pv-brand { display: none; } }   /* 좁은 별창에서 상단 줄바꿈 방지 */
+  </style>
+</head>
+<body>
+  <div class="hud"><div class="bar" id="hudBar"></div><div class="meta" id="hudMeta"></div></div>
+  <div class="deck">
+    <section class="slide slide--title" data-name="s1" data-part="1부 회귀">
+      <div class="slide__inner"><span class="label">회귀 fixture</span><h1>발표자 창 회귀 fixture</h1></div>
+      <aside class="slide-notes" hidden>
+        <h4>요지</h4><p>발표자 창이 대본을 읽는지 확인한다.</p>
+        <h4>소요 시간</h4><p>예상 1분 00초</p>
+      </aside>
+    </section>
+    <section class="slide slide--content" data-name="s2" data-part="1부 회귀">
+      <div class="slide__inner"><span class="label">두 번째</span><h2>동기화 대상 슬라이드</h2></div>
+      <aside class="slide-notes" hidden>
+        <h4>요지</h4><p>이 노트가 발표자 창에 떠야 한다.</p>
+        <h4>소요 시간</h4><p>예상 1분 30초</p>
+      </aside>
+    </section>
+    <section class="slide slide--content" data-name="s3" data-part="2부 회귀">
+      <div class="slide__inner"><span class="label">세 번째</span><h2>페이싱 계산 대상</h2></div>
+      <aside class="slide-notes" hidden>
+        <h4>요지</h4><p>계획 시간이 누적되는지 본다.</p>
+        <h4>소요 시간</h4><p>예상 45초</p>
+      </aside>
+    </section>
+    <section class="slide slide--closing" data-name="s4" data-part="2부 회귀">
+      <div class="slide__inner"><span class="label">마지막</span><h2>동기화 확인 슬라이드</h2></div>
+      <aside class="slide-notes" hidden>
+        <h4>요지</h4><p>인덱스 3으로 동기화되는 대상이다.</p>
+        <h4>소요 시간</h4><p>예상 2분</p>
+      </aside>
+    </section>
+  </div>
+<div class="presenter-view" aria-hidden="true">
+  <div class="pv-top">
+    <span class="pv-brand"><span class="dot"></span>발표자 보기</span>
+    <span class="pv-count" id="pvCount">01 / 01</span>
+    <span class="pv-spacer"></span>
+    <span class="pv-plan" id="pvPlan"></span>
+    <button class="pv-timer" id="pvTimer" title="클릭 또는 T: 리셋 · S: 정지·재개">00:00</button>
+    <span class="pv-pace" id="pvPace"></span>
+  </div>
+  <div class="pv-bar"><i id="pvBar"></i></div>
+  <div class="pv-main">
+    <div class="pv-kicker" id="pvKicker"></div>
+    <div class="pv-title" id="pvTitle"></div>
+    <div class="pv-notes" id="pvNotes"></div>
+    <div class="pv-next">
+      <div class="pv-next-label">다음 슬라이드</div>
+      <div class="pv-next-title" id="pvNextTitle"></div>
+    </div>
+  </div>
+  <div class="pv-foot">
+    <span class="pv-link lost" id="pvLink">연결 대기…</span>
+    <span class="pv-keys">← → 이동 · ↑ ↓ 노트 · T 리셋 · S 정지 · +/- 글자크기</span>
+  </div>
+</div>
+  <script>
+/* ═══ deck 전환 엔진 ═══
+   .on 단일 클래스로 슬라이드를 교차 전환. gen 세대 토큰으로 잔여 타이머 무효화.
+   페이지 총수는 slides.length로 자동 계산(하드코딩 금지). window.__deckGo(i)로 외부 점프. */
+(function () {
+  'use strict';
+  if (document.documentElement.classList.contains('presenter')) return; /* 발표자 창은 덱을 그리지 않음 */
+
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var cur = -1, gen = 0, timers = [];
+  function later(fn, ms) { var t = setTimeout(fn, ms); timers.push(t); return t; }
+  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  window.__deckLater = later;                 /* feature 모듈이 타이머를 공유 */
+  window.__deckGen = function () { return gen; };
+
+  var bar = document.getElementById('hudBar');
+  var meta = document.getElementById('hudMeta');
+
+  function go(i) {
+    if (i < 0 || i >= slides.length || i === cur) return;
+    gen++; clearTimers();
+    if (cur >= 0) slides[cur].classList.remove('on');
+    cur = i;
+    var sl = slides[cur];
+    sl.classList.add('on');
+    var myGen = gen;
+    /* 시퀀서 모듈이 있으면 [data-seq] 스테이지 가동 */
+    if (window.__runStage) {
+      Array.prototype.forEach.call(sl.querySelectorAll('[data-seq]'), function (st) { window.__runStage(st, myGen); });
+    }
+    if (bar)  bar.style.width = ((cur + 1) / slides.length * 100) + '%';
+    if (meta) meta.textContent = pad(cur + 1) + ' / ' + pad(slides.length);
+    if (history.replaceState) history.replaceState(null, '', '#' + (cur + 1));
+    if (window.__deckSync) window.__deckSync(cur);   /* 발표자 창 동기화 */
+    document.dispatchEvent(new CustomEvent('deck:change', { detail: { index: cur } }));
+  }
+  function next() { go(Math.min(cur + 1, slides.length - 1)); }
+  function prev() { go(Math.max(cur - 1, 0)); }
+
+  window.__deckGo = go;
+  window.__deckNext = next;
+  window.__deckPrev = prev;
+  window.__deckSlides = slides;
+  window.__deckCur = function () { return cur; };
+
+  /* 시작: #n 딥링크 → 더블 rAF 후 진입 (첫 페인트 후여야 드로잉 transition이 발화) */
+  var h = parseInt((location.hash || '').replace('#', ''), 10);
+  var start = isNaN(h) ? 0 : Math.min(Math.max(h - 1, 0), slides.length - 1);
+  requestAnimationFrame(function () { requestAnimationFrame(function () { go(start); }); });
+})();
+  </script>
+</body>
+</html>

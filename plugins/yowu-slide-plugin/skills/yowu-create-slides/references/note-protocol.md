@@ -70,40 +70,25 @@
 
 핵심 원칙:
 - 기본: `display: none`
-- `body.notes-visible` 클래스 추가 시 표시
+- `body.notes-visible` 클래스 추가 시 표시 — **팝업 차단 폴백 전용**이다. 평소 노트 버튼은 별창을 연다(§5)
 - `@media print`에서 강제 표시 (`page-break-inside: avoid`)
 
 ---
 
-## 5. 노트 토글 JS (30줄 이내)
+## 5. 노트 버튼 JS — 별창을 연다
 
-정본 §7 MODULE: notes-js에 정의된 코드와 동일하다. 여기서는 참조용으로만 남긴다 — 실제 구현은 정본을 그대로 삽입한다.
+정본 §7 MODULE: notes-js에 정의된 코드를 **그대로 삽입**한다. 여기에 코드를 다시 적지 않는다 — 두 곳에 두면 한쪽이 낡는다.
 
-```js
-// design-system.md §7 MODULE: notes-js와 동일 (여기서는 참조용)
-(function () {
-  var btn = document.getElementById('notesBtn');
-  if (!btn) return;
-  var body = document.body;
-  function sync() {
-    var active = body.classList.contains('notes-visible');
-    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
-  }
-  btn.addEventListener('click', function () { body.classList.toggle('notes-visible'); sync(); });
-  document.addEventListener('keydown', function (e) {
-    if (!(e.shiftKey && (e.key === 'N' || e.key === 'n'))) return;
-    if (e.isComposing) return;
-    var t = e.target;
-    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
-    btn.click();
-  });
-})();
-```
+동작 요약:
+
+- 노트 버튼(`N`)과 `Shift+N`은 **발표자 보기 별창을 연다**. `P` 키와 목적지가 같다.
+- 이미 열려 있으면 닫는다.
+- 팝업이 차단된 경우에만(`__openPresenter()`가 `false`를 반환) 슬라이드 아래 인라인 노트로 폴백하고, 버튼 툴팁에 이유를 적는다.
+- 별창을 사용자가 직접 닫아도 900ms 폴링이 버튼의 `aria-pressed`를 되돌린다.
+- 별창 자신에서는 실행되지 않는다(첫 줄 `presenter` 가드).
 
 **단축키**: `Shift+N` (한국어 IME 단독 `N` 입력 충돌 방지)
 **F키 바인딩과 동일 패턴**: `isComposing` + `input/textarea/contentEditable` 가드 포함
-
----
 
 ## 6. Mermaid·Chart.js 금지
 
@@ -130,4 +115,7 @@
 - **(b) 5요소 헤딩(`h4`)을 유지한다.** `.pv-notes h4`가 발표자 창에서 accent 색 소제목으로 그대로 시각화되므로(§1 5요소 템플릿 구조 유지), 헤딩을 생략하거나 구조를 흩트리면 발표자 창의 가독성이 깨진다.
 - **(c) `<strong>`/`<b>` 강조를 적극 활용한다.** `.pv-notes b, .pv-notes strong`이 `var(--accent-2)` 색으로 렌더되어 발표자가 한눈에 강조 포인트를 짚을 수 있다. 핵심 수치·키워드는 반드시 `<strong>`으로 감싼다.
 
-발표자 보기는 메인 덱에서 `P` 키로 별창을 열며, 두 창은 `postMessage`로 현재 슬라이드 인덱스를 양방향 동기화한다(메인 덱이 이동하면 발표자 창도 따라가고, 발표자 창에서 방향키를 눌러도 메인 덱이 넘어간다). 자세한 구현은 정본 §8을 참조.
+- **(d) `소요 시간`을 반드시 채운다.** 발표자 창의 **페이싱**이 이 값을 읽는다. 모든 슬라이드의 `소요 시간`을 누적해 "지금 몇 분 늦었는지"를 계산하므로, 한 장이라도 비면 그 뒤의 계산이 전부 어긋난다. 노트 전체에 하나도 없으면 페이싱 칸 자체가 사라진다.
+  - 파서가 읽는 형식: `1분 20초` · `예상 1분 00초` · `90초` · `2분` · `1분 20초 + Q&A`(꼬리표 무시). 단위 없는 숫자는 분으로 읽는다.
+
+발표자 보기는 메인 덱에서 `P` 키 또는 노트 버튼(`N`·`Shift+N`)으로 열며, 두 창은 `postMessage`로 현재 슬라이드 인덱스를 양방향 동기화한다(메인 덱이 이동하면 발표자 창도 따라가고, 발표자 창에서 방향키를 눌러도 메인 덱이 넘어간다). 별창이 2초마다 `hello`를 보내므로 메인 덱을 새로고침해도 스스로 다시 붙는다. 자세한 구현은 정본 §8을 참조.

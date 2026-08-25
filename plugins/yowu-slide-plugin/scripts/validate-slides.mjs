@@ -190,6 +190,15 @@ function staticAudit(source, file) {
     failures.push(`${basename(file)}: SVG edge가 있지만 __normalizeSvgEdges 안전망 누락`);
   }
 
+  // 발표자 브리지 무결성 (self-check M8) — presenter 모듈을 넣은 덱만 검사한다
+  if (source.includes('presenter-view')) {
+    ['__openPresenter', '__presenterOpen', 'yowu-presenter-hello', 'yowu-deck-sync'].forEach((token) => {
+      if (!source.includes(token)) {
+        failures.push(`${basename(file)}: 발표자 브리지 토큰 ${token} 누락 — 정본 §8 presenter-js 재삽입 필요`);
+      }
+    });
+  }
+
   const hasMermaid = /class=["'][^"']*\bmermaid\b/i.test(source);
   if (hasMermaid && /startOnLoad\s*:\s*true/i.test(source)) {
     failures.push(`${basename(file)}: hidden 렌더 위험 — Mermaid startOnLoad:true 사용`);
@@ -317,6 +326,59 @@ const mobileAuditExpression = `(() => {
   return { failures, viewport: { width: innerWidth, height: innerHeight }, slides: slides.length };
 })()`;
 
+const presenterAuditExpression = (index) => `(() => {
+  const failures = [];
+  const pad = (n) => (n < 10 ? '0' : '') + n;
+  const el = (id) => document.getElementById(id);
+  const root = document.querySelector('.presenter-view');
+  if (!document.documentElement.classList.contains('presenter')) failures.push('html.presenter 클래스 없음 — presenter-headscript 누락');
+  if (!root) return { failures: failures.concat('.presenter-view 마크업 없음') };
+  if (getComputedStyle(root).display === 'none') failures.push('.presenter-view가 렌더되지 않음 — presenter-css 누락');
+  if (root.hasAttribute('aria-hidden')) failures.push('.presenter-view에 aria-hidden 잔존 — 발표자 창이 스크린리더에서 숨는다');
+  const slides = document.querySelectorAll('.slide');
+  const expect = pad(${index} + 1) + ' / ' + pad(slides.length);
+  const got = el('pvCount') ? el('pvCount').textContent.trim() : '(pvCount 없음)';
+  if (got !== expect) failures.push('#pvCount 동기화 실패 — 기대 ' + expect + ', 실제 ' + got);
+  const title = el('pvTitle') ? el('pvTitle').textContent.trim() : '';
+  if (!title) failures.push('#pvTitle 비어 있음 — 대본 렌더 실패');
+  const hasNote = Boolean(slides[${index}] && slides[${index}].querySelector('.slide-notes'));
+  const notes = el('pvNotes') ? el('pvNotes').textContent : '';
+  if (hasNote && /이 슬라이드의 노트 없음/.test(notes)) failures.push('#pvNotes가 노트를 못 읽음 — 대본 소스 연결 끊김');
+  const anyPlan = Array.from(slides).some((slide) => {
+    const note = slide.querySelector('.slide-notes');
+    if (!note) return false;
+    return Array.from(note.querySelectorAll('h4')).some((h) => /소요\\s*시간/.test(h.textContent));
+  });
+  const plan = el('pvPlan');
+  if (anyPlan && (!plan || plan.classList.contains('off') || !plan.textContent.trim())) {
+    failures.push('#pvPlan 비어 있음 — 노트에 소요 시간이 있는데 페이싱이 꺼졌다');
+  }
+  return { failures };
+})()`;
+
+// 발표자 뷰(?presenter)를 실제로 열어 렌더와 동기화 왕복을 확인한다.
+// window.opener가 없으므로 sync 메시지를 자기 자신에게 주입해 렌더 경로만 검사한다.
+async function auditPresenter(cdp, sessionId, file, slideCount) {
+  const failures = [];
+  const url = `${pathToFileURL(file).href}?presenter`;
+  await setViewport(cdp, sessionId, desktopViewports[0]);
+  const navigation = await cdp.send('Page.navigate', { url }, sessionId);
+  if (navigation.errorText) {
+    failures.push(`${basename(file)} presenter: 탐색 실패 — ${navigation.errorText}`);
+    return failures;
+  }
+  if (!await waitFor(cdp, sessionId, `document.readyState === 'complete'`, 12000)) {
+    failures.push(`${basename(file)} presenter: load 이벤트 시간 초과`);
+    return failures;
+  }
+  const index = Math.min(3, Math.max(0, slideCount - 1));
+  await evaluate(cdp, sessionId, `window.postMessage({ type: 'yowu-deck-sync', index: ${index} }, '*'); true`);
+  await sleep(200);
+  const result = await evaluate(cdp, sessionId, presenterAuditExpression(index));
+  result.failures.forEach((message) => failures.push(`${basename(file)} presenter slide ${index + 1}: ${message}`));
+  return failures;
+}
+
 async function auditFile(cdp, sessionId, file, runtimeErrors) {
   const failures = [];
   const source = await readFile(file, 'utf8');
@@ -359,6 +421,10 @@ async function auditFile(cdp, sessionId, file, runtimeErrors) {
   await waitFor(cdp, sessionId, `Array.from(document.querySelectorAll('pre.mermaid')).every((node) => node.querySelector('svg'))`, 6000);
   const mobileResult = await evaluate(cdp, sessionId, mobileAuditExpression);
   mobileResult.failures.forEach((message) => failures.push(`${basename(file)} ${mobileViewport.name}: ${message}`));
+
+  if (source.includes('presenter-view')) {
+    failures.push(...await auditPresenter(cdp, sessionId, file, slideCount));
+  }
 
   runtimeErrors.forEach((message) => failures.push(`${basename(file)} console: ${message}`));
   return failures;

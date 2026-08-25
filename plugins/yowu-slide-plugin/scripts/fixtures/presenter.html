@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>발표자 창 정상 fixture</title>
+<!-- <head> 최상단 (FOUC 방지: 첫 페인트 전 발표자 모드 판정) -->
+<script>
+if (/[?&]presenter(?:[=&]|$)/.test(location.search)) document.documentElement.className += ' presenter';
+</script>
+  <style>
+    :root {
+      --bg:#0a0f1a; --bg-raise:#0f1523; --bg-card:#131a2b; --surface:rgba(255,255,255,.04);
+      --line:#1e2a3c; --line-soft:#16202f; --border:#22304a; --border-accent:rgba(87,201,216,.3);
+      --text-primary:#eaf0f9; --text-secondary:rgba(234,240,249,.72); --text-muted:rgba(234,240,249,.42);
+      --accent-1:#57c9d8; --accent-2:#e9b872; --ok:#5de4c7; --bad:#ff6b5b;
+      --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { width:100%; height:100%; margin:0; }
+    body { overflow:hidden; background:var(--bg); color:var(--text-primary); font-family:sans-serif; }
+    .deck { position:fixed; inset:0; }
+    .slide { position:absolute; inset:0; display:flex; align-items:center; padding:7vh 5vw 9vh; opacity:0; visibility:hidden; }
+    .slide.on { opacity:1; visibility:visible; }
+    .slide__inner { width:min(1160px,100%); min-width:0; margin:0 auto; }
+    aside.slide-notes { display:none; }
+    .hud .bar { position:fixed; left:0; bottom:0; height:3px; width:0%; background:var(--accent-1); }
+    @media (max-width:820px) { body { overflow:auto; } .deck { position:static; } .slide { position:relative; opacity:1; visibility:visible; } }
+.presenter-view { display: none; }
+html.presenter .deck, html.presenter .hud, html.presenter .fs-btn,
+html.presenter .notes-btn, html.presenter .stagebg, html.presenter .lightbox { display: none !important; }
+html.presenter { overflow: hidden; }
+html.presenter .presenter-view {
+  display: flex; flex-direction: column; position: fixed; inset: 0; z-index: 300;
+  background: var(--bg); color: var(--text-primary);
+}
+.pv-top { flex: none; display: flex; align-items: center; gap: 16px; padding: 12px 26px; border-bottom: 1px solid var(--line); background: var(--bg-raise); }
+.pv-brand { font-family: var(--mono); font-size: 11.5px; font-weight: 600; letter-spacing: .1em; color: var(--text-muted); display: flex; align-items: center; gap: 9px; }
+.pv-brand .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-1); box-shadow: 0 0 12px var(--accent-1); }
+.pv-count { font-family: var(--mono); font-size: 15px; font-weight: 600; letter-spacing: .1em; }
+.pv-spacer { flex: 1 1 auto; }
+.pv-plan { font-family: var(--mono); font-size: 11.5px; letter-spacing: .08em; color: var(--text-muted); white-space: nowrap; }
+.pv-timer { font-family: var(--mono); font-size: 21px; font-weight: 600; color: var(--accent-2); background: none; border: 1px solid var(--line); border-radius: 10px; padding: 4px 15px; cursor: pointer; }
+.pv-timer:hover { border-color: var(--accent-2); }
+.pv-timer.paused { opacity: .55; border-style: dashed; }
+/* 페이싱: 노트의 '소요 시간' 누적 대비 경과. 값은 cumPlan(i) 기준, 색은 구간 판정 */
+.pv-pace { font-family: var(--mono); font-size: 13.5px; font-weight: 700; min-width: 64px; text-align: right; color: var(--text-secondary); }
+.pv-pace.ahead { color: var(--ok); }
+.pv-pace.late { color: var(--bad); }
+.pv-plan.off, .pv-pace.off { display: none; }   /* 노트에 소요 시간이 하나도 없으면 감춘다 */
+.pv-bar { flex: none; height: 3px; background: var(--line-soft); }
+.pv-bar i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-1), var(--accent-2)); transition: width .3s ease; }
+.pv-main { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; width: min(1080px, 100%); margin: 0 auto; padding: 20px 30px 0; }
+.pv-kicker { font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--accent-1); min-height: 16px; }
+.pv-title { font-size: clamp(19px, 3.6vh, 27px); font-weight: 800; letter-spacing: -0.02em; margin: 4px 0 12px; }
+.pv-notes { flex: 1 1 auto; min-height: 0; overflow-y: auto; font-size: 18px; line-height: 1.8; padding-right: 8px; }
+.pv-notes h4 { font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--accent-1); margin: 14px 0 5px; }
+.pv-notes h4:first-child { margin-top: 0; }
+.pv-notes ul { padding-left: 22px; }
+.pv-notes b, .pv-notes strong { color: var(--accent-2); }
+.pv-next { flex: none; margin: 16px 0 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg-card); padding: 12px 18px; }
+.pv-next-label { font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: .2em; color: var(--text-muted); text-transform: uppercase; }
+.pv-next-title { font-size: 15.5px; font-weight: 700; margin-top: 3px; }
+.pv-foot { flex: none; display: flex; align-items: center; gap: 14px; padding: 9px 26px; border-top: 1px solid var(--line-soft); font-family: var(--mono); font-size: 10.5px; color: var(--text-muted); }
+.pv-link.lost { color: var(--bad); }
+.pv-keys { margin-left: auto; }
+@media (max-width: 620px) { .pv-brand { display: none; } }   /* 좁은 별창에서 상단 줄바꿈 방지 */
+  </style>
+</head>
+<body>
+  <div class="hud"><div class="bar" id="hudBar"></div><div class="meta" id="hudMeta"></div></div>
+  <div class="deck">
+    <section class="slide slide--title" data-name="s1" data-part="1부 회귀">
+      <div class="slide__inner"><span class="label">회귀 fixture</span><h1>발표자 창 회귀 fixture</h1></div>
+      <aside class="slide-notes" hidden>
+        <h4>요지</h4><p>발표자 창이 대본을 읽는지 확인한다.</p>
+        <h4>소요 시간</h4><p>예상 1분 00초</p>
+      </aside>
+    </section>
+    <section class="slide slide--content" data-name="s2" data-part="1부 회귀">
+      <div class="slide__inner"><span class="label">두 번째</span><h2>동기화 대상 슬라이드</h2></div>
+      <aside class="slide-notes" hidden>
+        <h4>요지</h4><p>이 노트가 발표자 창에 떠야 한다.</p>
+        <h4>소요 시간</h4><p>예상 1분 30초</p>
+      </aside>
+    </section>
+    <section class="slide slide--content" data-name="s3" data-part="2부 회귀">
+      <div class="slide__inner"><span class="label">세 번째</span><h2>페이싱 계산 대상</h2></div>
+      <aside class="slide-notes" hidden>
+        <h4>요지</h4><p>계획 시간이 누적되는지 본다.</p>
+        <h4>소요 시간</h4><p>예상 45초</p>
+      </aside>
+    </section>
+    <section class="slide slide--closing" data-name="s4" data-part="2부 회귀">
+      <div class="slide__inner"><span class="label">마지막</span><h2>동기화 확인 슬라이드</h2></div>
+      <aside class="slide-notes" hidden>
+        <h4>요지</h4><p>인덱스 3으로 동기화되는 대상이다.</p>
+        <h4>소요 시간</h4><p>예상 2분</p>
+      </aside>
+    </section>
+  </div>
+<div class="presenter-view" aria-hidden="true">
+  <div class="pv-top">
+    <span class="pv-brand"><span class="dot"></span>발표자 보기</span>
+    <span class="pv-count" id="pvCount">01 / 01</span>
+    <span class="pv-spacer"></span>
+    <span class="pv-plan" id="pvPlan"></span>
+    <button class="pv-timer" id="pvTimer" title="클릭 또는 T: 리셋 · S: 정지·재개">00:00</button>
+    <span class="pv-pace" id="pvPace"></span>
+  </div>
+  <div class="pv-bar"><i id="pvBar"></i></div>
+  <div class="pv-main">
+    <div class="pv-kicker" id="pvKicker"></div>
+    <div class="pv-title" id="pvTitle"></div>
+    <div class="pv-notes" id="pvNotes"></div>
+    <div class="pv-next">
+      <div class="pv-next-label">다음 슬라이드</div>
+      <div class="pv-next-title" id="pvNextTitle"></div>
+    </div>
+  </div>
+  <div class="pv-foot">
+    <span class="pv-link lost" id="pvLink">연결 대기…</span>
+    <span class="pv-keys">← → 이동 · ↑ ↓ 노트 · T 리셋 · S 정지 · +/- 글자크기</span>
+  </div>
+</div>
+  <script>
+/* ═══ deck 전환 엔진 ═══
+   .on 단일 클래스로 슬라이드를 교차 전환. gen 세대 토큰으로 잔여 타이머 무효화.
+   페이지 총수는 slides.length로 자동 계산(하드코딩 금지). window.__deckGo(i)로 외부 점프. */
+(function () {
+  'use strict';
+  if (document.documentElement.classList.contains('presenter')) return; /* 발표자 창은 덱을 그리지 않음 */
+
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var cur = -1, gen = 0, timers = [];
+  function later(fn, ms) { var t = setTimeout(fn, ms); timers.push(t); return t; }
+  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  window.__deckLater = later;                 /* feature 모듈이 타이머를 공유 */
+  window.__deckGen = function () { return gen; };
+
+  var bar = document.getElementById('hudBar');
+  var meta = document.getElementById('hudMeta');
+
+  function go(i) {
+    if (i < 0 || i >= slides.length || i === cur) return;
+    gen++; clearTimers();
+    if (cur >= 0) slides[cur].classList.remove('on');
+    cur = i;
+    var sl = slides[cur];
+    sl.classList.add('on');
+    var myGen = gen;
+    /* 시퀀서 모듈이 있으면 [data-seq] 스테이지 가동 */
+    if (window.__runStage) {
+      Array.prototype.forEach.call(sl.querySelectorAll('[data-seq]'), function (st) { window.__runStage(st, myGen); });
+    }
+    if (bar)  bar.style.width = ((cur + 1) / slides.length * 100) + '%';
+    if (meta) meta.textContent = pad(cur + 1) + ' / ' + pad(slides.length);
+    if (history.replaceState) history.replaceState(null, '', '#' + (cur + 1));
+    if (window.__deckSync) window.__deckSync(cur);   /* 발표자 창 동기화 */
+    document.dispatchEvent(new CustomEvent('deck:change', { detail: { index: cur } }));
+  }
+  function next() { go(Math.min(cur + 1, slides.length - 1)); }
+  function prev() { go(Math.max(cur - 1, 0)); }
+
+  window.__deckGo = go;
+  window.__deckNext = next;
+  window.__deckPrev = prev;
+  window.__deckSlides = slides;
+  window.__deckCur = function () { return cur; };
+
+  /* 시작: #n 딥링크 → 더블 rAF 후 진입 (첫 페인트 후여야 드로잉 transition이 발화) */
+  var h = parseInt((location.hash || '').replace('#', ''), 10);
+  var start = isNaN(h) ? 0 : Math.min(Math.max(h - 1, 0), slides.length - 1);
+  requestAnimationFrame(function () { requestAnimationFrame(function () { go(start); }); });
+})();
+  </script>
+  <script>
+/* ═══ 발표자 보기 ═══
+   메인 덱: P 키 또는 노트 버튼(N)으로 ?presenter 별창을 열고 postMessage로 현재 인덱스를 push.
+   발표자 창: aside.slide-notes를 대본으로 렌더 + 타이머·페이싱 + 다음 슬라이드. 방향키는 opener로 되돌림.
+   연결 유지: 별창이 2초마다 hello를 쏘고 덱이 sync로 답한다 — 덱을 새로고침해도 스스로 다시 붙는다.
+                (덱은 새로고침되면 별창 참조를 잃는다. 복구를 시작할 수 있는 쪽은 별창뿐이다.)
+   file:// origin 불투명 → targetOrigin '*' 고정. */
+(function () {
+  var isPresenter = document.documentElement.classList.contains('presenter');
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  /* 덱 파일명으로 창 이름·저장 키를 분리 — 덱 두 개를 열어도 서로의 발표자 창을 뺏지 않는다 */
+  var deckId = (location.pathname.split('/').pop() || 'deck').replace(/[^\w.-]/g, '') || 'deck';
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function clock(sec) { var s = Math.max(0, Math.round(sec)); return pad(Math.floor(s / 60)) + ':' + pad(s % 60); }
+  function titleOf(i) {
+    var t = slides[i].querySelector('h1, h2, .deck-title, .sl-title');
+    if (!t) return slides[i].dataset.name || ('슬라이드 ' + (i + 1));
+    var c = t.cloneNode(true);
+    Array.prototype.forEach.call(c.querySelectorAll('br'), function (b) { b.parentNode.replaceChild(document.createTextNode(' '), b); });
+    return c.textContent.replace(/\s+/g, ' ').trim();
+  }
+  function kickerOf(i) { var k = slides[i].querySelector('.kicker, .label'); return k ? k.textContent.replace(/\s+/g, ' ').trim() : ''; }
+  function notesOf(i) { var n = slides[i].querySelector('.slide-notes'); return n ? n.innerHTML : '<p style="color:var(--text-muted)">이 슬라이드의 노트 없음</p>'; }
+
+  if (!isPresenter) {
+    /* ── 메인 덱 브리지 ── */
+    var win = null, kick = null;
+    window.__deckSync = function (idx) {
+      if (!win || win.closed) return;
+      try { win.postMessage({ type: 'yowu-deck-sync', index: idx }, '*'); } catch (e) {}
+    };
+    window.__presenterOpen = function () { return !!(win && !win.closed); };
+    window.__closePresenter = function () { if (win && !win.closed) { try { win.close(); } catch (e) {} } win = null; };
+    window.__openPresenter = function () {   /* 성공 true · 팝업 차단 false — 호출자(notes-js)가 폴백을 정한다 */
+      if (win && !win.closed) { try { win.focus(); } catch (e) {} window.__deckSync(window.__deckCur()); return true; }
+      var base = location.href.split('#')[0];
+      var w = Math.min(1180, Math.round((screen.availWidth || 1440) * .62));
+      var h = Math.min(820, Math.round((screen.availHeight || 900) * .82));
+      var x = Math.max(0, (screen.availWidth || 1440) - w - 40);
+      var feat = 'width=' + w + ',height=' + h + ',left=' + x + ',top=60,menubar=no,toolbar=no,location=no,status=no';
+      win = window.open(base + (base.indexOf('?') > -1 ? '&' : '?') + 'presenter', 'yowu-presenter-' + deckId, feat);
+      if (!win) return false;
+      var tries = 0;
+      kick = setInterval(function () {        /* 별창이 뜨는 동안의 초기 응답성. 이후는 별창의 hello가 맡는다 */
+        if (++tries > 40 || !win || win.closed) { clearInterval(kick); return; }
+        window.__deckSync(window.__deckCur());
+      }, 250);
+      return true;
+    };
+    window.addEventListener('message', function (e) {
+      var d = e.data || {};
+      if (d.type === 'yowu-presenter-hello') { win = e.source; window.__deckSync(window.__deckCur()); }
+      else if (d.type === 'yowu-deck-nav') {
+        win = e.source || win;
+        if (d.action === 'next') window.__deckNext();
+        else if (d.action === 'prev') window.__deckPrev();
+        else if (d.action === 'home') window.__deckGo(0);
+        else if (d.action === 'end') window.__deckGo(slides.length - 1);
+      }
+    });
+    return;
+  }
+
+  /* ── 발표자 창 부트 ── */
+  document.title = '발표자 보기';
+  var pvRoot = document.querySelector('.presenter-view');
+  if (pvRoot) pvRoot.removeAttribute('aria-hidden');   /* 마크업의 aria-hidden은 메인 덱에서 숨길 때만 유효 */
+  var elCount = document.getElementById('pvCount'), elBar = document.getElementById('pvBar'),
+      elKicker = document.getElementById('pvKicker'), elTitle = document.getElementById('pvTitle'),
+      elNotes = document.getElementById('pvNotes'), elNextTitle = document.getElementById('pvNextTitle'),
+      elTimer = document.getElementById('pvTimer'), elLink = document.getElementById('pvLink'),
+      elPlan = document.getElementById('pvPlan'), elPace = document.getElementById('pvPace');
+
+  /* 계획 시간: 노트의 '소요 시간' 항목을 초로 환산. "예상 1분 20초 + Q&A" 같은 꼬리표는 무시한다 */
+  function planOf(i) {
+    var n = slides[i].querySelector('.slide-notes'); if (!n) return 0;
+    var hs = n.querySelectorAll('h4');
+    for (var k = 0; k < hs.length; k++) {
+      if (!/소요\s*시간|duration/i.test(hs[k].textContent)) continue;
+      var p = hs[k].nextElementSibling; if (!p) return 0;
+      var t = p.textContent;
+      var m = /(\d+)\s*분/.exec(t), s = /(\d+)\s*초/.exec(t);
+      if (!m && !s) { var only = /(\d+)/.exec(t); return only ? +only[1] * 60 : 0; }   /* 단위 없는 숫자는 분으로 읽는다 */
+      return (m ? +m[1] * 60 : 0) + (s ? +s[1] : 0);
+    }
+    return 0;
+  }
+  var CUM = [], TOTAL = 0;
+  for (var pi = 0; pi < slides.length; pi++) { TOTAL += planOf(pi); CUM[pi] = TOTAL; }
+  function cumPlan(i) { return i < 0 ? 0 : (CUM[i] || 0); }
+  if (TOTAL > 0) { elPlan.textContent = '총 ' + clock(TOTAL); }
+  else { elPlan.classList.add('off'); elPace.classList.add('off'); }
+
+  /* 타이머: 누적(acc) + 마지막 재개 시각(t0). 정지·재개를 지원하려면 시작 시각 하나로는 부족하다 */
+  var TKEY = 'yowu-deck-pv-timer-' + deckId;
+  var tm = { acc: 0, t0: null, paused: true };
+  try {
+    var st = JSON.parse(localStorage.getItem(TKEY) || 'null');
+    if (st && Date.now() - (st.savedAt || 0) < 216e5) {   /* 6시간 지난 기록은 폐기 — 어제 발표가 되살아나지 않게 */
+      tm.acc = +st.acc || 0; tm.t0 = st.t0 || null; tm.paused = !!st.paused;
+      if (!tm.paused && !tm.t0) tm.paused = true;
+    }
+  } catch (e) {}
+  function saveTimer() {
+    try { localStorage.setItem(TKEY, JSON.stringify({ acc: tm.acc, t0: tm.t0, paused: tm.paused, savedAt: Date.now() })); } catch (e) {}
+  }
+  function elapsed() { return tm.paused ? tm.acc : tm.acc + (Date.now() - tm.t0) / 1000; }
+  function startTimer() { if (tm.paused) { tm.t0 = Date.now(); tm.paused = false; saveTimer(); } }
+  function pauseTimer() { if (!tm.paused) { tm.acc = elapsed(); tm.paused = true; saveTimer(); } }
+  function resetTimer() { tm.acc = 0; tm.t0 = Date.now(); tm.paused = false; saveTimer(); tick(); }
+
+  var curIdx = -1;
+  function paceTick() {
+    if (TOTAL <= 0) return;
+    var e = elapsed(), hi = cumPlan(curIdx), lo = cumPlan(curIdx - 1), d = e - hi;
+    elPace.textContent = (d < 0 ? '−' : '+') + clock(Math.abs(d));
+    /* 정상 구간은 [cumPlan(i-1), cumPlan(i)+30] — 계획만큼 머무는 것은 늦은 게 아니다 */
+    elPace.className = 'pv-pace' + (e < lo ? ' ahead' : (e > hi + 30 ? ' late' : ''));
+  }
+  function tick() {
+    elTimer.textContent = clock(elapsed());
+    elTimer.classList.toggle('paused', tm.paused);
+    paceTick();
+  }
+
+  function render(i) {
+    if (typeof i !== 'number' || i < 0 || i >= slides.length) return;
+    if (i === curIdx) { paceTick(); return; }   /* 같은 슬라이드 재수신 — 다시 그리지 않는다(노트 스크롤 위치 보존) */
+    curIdx = i;
+    elCount.textContent = pad(i + 1) + ' / ' + pad(slides.length);
+    elBar.style.width = ((i + 1) / slides.length * 100) + '%';
+    elKicker.textContent = kickerOf(i);
+    elTitle.textContent = titleOf(i);
+    elNotes.innerHTML = notesOf(i);
+    elNotes.scrollTop = 0;
+    elNextTitle.textContent = (i + 1 < slides.length) ? titleOf(i + 1) : '(마지막 슬라이드)';
+    paceTick();
+  }
+
+  var fs = 18; try { fs = +localStorage.getItem('yowu-deck-pv-fs') || 18; } catch (e) {}   /* 글자크기는 덱 공통 */
+  function setFs(v) { fs = Math.min(32, Math.max(13, v)); elNotes.style.fontSize = fs + 'px'; try { localStorage.setItem('yowu-deck-pv-fs', String(fs)); } catch (e) {} }
+  setFs(fs);
+
+  var lastSync = 0, deckWin = window.opener;
+  function link(text, lost) { elLink.textContent = text; elLink.classList.toggle('lost', !!lost); }
+  function hello() { if (deckWin && !deckWin.closed) { try { deckWin.postMessage({ type: 'yowu-presenter-hello' }, '*'); } catch (e) {} } }
+  function nav(action) { if (deckWin && !deckWin.closed) { try { deckWin.postMessage({ type: 'yowu-deck-nav', action: action }, '*'); } catch (e) {} } }
+
+  window.addEventListener('message', function (e) {
+    var d = e.data || {};
+    if (d.type !== 'yowu-deck-sync') return;
+    deckWin = e.source || deckWin;
+    lastSync = Date.now();
+    if (tm.paused && tm.acc === 0 && tm.t0 === null) startTimer();   /* 첫 연결에 타이머 시작 (복원된 기록은 건드리지 않는다) */
+    link('메인 덱과 연결됨', false);
+    render(d.index);
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.isComposing) return;
+    var k = e.key;
+    if (k === 'ArrowRight' || k === ' ' || k === 'PageDown') { e.preventDefault(); nav('next'); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); nav('prev'); }
+    else if (k === 'Home') { e.preventDefault(); nav('home'); }
+    else if (k === 'End') { e.preventDefault(); nav('end'); }
+    else if (k === 'ArrowDown') { e.preventDefault(); elNotes.scrollTop += 80; }
+    else if (k === 'ArrowUp') { e.preventDefault(); elNotes.scrollTop -= 80; }
+    else if (k === 't' || k === 'T') resetTimer();
+    else if (k === 's' || k === 'S') { if (tm.paused) startTimer(); else pauseTimer(); tick(); }
+    else if (k === '+' || k === '=') setFs(fs + 1);
+    else if (k === '-' || k === '_') setFs(fs - 1);
+  });
+  elTimer.addEventListener('click', resetTimer);
+
+  setInterval(tick, 1000);
+  setInterval(function () {                    /* 하트비트 — 덱이 살아 있으면 2초마다 다시 붙는다 */
+    if (!deckWin) { link('단독으로 열렸습니다 — 메인 덱에서 P 키로 여세요', true); return; }
+    if (deckWin.closed) { link('메인 덱 창이 닫혔습니다 — 덱에서 P 키로 다시 여세요', true); return; }
+    hello();
+    if (lastSync === 0) { link('연결 대기…', true); return; }   /* 첫 연결 전과 끊긴 뒤는 다른 상태다 */
+    if (Date.now() - lastSync > 5000) link('재연결 중…', true);
+  }, 2000);
+
+  render(0);                                   /* 첫 sync 전에도 자기 슬라이드를 안다 */
+  tick();
+  if (!deckWin) link('단독으로 열렸습니다 — 메인 덱에서 P 키로 여세요', true);
+  else hello();
+})();
+  </script>
+</body>
+</html>
