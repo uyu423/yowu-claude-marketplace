@@ -17,7 +17,7 @@ HTML **deck(페이지 넘김) 엔진** 기반 인터랙티브 발표자료 생�
 - **본문 컴포넌트**: 목록(`.blist`)·강조 블록(위험/유지/원인)·구간 표지·수평 타임라인·체크 격자·전환 행·키값·결론 문장을 정본 모듈로 제공. 악센트 3색에 **의미를 배정**(실측/인용/위험)해 한 덱 안에서 일관되게 쓴다
 - **근거 스탬프·장 전환**: 수치가 있는 슬라이드는 출처(`.src`)를 화면에 달고, 출처가 없으면 `미확인`으로 밝힌다. 구간이 바뀌는 자리에는 다음 장의 질문으로 넘기는 한 줄(`.bridge`)을 둔다
 - **자율 적용(Auto-Apply)**: 콘텐츠 신호를 보고 AI가 위 인터랙션 기능을 **스스로 판단해 적용** (별도 지시 불필요, Step 0.5)
-- **멀티 출력**: 인쇄/PDF 선형화(`@media print`), 딥링크 공유, 전체화면(`F`)
+- **멀티 출력**: 인쇄/PDF 선형화(`@media print`), 배포용 내보내기(단일 HTML·16:9 PDF, `export-slides.mjs`), 딥링크 공유, 전체화면(`F`)
 - **테마 선택**: Dark(기술) / Light(비즈니스), 콘텐츠 성격 자동 권장
 - **디자인 소스**: frontend-design(화려) / 자체 디자인시스템(심플) / 사용자 커스텀
 - **콘텐츠 품질 가드**: 환각 금지, 결론형 제목, 키워드 본문, 금지 문구 필터, 자기 검증 루브릭(Strict 모드)
@@ -110,6 +110,9 @@ scripts/
   validate-slides.mjs             # 의존성 없는 Chrome DevTools 기반 렌더 검증기
   test-validate-slides.mjs        # 검증기 정상/실패 fixture 회귀 테스트
   test-presenter-sync.mjs         # 덱·발표자 창 두 창 통합 테스트 (동기화·재연결·타이머)
+  export-slides.mjs               # 배포용 내보내기 (단일 HTML · 16:9 PDF)
+  test-export-slides.mjs          # 내보내기 회귀 테스트 (자산 인라인·격리 렌더·면 수·비율)
+  lib/chrome.mjs                  # Chrome 탐색·실행·CDP 클라이언트 (검증기·내보내기 공용)
   fixtures/                       # 긴 SVG·overflow·발표자 브리지·컴포넌트·노트 회귀 fixture
 ```
 
@@ -126,3 +129,26 @@ node plugins/yowu-slide-plugin/scripts/test-presenter-sync.mjs path/to/deck.html
 검증기는 `1920×1080`, `1280×720`, `390×844`에서 모든 슬라이드를 열어 본 뒤 실패한 슬라이드와 요소를 출력한다. 덱에 발표자 모듈이 있으면 `?presenter`로 한 번 더 열어 대본 렌더와 인덱스 동기화를 확인한다.
 
 `test-presenter-sync.mjs`는 덱과 발표자 창을 **실제로 두 개 띄워** 창 사이 왕복을 검사한다. 덱을 새로고침한 뒤에도 별창이 스스로 다시 붙는지(하트비트), 노트 스크롤이 유지되는지, 타이머 정지·재개가 되는지를 본다 — 한 창만 여는 검사로는 잡히지 않는 회귀다. 인자를 생략하면 fixture와 다크 예제를 검사한다. `SLIDE_CHROME=/path/to/chrome`으로 브라우저 경로를 지정할 수 있다.
+
+## 내보내기
+
+덱을 메일이나 메신저로 보낼 때 쓴다. 이미지가 붙은 덱은 `assets/` 폴더를 같이 옮기지 않으면 그림이 깨진다. 단일 HTML은 파일 하나만 보내도 열린다.
+
+```bash
+node plugins/yowu-slide-plugin/scripts/export-slides.mjs path/to/deck.html                 # 둘 다
+node plugins/yowu-slide-plugin/scripts/export-slides.mjs path/to/deck.html --standalone    # 단일 HTML만
+node plugins/yowu-slide-plugin/scripts/export-slides.mjs path/to/deck.html --pdf           # PDF만
+node plugins/yowu-slide-plugin/scripts/test-export-slides.mjs
+```
+
+| 산출물 | 내용 | 요구 사항 |
+|---|---|---|
+| `{deck}.standalone.html` | 로컬 자산을 data URI로 넣는다. 대상은 태그의 `src`·`srcset`·`poster`·`style` 속성, `<link>`·`<image>`의 `href`, `<style>` 블록 안 `url()`이다. 페이지 넘김·발표자 보기·라이트박스가 그대로 동작한다 | 없음 (Chrome 불필요) |
+| `{deck}.pdf` | 슬라이드 한 장이 한 면(1600×900px, 16:9)이다. 노트는 뺀다 | Node.js 22+, Chrome |
+
+- **옵션**: `--with-notes`(PDF에 발표자 노트 포함), `--out <dir>`(출력 위치, 기본은 덱과 같은 폴더), `--force`(단일 HTML 20MB 상한 무시). 8MB를 넘으면 메일 첨부 한도 경고를 낸다
+- **그대로 두는 것**: `https://` CDN(폰트·highlight.js 등), 이미 `data:`인 자산, 코드 블록 속 예시 마크업, JS가 문자열로 조립하는 경로. 없는 파일은 경고하고 원래 경로를 남긴다. 외부 CSS 파일 안의 상대 `url()`은 따라가지 않는다
+- **PDF 실패는 단일 HTML을 막지 않는다.** Chrome이 없어도 단일 HTML은 만들어지고 종료 코드만 1이 된다
+- **PDF는 덱 토큰으로 찍는다.** 정본 인쇄 규칙의 흰 바탕을 `var(--bg)`로 되돌린다. 그래서 다크 덱도 흰 바탕에 흰 글씨가 되지 않는다
+- **용지를 덱 크기로 넘긴다.** 기본 Letter 용지(폭 816px)로 찍으면 인쇄 미디어 쿼리가 816px로 평가된다. 그러면 모바일 폴백(`max-width: 820px`)이 잡혀 다열 배치가 1열로 접힌다
+- **원본은 건드리지 않는다.** 인쇄 CSS는 덱 옆 임시본(`.{deck}.print.html`)에 얹고 끝나면 지운다. PDF 면 수가 슬라이드 수와 다르면 실패로 보고한다(정본 `@media print`가 빠진 덱)
