@@ -1,0 +1,15 @@
+{
+    "description": "한국어 글쓰기 상시 규칙 카드를 세션 컨텍스트에 넣는다. YOWU_WRITE_ALWAYS_ON=0이면 넣지 않는다.",
+    "hooks": {
+        "SessionStart": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "[ \"$YOWU_WRITE_ALWAYS_ON\" = 0 ] || cat \"${CLAUDE_PLUGIN_ROOT}/references/always-on.md\""
+                    }
+                ]
+            }
+        ]
+    }
+}
